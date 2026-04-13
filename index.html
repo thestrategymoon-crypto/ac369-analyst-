@@ -341,20 +341,33 @@ async function analyze(sym) {
   show('loadingArea');
 
   try {
-    // 1. Binance klines
-    const klRes = await fetch(`https://api.binance.com/api/v3/klines?symbol=${ticker}USDT&interval=1d&limit=90`);
+    // 1. Binance Daily klines — 300 candle untuk EMA200 akurat
+    const klRes = await fetch(`https://api.binance.com/api/v3/klines?symbol=${ticker}USDT&interval=1d&limit=300`);
     if(!klRes.ok) throw new Error(`"${ticker}" tidak ditemukan di Binance. Coba ticker lain seperti BTC, ETH, SOL.`);
     const klines = await klRes.json();
-    if(!Array.isArray(klines)||klines.length<30) throw new Error("Data candle tidak cukup.");
+    if(!Array.isArray(klines)||klines.length<50) throw new Error("Data candle tidak cukup.");
 
     const opens=klines.map(k=>+k[1]),highs=klines.map(k=>+k[2]),lows=klines.map(k=>+k[3]),closes=klines.map(k=>+k[4]),volumes=klines.map(k=>+k[5]);
     const price=closes[closes.length-1];
 
-    // 2. Binance 24h
+    // 2. Binance Weekly klines — 60 candle weekly proper
+    let wCloses=[],wHighs=[],wLows=[];
+    try {
+      const wRes=await fetch(`https://api.binance.com/api/v3/klines?symbol=${ticker}USDT&interval=1w&limit=60`);
+      if(wRes.ok){
+        const wk=await wRes.json();
+        wCloses=wk.map(k=>+k[4]);
+        wHighs=wk.map(k=>+k[2]);
+        wLows=wk.map(k=>+k[3]);
+      }
+    }catch(_){}
+    if(wCloses.length<10){ wCloses=closes.filter((_,i)=>i%7===0); wHighs=highs.filter((_,i)=>i%7===0); wLows=lows.filter((_,i)=>i%7===0); }
+
+    // 3. Binance 24h ticker
     const t24=await (await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${ticker}USDT`)).json();
     const change24h=+t24.priceChangePercent,high24h=+t24.highPrice,low24h=+t24.lowPrice,vol24h=+t24.quoteVolume;
 
-    // 3. CoinGecko
+    // 4. CoinGecko
     let mcap=null,change7d=null,coinName=ticker;
     const cgId=COIN_IDS[ticker];
     if(cgId){
@@ -366,45 +379,165 @@ async function analyze(sym) {
       }catch(_){}
     }
 
-    // 4. TA calculations
-    const wCloses=closes.filter((_,i)=>i%7===0);
-    const wHighs=highs.filter((_,i)=>i%7===0);
-    const wLows=lows.filter((_,i)=>i%7===0);
+    // 5. TA calculations — semua pakai 300 candle
+    const last=arr=>arr.filter(v=>v!=null).slice(-1)[0];
 
-    const last=arr=>arr[arr.length-1];
-    const ma20=last(sma(closes,20)),ma50=last(sma(closes,50)),ma200=last(sma(closes,Math.min(200,closes.length)));
-    const ema50=last(ema(closes,50)),ema200=last(ema(closes,Math.min(200,closes.length)));
-    const rsiD=rsi(closes,14),rsiW=rsi(wCloses,14);
+    // MA/EMA — now properly calculated with full 300 candles
+    const ma20=last(sma(closes,20));
+    const ma50=last(sma(closes,50));
+    const ma200=last(sma(closes,200));  // full 200-period
+    const ema12=last(ema(closes,12));
+    const ema26=last(ema(closes,26));
+    const ema50=last(ema(closes,50));
+    const ema200=last(ema(closes,200)); // full 200-period EMA
+
+    // Weekly MA
+    const wMa20=last(sma(wCloses,20));
+    const wEma50=last(ema(wCloses,50));
+
+    // RSI Daily + Weekly
+    const rsiD=rsi(closes.slice(-50),14);
+    const rsiW=wCloses.length>=15?rsi(wCloses.slice(-30),14):null;
+
+    // Stochastic RSI (14,3,3)
+    function stochRSI(closes,rsiLen=14,stochLen=14,kSmooth=3,dSmooth=3){
+      const rsiArr=[];
+      for(let i=rsiLen;i<closes.length;i++) rsiArr.push(rsi(closes.slice(i-rsiLen,i+1),rsiLen));
+      const stochArr=[];
+      for(let i=stochLen-1;i<rsiArr.length;i++){
+        const sl=rsiArr.slice(i-stochLen+1,i+1);
+        const mn=Math.min(...sl),mx=Math.max(...sl);
+        stochArr.push(mx===mn?50:(rsiArr[i]-mn)/(mx-mn)*100);
+      }
+      const kArr=sma(stochArr,kSmooth).filter(v=>v!=null);
+      const dArr=sma(kArr,dSmooth).filter(v=>v!=null);
+      return {k:kArr[kArr.length-1],d:dArr[dArr.length-1]};
+    }
+    const stoch=stochRSI(closes);
+
+    // ATR (14)
+    function calcATR(highs,lows,closes,p=14){
+      const tr=highs.map((h,i)=>i===0?h-lows[i]:Math.max(h-lows[i],Math.abs(h-closes[i-1]),Math.abs(lows[i]-closes[i-1])));
+      return last(sma(tr,p));
+    }
+    const atr=calcATR(highs,lows,closes,14);
+    const atrPct=(atr/price*100).toFixed(2);
+
+    // Bollinger Bands (20,2)
+    function bollinger(closes,p=20,mult=2){
+      const ma=sma(closes,p);
+      const bands=closes.map((_,i)=>{
+        if(i<p-1) return null;
+        const sl=closes.slice(i-p+1,i+1),m=ma[i];
+        const std=Math.sqrt(sl.reduce((a,v)=>a+(v-m)**2,0)/p);
+        return {upper:m+mult*std,middle:m,lower:m-mult*std};
+      }).filter(v=>v!=null);
+      return bands[bands.length-1];
+    }
+    const bb=bollinger(closes);
+    const bbPct=bb?((price-bb.lower)/(bb.upper-bb.lower)*100).toFixed(1):null;
+    const bbState=bb?(price>bb.upper?"Di atas Upper Band — overbought":price<bb.lower?"Di bawah Lower Band — oversold":bbPct>70?"Mendekati Upper Band":bbPct<30?"Mendekati Lower Band":"Di dalam band — netral"):"—";
+
+    // MACD
     const macdD=macd(closes);
+    let macdL="—";
+    if(macdD.hist!=null){
+      if(macdD.hist>0&&macdD.prevHist<=0) macdL="Bullish crossover baru ✓";
+      else if(macdD.hist>0) macdL="Histogram positif ("+macdD.hist.toFixed(4)+")";
+      else if(macdD.hist<0&&macdD.prevHist>=0) macdL="Bearish crossover baru ✗";
+      else macdL="Histogram negatif ("+macdD.hist.toFixed(4)+")";
+    }
+
+    // S/R dari 300 candle
     const {supports,resistances}=findSR(highs,lows,price);
     const vol=volAnalysis(volumes);
     const {hhhl,bos}=structure(closes,highs,lows);
 
-    const abM20=price>ma20,abM50=price>ma50,abM200=price>(ma200||price*.9);
-    const abE50=price>ema50,abE200=price>(ema200||price*.88);
-    const gc=ema50>(ema200||0);
-    const trend=abM50&&abM200?"BULLISH":!abM50&&!abM200?"BEARISH":"SIDEWAYS";
+    // MA states
+    const abM20=price>ma20,abM50=price>ma50,abM200=ma200?price>ma200:null;
+    const abE50=price>ema50,abE200=ema200?price>ema200:null;
+    const gc=ema200?ema50>ema200:null;
+    const trend=abM50&&abM200?"BULLISH":(!abM50&&abM200===false)?"BEARISH":"SIDEWAYS";
     const trendColor=trend==="BULLISH"?"#00ff87":trend==="BEARISH"?"#ff4560":"#f5c518";
 
     const rsiDL=rsiD>70?"Overbought — waspadai pullback":rsiD<30?"Oversold — potensi bounce kuat":rsiD<45?"Zona lemah — tekanan turun":"Netral — belum ekstrem";
-    let macdL="—";
-    if(macdD.hist!=null){
-      if(macdD.hist>0&&macdD.prevHist<=0) macdL="Bullish crossover baru ✓";
-      else if(macdD.hist>0) macdL=`Histogram positif`;
-      else if(macdD.hist<0&&macdD.prevHist>=0) macdL="Bearish crossover baru ✗";
-      else macdL="Histogram negatif";
-    }
 
-    const {sig,conf,reason}=signal({rsiD,rsiW:rsiW||50,macdD,price,ma20,ma50,ma200:ma200||price*.9,change24h});
+    // ── CONFLUENCE SCORING ENGINE (lebih akurat) ──
+    // Setiap faktor diberi bobot berbeda
+    const factors=[];
+    // RSI (bobot tinggi)
+    if(rsiD<30){factors.push({name:"RSI OS",val:2,bull:true});}
+    else if(rsiD<45){factors.push({name:"RSI lemah",val:1,bull:true});}
+    else if(rsiD>75){factors.push({name:"RSI OB",val:2,bull:false});}
+    else if(rsiD>65){factors.push({name:"RSI tinggi",val:1,bull:false});}
+    // RSI Weekly
+    if(rsiW){
+      if(rsiW<35){factors.push({name:"RSI-W OS",val:2,bull:true});}
+      else if(rsiW>70){factors.push({name:"RSI-W OB",val:2,bull:false});}
+    }
+    // Stochastic RSI
+    if(stoch.k&&stoch.d){
+      if(stoch.k<20&&stoch.d<20){factors.push({name:"StochRSI OS",val:1.5,bull:true});}
+      else if(stoch.k>80&&stoch.d>80){factors.push({name:"StochRSI OB",val:1.5,bull:false});}
+      if(stoch.k>stoch.d&&stoch.k<50){factors.push({name:"StochRSI Cross+",val:1,bull:true});}
+      if(stoch.k<stoch.d&&stoch.k>50){factors.push({name:"StochRSI Cross-",val:1,bull:false});}
+    }
+    // MA alignment (bobot tinggi)
+    if(abM20)factors.push({name:"Price>MA20",val:0.5,bull:true});
+    if(abM50)factors.push({name:"Price>MA50",val:1,bull:true});
+    if(abM200===true)factors.push({name:"Price>MA200",val:2,bull:true});
+    if(abM200===false)factors.push({name:"Price<MA200",val:2,bull:false});
+    if(gc===true)factors.push({name:"Golden Cross",val:2,bull:true});
+    if(gc===false)factors.push({name:"Death Cross",val:2,bull:false});
+    // MACD
+    if(macdD.hist>0&&macdD.prevHist<=0)factors.push({name:"MACD Crossover",val:1.5,bull:true});
+    else if(macdD.hist>0)factors.push({name:"MACD+",val:0.5,bull:true});
+    if(macdD.hist<0&&macdD.prevHist>=0)factors.push({name:"MACD Crossunder",val:1.5,bull:false});
+    else if(macdD.hist<0)factors.push({name:"MACD-",val:0.5,bull:false});
+    // Bollinger
+    if(bb){
+      if(price<bb.lower)factors.push({name:"BB Oversold",val:1,bull:true});
+      if(price>bb.upper)factors.push({name:"BB Overbought",val:1,bull:false});
+    }
+    // 24h change momentum
+    if(change24h>5)factors.push({name:"Momentum+",val:0.5,bull:true});
+    if(change24h<-5)factors.push({name:"Momentum-",val:0.5,bull:false});
+
+    const bullScore=factors.filter(f=>f.bull).reduce((a,f)=>a+f.val,0);
+    const bearScore=factors.filter(f=>!f.bull).reduce((a,f)=>a+f.val,0);
+    const totalMax=factors.reduce((a,f)=>a+f.val,0)||1;
+    const netScore=bullScore-bearScore;
+    const confluence=Math.round((Math.max(bullScore,bearScore)/totalMax)*100);
+    const conf=Math.min(9,Math.max(4,Math.round(Math.abs(netScore)*0.7+4)));
+
+    let sig,reason;
+    if(netScore>=3){
+      sig="BELI";
+      const top=factors.filter(f=>f.bull).sort((a,b)=>b.val-a.val).slice(0,3).map(f=>f.name).join(", ");
+      reason=`${top} — ${factors.filter(f=>f.bull).length} faktor bullish terkonfirmasi. RSI ${Math.round(rsiD)} dengan struktur MA mendukung. Konfluensi ${confluence}%. Entry bertahap, SL disiplin.`;
+    } else if(netScore<=-3){
+      sig="JUAL";
+      const top=factors.filter(f=>!f.bull).sort((a,b)=>b.val-a.val).slice(0,3).map(f=>f.name).join(", ");
+      reason=`${top} — ${factors.filter(f=>!f.bull).length} faktor bearish aktif. Tekanan jual dominan, hindari long. Konfluensi ${confluence}%. Capital preservation prioritas.`;
+    } else {
+      sig="TAHAN";
+      reason=`Konfluensi mixed: ${factors.filter(f=>f.bull).length} bullish vs ${factors.filter(f=>!f.bull).length} bearish. RSI ${Math.round(rsiD)} netral. Tunggu konfirmasi arah sebelum entry — probabilitas belum cukup tinggi.`;
+    }
     const sc=SIGCFG[sig];
 
-    const slPrice=supports[0]?.price*0.985||price*0.93;
+    const slPrice=Math.min(supports[0]?.price*0.985,price*(1-atr*2/price))||price*0.93;
     const tp1=resistances[0]?.price||price*1.10;
     const tp2=resistances[1]?.price||price*1.20;
     const tp3=resistances[2]?.price||price*1.35;
-    const rr=((tp1-price)/(price-slPrice)).toFixed(2);
+    const rrRaw=(tp1-price)/(price-slPrice);
+    const rr=rrRaw>0?rrRaw.toFixed(2):"N/A";
     const sector=SECTORS[ticker]||"Crypto Asset";
     const now=new Date().toLocaleString("id-ID");
+
+    // Stoch labels
+    const stochK=stoch.k?Math.round(stoch.k):null;
+    const stochD=stoch.d?Math.round(stoch.d):null;
+    const stochState=stochK?(stochK<20?"Oversold zone":stochK>80?"Overbought zone":stochK>stochD?"K > D — bullish bias":"K < D — bearish bias"):"—";
 
     // ── RENDER ──
 
@@ -436,7 +569,15 @@ async function analyze(sym) {
         <div style="flex:1;min-width:140px">
           <div class="sig-label-sm" style="color:var(--dim)">Sinyal Alpha Crypto 369</div>
           <div class="sig-name" style="color:${sc.c}">${sig}</div>
-          <div class="sig-conf" style="color:${sc.c};opacity:.55">Keyakinan: ${conf}/10</div>
+          <div class="sig-conf" style="color:${sc.c};opacity:.7">Keyakinan: ${conf}/10</div>
+          <div style="margin-top:6px;display:flex;gap:12px">
+            <span style="font-size:9px;color:#00ff87">▲ Bull: ${factors.filter(f=>f.bull).length} faktor</span>
+            <span style="font-size:9px;color:#ff4560">▼ Bear: ${factors.filter(f=>!f.bull).length} faktor</span>
+          </div>
+          <div style="margin-top:6px;background:rgba(255,255,255,.04);border-radius:4px;height:4px;width:100%;overflow:hidden">
+            <div style="height:100%;width:${confluence}%;background:${sc.c};border-radius:4px;transition:width .5s"></div>
+          </div>
+          <div style="font-size:8px;color:var(--dim);margin-top:3px;letter-spacing:1px">KONFLUENSI ${confluence}%</div>
         </div>
         <div class="sig-reasoning">${reason}</div>
       </div>`;
@@ -453,9 +594,13 @@ async function analyze(sym) {
     document.getElementById('momentumCard').innerHTML=`
       <div class="section-head">Momentum & Indikator</div>
       ${row("RSI Daily",`${Math.round(rsiD)} — ${rsiD>70?"OB":rsiD<30?"OS":"Netral"}`,rsiD>70?"#ff4560":rsiD<30?"#00ff87":"#f5c518",true)}
-      ${row("RSI Weekly",rsiW?`${Math.round(rsiW)}`:"—","#c4ccd6",true)}
+      ${row("RSI Weekly",rsiW?`${Math.round(rsiW)}`:"—",rsiW>65?"#ff4560":rsiW<35?"#00ff87":"#c4ccd6",true)}
       ${row("RSI State",rsiDL,"#5a6a7a")}
+      ${row("Stoch RSI K/D",stochK?`${stochK} / ${stochD||"—"}`:  "—",stochK<20?"#00ff87":stochK>80?"#ff4560":"#f5c518",true)}
+      ${row("Stoch State",stochState,"#5a6a7a")}
       ${row("MACD Daily",macdL,"#5a6a7a")}
+      ${row("ATR(14)",`${fmt(atr)} (${atrPct}% volatilitas)` ,"#5a6a7a")}
+      ${row("Bollinger %B",bbPct?`${bbPct}% — ${bbState}`:"—","#5a6a7a")}
       ${row("Volume",vol,"#5a6a7a")}
       <div class="section-head" style="margin-top:14px">Struktur SMC</div>
       ${row("BOS/CHoCH",bos,"#c4ccd6")}
@@ -463,7 +608,7 @@ async function analyze(sym) {
 
     // MA
     document.getElementById('maCard').innerHTML=`
-      <div class="section-head">Moving Averages (Kalkulasi Real)</div>
+      <div class="section-head">Moving Averages (300 Candle · EMA200 Akurat)</div>
       <div class="ma-grid">
         ${maItem("MA 20 Daily",abM20,ma20)}
         ${maItem("MA 50 Daily",abM50,ma50)}
@@ -471,19 +616,22 @@ async function analyze(sym) {
         ${maItem("EMA 50",abE50,ema50)}
         ${maItem("EMA 200",abE200,ema200)}
       </div>
-      ${row("EMA Cross",gc?"Golden Cross EMA50/200 aktif ✓":"Death Cross EMA50/200 aktif ✗",gc?"#00ff87":"#ff4560")}`;
+      ${row("EMA Cross",gc===true?"Golden Cross EMA50/200 aktif ✓":gc===false?"Death Cross EMA50/200 aktif ✗":"EMA200 belum cukup data",gc===true?"#00ff87":gc===false?"#ff4560":"#f5c518")}
+      ${row("Weekly MA20",wMa20?fmt(wMa20):"—",wMa20&&price>wMa20?"#00ff87":"#ff4560",true)}
+      ${row("BB Upper/Lower",bb?`${fmt(bb.upper)} / ${fmt(bb.lower)}`:"—","#5a6a7a",true)}`;
 
     // Scenarios
     document.getElementById('scenarioGrid').innerHTML=`
       <div class="scenario-card" style="background:rgba(0,255,135,.04);border:1px solid rgba(0,255,135,.13)">
         <div class="scenario-head" style="color:#00ff87">▲ Skenario Bullish</div>
         ${row("Entry (Harga Kini)",fmt(price),"#00ff87",true)}
-        ${row("Stop Loss",fmt(slPrice),"#ff4560",true)}
-        ${row("Target 1",fmt(tp1),"#00c96a",true)}
-        ${row("Target 2",fmt(tp2),"#00c96a",true)}
-        ${row("Target 3",fmt(tp3),"#00c96a",true)}
+        ${row("Stop Loss (ATR×2)",fmt(slPrice),"#ff4560",true)}
+        ${row("Target 1 (R1)",fmt(tp1),"#00c96a",true)}
+        ${row("Target 2 (R2)",fmt(tp2),"#00c96a",true)}
+        ${row("Target 3 (R3)",fmt(tp3),"#00c96a",true)}
         ${row("Risk / Reward","1 : "+rr,"#f5c518")}
-        <div class="scenario-note" style="background:rgba(0,255,135,.04);color:#1e4a2a">Konfirmasi: BOS bullish + close daily di atas resistance + volume ekspansi</div>
+        ${row("ATR Volatilitas",`${fmt(atr)} / ${atrPct}%`,"#5a6a7a")}
+        <div class="scenario-note" style="background:rgba(0,255,135,.04);color:#1e4a2a">Konfirmasi: BOS bullish + close daily di atas R1 + volume ekspansi + StochRSI bullish cross</div>
       </div>
       <div class="scenario-card" style="background:rgba(255,69,96,.04);border:1px solid rgba(255,69,96,.13)">
         <div class="scenario-head" style="color:#ff4560">▼ Skenario Bearish</div>
@@ -491,7 +639,8 @@ async function analyze(sym) {
         ${row("Konfirmasi","Close D1 &lt; S1","#7a2030")}
         ${row("Target Down 1",fmt(supports[1]?.price),"#ff4560",true)}
         ${row("Target Down 2",fmt(supports[2]?.price),"#ff4560",true)}
-        <div class="scenario-note" style="background:rgba(255,69,96,.04);color:#5a1a22;margin-top:36px">Trigger: Candle daily tutup di bawah ${fmt(supports[0]?.price)} dengan volume di atas rata-rata</div>
+        ${row("BB Lower Band",bb?fmt(bb.lower):"—","#ff4560",true)}
+        <div class="scenario-note" style="background:rgba(255,69,96,.04);color:#5a1a22;margin-top:12px">Trigger: Close di bawah ${fmt(supports[0]?.price)} + volume spike + MACD bearish cross = konfirmasi full</div>
       </div>`;
 
     // Market data
