@@ -120,7 +120,77 @@ input[type=text]:focus{border-color:rgba(0,255,135,.4)}
   <div id="res" class="hidden">
     <div class="card" id="prc"></div>
     <div id="sgc"></div>
-    <div id="sva" class="hidden" style="margin-bottom:11px"><button class="btn" style="width:100%" onclick="SV()">＋ SIMPAN KE SIGNAL TRACKER</button></div>
+    <!-- TRADE EXECUTION PANEL -->
+    <div id="sva" class="hidden" style="margin-bottom:11px">
+      <div id="trade-panel" style="background:rgba(9,12,20,.96);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:18px 20px;backdrop-filter:blur(14px);box-shadow:0 4px 32px rgba(0,0,0,.5)">
+        <div style="font-size:9px;letter-spacing:3px;color:var(--g);text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid rgba(0,255,135,.09);display:flex;align-items:center;gap:7px">
+          <span style="width:3px;height:3px;border-radius:50%;background:var(--g);display:inline-block"></span>
+          Eksekusi Trade
+        </div>
+
+        <!-- Order params display -->
+        <div id="trade-params" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:7px;margin-bottom:14px"></div>
+
+        <!-- Size input -->
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:160px">
+            <div style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px">Ukuran Posisi (USDT)</div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <input type="number" id="trade-size" value="100" min="10" step="10"
+                style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 12px;font-size:14px;font-weight:700;color:#e8f0f8;outline:none;font-family:'IBM Plex Mono',monospace;width:100%;max-width:130px"
+                oninput="UTP()"/>
+              <span style="font-size:11px;color:var(--dim)">USDT</span>
+            </div>
+          </div>
+          <!-- Leverage -->
+          <div style="flex:1;min-width:140px">
+            <div style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px">Leverage</div>
+            <div style="display:flex;gap:5px">
+              ${[1,2,3,5,10].map(x=>`<button onclick="setLev(${x})" id="lev-${x}" class="lev-btn" style="padding:6px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:6px;color:var(--dim);font-size:10px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .15s">${x}x</button>`).join("")}
+            </div>
+          </div>
+        </div>
+
+        <!-- Risk/Reward preview -->
+        <div id="rr-preview" style="background:rgba(255,255,255,.03);border-radius:9px;padding:10px 13px;margin-bottom:14px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center"></div>
+
+        <!-- Exchange buttons -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px">
+          <button onclick="openBybit('LONG')" id="btn-bybit-long"
+            style="padding:13px 10px;background:linear-gradient(135deg,rgba(0,255,135,.12),rgba(0,200,100,.06));border:1px solid rgba(0,255,135,.4);border-radius:10px;color:#00ff87;font-size:10px;font-weight:700;letter-spacing:1.5px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px">
+            <span style="font-size:16px">▲</span>
+            <span>BYBIT LONG</span>
+            <span style="font-size:8px;opacity:.6;letter-spacing:1px">Buka di Bybit →</span>
+          </button>
+          <button onclick="openBybit('SHORT')" id="btn-bybit-short"
+            style="padding:13px 10px;background:linear-gradient(135deg,rgba(255,69,96,.12),rgba(200,50,70,.06));border:1px solid rgba(255,69,96,.4);border-radius:10px;color:#ff4560;font-size:10px;font-weight:700;letter-spacing:1.5px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px">
+            <span style="font-size:16px">▼</span>
+            <span>BYBIT SHORT</span>
+            <span style="font-size:8px;opacity:.6;letter-spacing:1px">Buka di Bybit →</span>
+          </button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px">
+          <button onclick="openBinance('BUY')"
+            style="padding:11px 10px;background:rgba(245,197,24,.08);border:1px solid rgba(245,197,24,.3);border-radius:10px;color:#f5c518;font-size:10px;font-weight:700;letter-spacing:1.5px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s">
+            ⚡ BINANCE FUTURES BUY
+          </button>
+          <button onclick="openBinance('SELL')"
+            style="padding:11px 10px;background:rgba(245,197,24,.04);border:1px solid rgba(245,197,24,.2);border-radius:10px;color:#9a8a30;font-size:10px;font-weight:700;letter-spacing:1.5px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s">
+            ⚡ BINANCE FUTURES SELL
+          </button>
+        </div>
+
+        <!-- Copy order detail -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px">
+          <button onclick="copyOrder()" style="padding:9px 10px;background:rgba(0,204,255,.07);border:1px solid rgba(0,204,255,.25);border-radius:9px;color:#00ccff;font-size:9px;font-weight:700;letter-spacing:1.5px;cursor:pointer;font-family:'IBM Plex Mono',monospace">📋 COPY ORDER DETAIL</button>
+          <button onclick="SV()" style="padding:9px 10px;background:rgba(0,255,135,.07);border:1px solid rgba(0,255,135,.25);border-radius:9px;color:var(--g);font-size:9px;font-weight:700;letter-spacing:1.5px;cursor:pointer;font-family:'IBM Plex Mono',monospace">＋ SIMPAN KE TRACKER</button>
+        </div>
+
+        <div style="font-size:9px;color:#1e2d3d;text-align:center;letter-spacing:.5px;line-height:1.7">
+          ⚠ Kamu tetap yang approve order di exchange · Selalu gunakan SL · Tidak ada eksekusi otomatis
+        </div>
+      </div>
+    </div>
     <div class="g2"><div class="card" id="src"></div><div class="card" id="mmc"></div></div>
     <div class="card" id="mac"></div>
     <div class="scg" id="scg"></div>
@@ -367,6 +437,7 @@ async function AN(sym){
       </div>`;
 
     hd('la');sh('res');sh('sva');
+    setTimeout(()=>setLev(LEV),50); // init trade panel
   }catch(e){$('em').textContent=e.message||"Gagal fetch data.";hd('la');sh('ea');}
   $('ab').disabled=false;
 }
@@ -460,6 +531,7 @@ function RT(){
         <span>${age===0?"Hari ini":age+"hr lalu"}</span>
         ${s.hitLevel?`<span style="color:${stc}">Hit: ${s.hitLevel} @ ${fmt(s.hitPrice)}</span>`:""}
         <button onclick="DS(${s.id})" style="background:none;border:none;color:#3d4a5a;cursor:pointer;font-size:9px;font-family:inherit;padding:0">✕ Hapus</button>
+        <button onclick="QT('${s.ticker}','${s.sig}',${s.entry},${s.sl},${s.tp1},${s.tp2},${s.tp3})" style="background:rgba(0,255,135,.07);border:1px solid rgba(0,255,135,.2);border-radius:5px;color:var(--g);cursor:pointer;font-size:9px;font-family:inherit;padding:2px 8px;letter-spacing:1px">⚡ TRADE</button>
       </div>
     </div>`;
   }).join("");
@@ -467,6 +539,20 @@ function RT(){
 
 function DS(id){if(!confirm("Hapus signal ini?"))return;SS(GS().filter(s=>s.id!==id));RT();}
 function CC(){if(!confirm("Hapus semua win/loss/expired?"))return;SS(GS().filter(s=>s.status==="active"));RT();}
+
+// Quick trade from tracker — set CSD then open Bybit
+function QT(ticker,sig,entry,sl,tp1,tp2,tp3){
+  CSD={ticker,sig,conf:7,cp:70,price:entry,entry,sl,tp1,tp2,tp3,trend:"—"};
+  T('analyze');
+  // Scroll to top
+  window.scrollTo({top:0,behavior:'smooth'});
+  sh('sva');
+  setTimeout(()=>setLev(LEV),80);
+  setTimeout(()=>{
+    const panel=document.getElementById('trade-panel');
+    if(panel)panel.scrollIntoView({behavior:'smooth',block:'center'});
+  },300);
+}
 
 // WINRATE
 function RW(){
@@ -510,6 +596,160 @@ function RW(){
   const ck=Object.keys(bc).sort((a,b)=>{const wa=bc[a].w/(bc[a].w+bc[a].l||1),wb2=bc[b].w/(bc[b].w+bc[b].l||1);return wb2-wa;});
   if(ck.length){$('wb').innerHTML=`<div class="sh">Winrate Per Koin</div><div class="wrc">${ck.map(c=>{const n=bc[c],wr2=Math.round(n.w/(n.w+n.l||1)*100);const c2=wr2>=60?"#00ff87":wr2>=45?"#f5c518":"#ff4560";return`<div class="wrci"><div style="font-size:10px;font-weight:700;color:#e8f0f8;margin-bottom:2px">${c}</div><div style="font-size:11px;font-weight:700;color:${c2}">${wr2}%</div><div style="font-size:8px;color:var(--dmr)">${n.w}W/${n.l}L</div></div>`;}).join("")}</div>`;}
 }
+
+// ═══════════════════════════════════════════════
+// TRADE EXECUTION — LEVEL 1
+// ═══════════════════════════════════════════════
+let LEV=3; // default leverage
+
+function setLev(x){
+  LEV=x;
+  document.querySelectorAll('.lev-btn').forEach(b=>{
+    const bx=parseInt(b.id.split('-')[1]);
+    b.style.background=bx===x?'rgba(0,255,135,.15)':'rgba(255,255,255,.03)';
+    b.style.borderColor=bx===x?'rgba(0,255,135,.5)':'rgba(255,255,255,.07)';
+    b.style.color=bx===x?'#00ff87':'var(--dim)';
+  });
+  UTP();
+}
+
+function UTP(){
+  if(!CSD)return;
+  const size=parseFloat(document.getElementById('trade-size').value)||100;
+  const p=CSD.price,sl=CSD.sl,tp1=CSD.tp1,tp2=CSD.tp2,tp3=CSD.tp3;
+
+  // Qty in base asset
+  const qty=(size*LEV/p);
+  const qtyFmt=qty>=1?qty.toFixed(3):qty.toFixed(6);
+
+  // Risk/reward calculations
+  const riskUSDT=size*(p-sl)/p*LEV;
+  const profTP1=size*(tp1-p)/p*LEV;
+  const profTP2=size*(tp2-p)/p*LEV;
+  const profTP3=size*(tp3-p)/p*LEV;
+  const rrTP1=riskUSDT>0?(profTP1/riskUSDT).toFixed(2):"—";
+
+  // Params display
+  document.getElementById('trade-params').innerHTML=[
+    {l:"Entry",v:fmt(p),c:"#e8f0f8"},
+    {l:"Stop Loss",v:fmt(sl),c:"#ff4560"},
+    {l:"TP1",v:fmt(tp1),c:"#00ff87"},
+    {l:"TP2",v:fmt(tp2),c:"#00c96a"},
+    {l:"TP3",v:fmt(tp3),c:"#009955"},
+    {l:"Leverage",v:LEV+"x",c:"#f5c518"},
+    {l:"Qty Koin",v:qtyFmt,c:"#00ccff"},
+    {l:"Nilai",v:fmt(size*LEV),c:"#c4ccd6"},
+  ].map(x=>`<div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);border-radius:7px;padding:7px 9px;text-align:center">
+    <div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">${x.l}</div>
+    <div style="font-size:11px;font-weight:700;color:${x.c};font-family:'IBM Plex Mono',monospace">${x.v}</div>
+  </div>`).join("");
+
+  // RR preview
+  document.getElementById('rr-preview').innerHTML=[
+    {l:"Modal",v:"$"+size.toFixed(0),c:"#c4ccd6"},
+    {l:"Max Risk",v:"-$"+riskUSDT.toFixed(1),c:"#ff4560"},
+    {l:"Profit TP1",v:"+$"+profTP1.toFixed(1),c:"#00ff87"},
+    {l:"R:R TP1",v:"1:"+rrTP1,c:"#f5c518"},
+  ].map(x=>`<div><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">${x.l}</div><div style="font-size:13px;font-weight:800;color:${x.c};font-family:'IBM Plex Mono',monospace">${x.v}</div></div>`).join("");
+}
+
+function openBybit(side){
+  if(!CSD)return;
+  const size=parseFloat(document.getElementById('trade-size').value)||100;
+  const sym=CSD.ticker+"USDT";
+  const qty=(size*LEV/CSD.price);
+  const qtyStr=qty>=1?qty.toFixed(3):qty.toFixed(6);
+  const slStr=CSD.sl.toFixed(CSD.sl>=1?2:4);
+  const tpStr=CSD.tp1.toFixed(CSD.tp1>=1?2:4);
+
+  // Bybit deep link — opens trade page with symbol pre-selected
+  // Parameters: type=1 (perpetual), symbol, leverage
+  const url=`https://www.bybit.com/trade/usdt/${sym}?lever=${LEV}&orderType=Limit&price=${CSD.price.toFixed(CSD.price>=1?2:4)}&qty=${qtyStr}&side=${side==="LONG"?"Buy":"Sell"}&stopLoss=${slStr}&takeProfit=${tpStr}`;
+
+  // Build order summary for clipboard
+  const orderText=`AC369 SIGNAL — ${side}
+Pair: ${sym} (PERP)
+Entry: ${fmt(CSD.price)}
+Stop Loss: ${fmt(CSD.sl)}
+TP1: ${fmt(CSD.tp1)}
+TP2: ${fmt(CSD.tp2)}
+TP3: ${fmt(CSD.tp3)}
+Leverage: ${LEV}x
+Size: $${size} (Notional: $${(size*LEV).toFixed(0)})
+Qty: ${qtyStr} ${CSD.ticker}
+Signal: ${CSD.sig} | Konfluensi: ${CSD.cp}%
+---
+@Alphacrypto_id | AC369 Signal System`;
+
+  // Copy to clipboard then open Bybit
+  navigator.clipboard.writeText(orderText).catch(()=>{});
+  window.open(url,'_blank');
+
+  // Visual feedback
+  const btn=document.getElementById(side==="LONG"?'btn-bybit-long':'btn-bybit-short');
+  const origText=btn.innerHTML;
+  btn.innerHTML=`<span>✓</span><span>MEMBUKA BYBIT...</span><span style="font-size:8px;opacity:.6">Order detail di-copy</span>`;
+  setTimeout(()=>btn.innerHTML=origText,2500);
+}
+
+function openBinance(side){
+  if(!CSD)return;
+  const sym=CSD.ticker+"USDT";
+  // Binance Futures deep link
+  const url=`https://www.binance.com/en/futures/${sym}`;
+  // Copy order detail
+  const size=parseFloat(document.getElementById('trade-size').value)||100;
+  const orderText=`AC369 SIGNAL — ${side}
+Pair: ${sym} (PERP)
+Entry: ${fmt(CSD.price)}
+Stop Loss: ${fmt(CSD.sl)}
+TP1: ${fmt(CSD.tp1)} | TP2: ${fmt(CSD.tp2)} | TP3: ${fmt(CSD.tp3)}
+Leverage: ${LEV}x | Size: $${size}
+Signal: ${CSD.sig} | Konfluensi: ${CSD.cp}%
+@Alphacrypto_id`;
+  navigator.clipboard.writeText(orderText).catch(()=>{});
+  window.open(url,'_blank');
+}
+
+function copyOrder(){
+  if(!CSD)return;
+  const size=parseFloat(document.getElementById('trade-size').value)||100;
+  const qty=(size*LEV/CSD.price);
+  const text=`═══════════════════════
+AC369 SIGNAL SYSTEM
+═══════════════════════
+Pair   : ${CSD.ticker}/USDT (PERP)
+Signal : ${CSD.sig} | Keyakinan: ${CSD.conf}/10
+Konflu : ${CSD.cp}%
+Tren   : ${CSD.trend}
+───────────────────────
+Entry  : ${fmt(CSD.price)}
+SL     : ${fmt(CSD.sl)}
+TP1    : ${fmt(CSD.tp1)}
+TP2    : ${fmt(CSD.tp2)}
+TP3    : ${fmt(CSD.tp3)}
+───────────────────────
+Lev    : ${LEV}x
+Size   : $${size} USDT
+Notional: $${(size*LEV).toFixed(0)}
+Qty    : ${qty>=1?qty.toFixed(3):qty.toFixed(6)} ${CSD.ticker}
+───────────────────────
+${new Date().toLocaleString('id-ID')}
+@Alphacrypto_id | Alpha Crypto 369
+═══════════════════════`;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=event.target;
+    btn.textContent="✓ TERSALIN!";
+    btn.style.color="#00ff87";
+    setTimeout(()=>{btn.textContent="📋 COPY ORDER DETAIL";btn.style.color="#00ccff";},2000);
+  }).catch(()=>alert(text));
+}
+
+// Init leverage UI
+setTimeout(()=>setLev(3),100);
+
+// Auto-update trade params when size changes
+document.addEventListener('input',e=>{if(e.target.id==='trade-size')UTP();});
 
 // Auto refresh harga setiap 5 menit saat di tab tracker
 setInterval(()=>{if(document.getElementById('tab-tracker').classList.contains('active'))RF();},300000);
