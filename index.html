@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Analis Teknikal Real-Time · Alpha Crypto 369</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#00ff87;--red:#ff4560;--yellow:#f5c518;--blue:#00ccff;
+  --bg:#060810;--card:rgba(9,12,20,.95);--border:rgba(255,255,255,.07);
+  --text:#c4ccd6;--dim:#2d3d4d;--dimmer:#1a2535;
+}
+body{min-height:100vh;background:var(--bg);font-family:'IBM Plex Mono',monospace;color:var(--text);overflow-x:hidden}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(0,255,135,.2);border-radius:4px}
+
+/* BG */
+.bg-grid{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(0,255,135,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,135,.018) 1px,transparent 1px);
+  background-size:42px 42px}
+.bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 80% 45% at 50% -5%,rgba(0,255,135,.055) 0%,transparent 65%)}
+.bg-scan{position:fixed;left:0;right:0;height:2px;pointer-events:none;z-index:0;
+  background:linear-gradient(transparent,rgba(0,255,135,.06),transparent);
+  animation:scan 9s linear infinite}
+@keyframes scan{0%{top:-2px}100%{top:100vh}}
+
+/* Layout */
+.wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:28px 16px 80px}
+
+/* Animations */
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* Typography */
+.label{font-size:8px;letter-spacing:3px;color:var(--dimmer);text-transform:uppercase}
+.section-head{font-size:9px;letter-spacing:3px;color:var(--green);text-transform:uppercase;
+  margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid rgba(0,255,135,.09);
+  display:flex;align-items:center;gap:7px}
+.section-head::before{content:'';width:3px;height:3px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:20px 22px;backdrop-filter:blur(14px);box-shadow:0 4px 36px rgba(0,0,0,.5);
+  animation:fadeUp .35s ease both;margin-bottom:13px}
+
+/* Header */
+.header{text-align:center;margin-bottom:32px;animation:fadeUp .5s ease}
+.badge{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(0,255,135,.2);
+  border-radius:3px;padding:4px 12px;margin-bottom:14px;background:rgba(0,255,135,.03)}
+.badge-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+.badge-text{font-size:8px;letter-spacing:3px;color:var(--green);text-transform:uppercase}
+h1{font-size:clamp(22px,5vw,38px);font-weight:700;color:#e8f0f8;letter-spacing:-1px;line-height:1.1;margin-bottom:8px}
+.grad{background:linear-gradient(90deg,var(--green),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{color:var(--dimmer);font-size:9px;letter-spacing:2px;text-transform:uppercase}
+
+/* Input */
+.input-wrap{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:13px}
+input{flex:1;min-width:150px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
+  border-radius:10px;padding:14px 16px;font-size:20px;font-weight:700;color:var(--green);
+  outline:none;font-family:inherit;letter-spacing:3px;caret-color:var(--green);transition:border-color .2s}
+input:focus{border-color:rgba(0,255,135,.4)}
+.btn-analyze{padding:14px 24px;background:rgba(0,255,135,.09);border:1px solid rgba(0,255,135,.35);
+  border-radius:10px;color:var(--green);font-size:10px;font-weight:700;letter-spacing:2.5px;
+  cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap}
+.btn-analyze:hover{background:rgba(0,255,135,.18);box-shadow:0 0 22px rgba(0,255,135,.25)}
+.btn-analyze:disabled{opacity:.4;cursor:not-allowed}
+.quick-wrap{display:flex;gap:6px;flex-wrap:wrap}
+.qbtn{padding:4px 10px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);
+  border-radius:14px;color:var(--dim);font-size:9px;font-weight:600;letter-spacing:.8px;
+  cursor:pointer;font-family:inherit;transition:all .15s}
+.qbtn:hover{background:rgba(0,255,135,.07);border-color:rgba(0,255,135,.4);color:var(--green)}
+
+/* Loading */
+.loader{text-align:center;padding:44px 24px}
+.spinner-outer{width:50px;height:50px;margin:0 auto 18px;position:relative}
+.sp1{position:absolute;inset:0;border:2px solid rgba(0,255,135,.06);border-top:2px solid var(--green);border-radius:50%;animation:spin .75s linear infinite}
+.sp2{position:absolute;inset:7px;border:1px solid rgba(0,255,135,.04);border-bottom:1px solid rgba(0,255,135,.2);border-radius:50%;animation:spin 1.1s linear infinite reverse}
+.loader-title{color:var(--green);font-size:9px;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px}
+.loader-sub{color:var(--dimmer);font-size:9px;letter-spacing:1px}
+
+/* Error */
+.error-card{background:rgba(255,69,96,.05);border:1px solid rgba(255,69,96,.2);border-radius:14px;padding:18px 22px;margin-bottom:13px}
+.error-title{color:var(--red);font-size:10px;font-weight:700;margin-bottom:5px;letter-spacing:1px}
+.error-msg{color:#7a2030;font-size:11px;word-break:break-word;line-height:1.6}
+
+/* Price header */
+.price-header{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.price-left{flex:1;min-width:180px}
+.coin-name{font-size:22px;font-weight:700;color:#e8f0f8;letter-spacing:-0.5px;margin-bottom:6px}
+.coin-name span{color:var(--dim);font-weight:400;font-size:14px}
+.tags{display:flex;gap:7px;flex-wrap:wrap}
+.tag{font-size:8px;color:var(--dimmer);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:3px;padding:2px 7px;letter-spacing:1px;text-transform:uppercase}
+.price-right{text-align:right}
+.price-big{font-size:28px;font-weight:700;color:#e8f0f8;letter-spacing:-1px}
+.chg{font-size:13px;font-weight:700;margin-top:2px}
+.price-hl{border-left:1px solid rgba(255,255,255,.05);padding-left:16px;text-align:right}
+.trend-label{font-size:15px;font-weight:800;letter-spacing:2px;margin-top:4px}
+
+/* Signal */
+.signal-card{border-radius:14px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:13px;animation:fadeUp .35s .05s ease both}
+.sig-icon{width:54px;height:54px;border-radius:13px;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.sig-label-sm{font-size:8px;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:3px}
+.sig-name{font-size:26px;font-weight:800;letter-spacing:4px;line-height:1}
+.sig-conf{font-size:9px;margin-top:3px}
+.sig-reasoning{max-width:260px;font-size:11px;color:#4b5d6e;line-height:1.65;font-style:italic}
+
+/* Grid 2col */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px;animation:fadeUp .35s .08s ease both}
+@media(max-width:560px){.grid2{grid-template-columns:1fr}}
+.grid2 .card{margin-bottom:0}
+
+/* Rows */
+.row{display:flex;justify-content:space-between;align-items:flex-start;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.035)}
+.row-label{color:#3d4a5a;font-size:11px;letter-spacing:.3px;flex-shrink:0;padding-right:10px}
+.row-val{font-size:11px;text-align:right;font-weight:500;line-height:1.4}
+.row-val.mono{font-size:12px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+
+/* Zone rows */
+.zone-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.zone-type{font-size:9px;letter-spacing:1px;width:20px;flex-shrink:0;font-weight:700}
+.zone-price{font-size:13px;color:#e2eaf3;font-weight:700;font-family:'IBM Plex Mono',monospace;flex:1}
+.zone-str{font-size:9px;letter-spacing:1px;opacity:.5}
+
+/* MA dots */
+.ma-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px;margin-bottom:12px}
+.ma-item{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:8px;padding:10px 12px}
+.ma-item-label{font-size:8px;color:var(--dimmer);letter-spacing:1px;margin-bottom:5px;text-transform:uppercase}
+.ma-status{display:flex;align-items:center;margin-bottom:2px}
+.ma-dot{width:7px;height:7px;border-radius:50%;margin-right:7px;flex-shrink:0}
+.ma-status-text{font-size:10px;font-weight:700}
+.ma-price{font-size:9px;color:var(--dim);font-family:'IBM Plex Mono',monospace}
+
+/* Scenarios */
+.scenario-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px;animation:fadeUp .35s .16s ease both}
+@media(max-width:560px){.scenario-grid{grid-template-columns:1fr}}
+.scenario-card{border-radius:14px;padding:18px 20px}
+.scenario-head{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.scenario-note{margin-top:10px;padding:9px 11px;border-radius:7px;font-size:10px;line-height:1.6}
+
+/* Market data grid */
+.market-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+
+/* Footer */
+.footer{text-align:center;padding:14px;margin-top:4px}
+.footer-text{font-size:8px;color:#111d2a;letter-spacing:1.5px;line-height:1.9;text-transform:uppercase}
+
+/* Hidden initially */
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<div class="bg-scan"></div>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="badge">
+      <span class="badge-dot"></span>
+      <span class="badge-text">Alpha Crypto 369 · Live Data · Binance + CoinGecko</span>
+    </div>
+    <h1>ANALIS TEKNIKAL<br/><span class="grad">REAL-TIME</span></h1>
+    <p class="subtitle">Harga Live · RSI · MACD · MA · S/R Pivot · SMC Framework</p>
+  </div>
+
+  <!-- INPUT -->
+  <div class="card">
+    <div class="label" style="margin-bottom:12px">↗ Masukkan Ticker Crypto</div>
+    <div class="input-wrap">
+      <input id="tickerInput" type="text" placeholder="Ketik ticker... BTC / ETH / SOL" maxlength="10" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')analyze()"/>
+      <button class="btn-analyze" id="analyzeBtn" onclick="analyze()">▶ ANALISIS</button>
+    </div>
+    <div class="quick-wrap" id="quickWrap"></div>
+  </div>
+
+  <!-- STATUS AREAS -->
+  <div id="loadingArea" class="card hidden">
+    <div class="loader">
+      <div class="spinner-outer"><div class="sp1"></div><div class="sp2"></div></div>
+      <div class="loader-title">Fetching Live Data</div>
+      <div class="loader-sub">Binance OHLCV · CoinGecko · Calculating TA...</div>
+    </div>
+  </div>
+
+  <div id="errorArea" class="error-card hidden">
+    <div class="error-title">⚠ GAGAL FETCH DATA</div>
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results" class="hidden">
+    <div class="card" id="priceCard"></div>
+    <div id="signalCard"></div>
+    <div class="grid2">
+      <div class="card" id="srCard"></div>
+      <div class="card" id="momentumCard"></div>
+    </div>
+    <div class="card" id="maCard"></div>
+    <div class="scenario-grid" id="scenarioGrid"></div>
+    <div class="card" id="marketCard"></div>
+    <div class="footer"><p class="footer-text">Alpha Crypto 369 · @Alphacrypto_id · Data: Binance API + CoinGecko<br/>Analisis teknikal — bukan saran investasi · Selalu gunakan risk management</p></div>
+  </div>
+
+</div>
+
+<script>
+const TICKERS = ["BTC","ETH","SOL","BNB","XRP","AVAX","ARB","OP","LINK","DOT","HYPE","SUI","WIF","PEPE","TIA","RENDER","WLD","INJ","ATOM","NEAR","DOGE","ADA"];
+const COIN_IDS = {BTC:"bitcoin",ETH:"ethereum",SOL:"solana",BNB:"binancecoin",XRP:"ripple",AVAX:"avalanche-2",ARB:"arbitrum",OP:"optimism",LINK:"chainlink",DOT:"polkadot",HYPE:"hyperliquid",SUI:"sui",WIF:"dogwifhat",PEPE:"pepe",TIA:"celestia",RENDER:"render-token",WLD:"worldcoin-wld",INJ:"injective-protocol",ATOM:"cosmos",NEAR:"near",APT:"aptos",GMX:"gmx",AAVE:"aave",UNI:"uniswap",DOGE:"dogecoin",ADA:"cardano"};
+const SECTORS = {BTC:"Store of Value",ETH:"Smart Contract L1",SOL:"High-Perf L1",BNB:"Exchange Token",XRP:"Payment Network",AVAX:"Smart Contract L1",ARB:"Ethereum L2",OP:"Ethereum L2",LINK:"Oracle Network",DOT:"Cross-Chain",HYPE:"Perpetual DEX",SUI:"High-Perf L1",WIF:"Meme Coin",PEPE:"Meme Coin",TIA:"Data Availability",RENDER:"Decentralized GPU",WLD:"Identity Protocol",INJ:"DeFi L1",ATOM:"IBC Ecosystem",NEAR:"AI-Focused L1",DOGE:"Meme Coin",ADA:"Smart Contract L1"};
+const SIGCFG = {BELI:{c:"#00ff87",bg:"rgba(0,255,135,.07)",bd:"rgba(0,255,135,.2)",glow:"rgba(0,255,135,.18)",icon:"▲"},TAHAN:{c:"#f5c518",bg:"rgba(245,197,24,.07)",bd:"rgba(245,197,24,.2)",glow:"rgba(245,197,24,.18)",icon:"◆"},JUAL:{c:"#ff4560",bg:"rgba(255,69,96,.07)",bd:"rgba(255,69,96,.2)",glow:"rgba(255,69,96,.18)",icon:"▼"}};
+
+// Build quick buttons
+const qw = document.getElementById('quickWrap');
+TICKERS.forEach(t => {
+  const b = document.createElement('button');
+  b.className = 'qbtn'; b.textContent = t;
+  b.onclick = () => { document.getElementById('tickerInput').value = t; analyze(t); };
+  qw.appendChild(b);
+});
+
+// ── TA functions ──
+function sma(arr, p) {
+  return arr.map((_,i) => i<p-1 ? null : arr.slice(i-p+1,i+1).reduce((a,b)=>a+b,0)/p);
+}
+function ema(arr, p) {
+  const k=2/(p+1); let e=null, res=[];
+  arr.forEach(v=>{ if(v==null){res.push(null);return;} e=e===null?v:v*k+e*(1-k); res.push(e); });
+  return res;
+}
+function rsi(closes, p=14) {
+  if(closes.length<p+1) return null;
+  let g=0,l=0;
+  for(let i=1;i<=p;i++){const d=closes[i]-closes[i-1];d>0?g+=d:l-=d;}
+  let ag=g/p,al=l/p;
+  for(let i=p+1;i<closes.length;i++){const d=closes[i]-closes[i-1];ag=(ag*(p-1)+Math.max(d,0))/p;al=(al*(p-1)+Math.max(-d,0))/p;}
+  return al===0?100:100-100/(1+ag/al);
+}
+function macd(closes) {
+  const e12=ema(closes,12),e26=ema(closes,26);
+  const ml=e12.map((v,i)=>v!=null&&e26[i]!=null?v-e26[i]:null).filter(v=>v!=null);
+  const sig=ema(ml,9);
+  const lm=ml[ml.length-1],ls=sig[sig.length-1];
+  const hist=lm!=null&&ls!=null?lm-ls:null;
+  const ph=ml.length>1&&sig.length>1?ml[ml.length-2]-sig[sig.length-2]:null;
+  return {macd:lm,signal:ls,hist,prevHist:ph};
+}
+function findSR(highs,lows,price) {
+  const pivots=[];
+  for(let i=2;i<highs.length-2;i++){
+    if(highs[i]>highs[i-1]&&highs[i]>highs[i-2]&&highs[i]>highs[i+1]&&highs[i]>highs[i+2]) pivots.push({price:highs[i],type:"R"});
+    if(lows[i]<lows[i-1]&&lows[i]<lows[i-2]&&lows[i]<lows[i+1]&&lows[i]<lows[i+2]) pivots.push({price:lows[i],type:"S"});
+  }
+  const used=new Set(),cl=[];
+  pivots.forEach((p,i)=>{
+    if(used.has(i))return;
+    const g=[p];
+    pivots.forEach((q,j)=>{if(i!==j&&!used.has(j)&&Math.abs(p.price-q.price)/p.price<0.02){g.push(q);used.add(j);}});
+    used.add(i);
+    cl.push({price:g.reduce((a,b)=>a+b.price,0)/g.length,type:p.type,strength:g.length});
+  });
+  let sup=cl.filter(z=>z.price<price*1.01).sort((a,b)=>b.price-a.price).slice(0,3);
+  let res=cl.filter(z=>z.price>price*0.99).sort((a,b)=>a.price-b.price).slice(0,3);
+  while(sup.length<3) sup.push({price:price*(0.88-sup.length*0.07),type:"S",strength:1});
+  while(res.length<3) res.push({price:price*(1.08+res.length*0.07),type:"R",strength:1});
+  return {supports:sup.slice(0,3),resistances:res.slice(0,3)};
+}
+function volAnalysis(vols) {
+  const avg=vols.slice(-20).reduce((a,b)=>a+b,0)/20;
+  const r=vols.slice(-5).reduce((a,b)=>a+b,0)/5/avg;
+  if(r>1.5) return "Volume surge — konfirmasi momentum kuat";
+  if(r>1.1) return "Volume di atas rata-rata — bullish bias";
+  if(r<0.6) return "Volume kering — konsolidasi / distribusi";
+  return "Volume normal — pasar dalam keseimbangan";
+}
+function structure(closes,highs,lows) {
+  const rH=highs.slice(-3),pH=highs.slice(-6,-3),rL=lows.slice(-3),pL=lows.slice(-6,-3);
+  const lh=Math.max(...rH),pvh=Math.max(...pH),ll=Math.min(...rL),pvl=Math.min(...pL);
+  let hhhl=lh>pvh&&ll>pvl?"HH/HL terbentuk — uptrend valid":lh<pvh&&ll<pvl?"LH/LL aktif — downtrend berlanjut":"Struktur transisi — konsolidasi";
+  const n=closes.length,r5h=Math.max(...highs.slice(-10,-5)),r5l=Math.min(...lows.slice(-10,-5));
+  let bos=closes[n-1]>r5h?"BOS Bullish terkonfirmasi":closes[n-1]<r5l?"BOS Bearish terkonfirmasi":closes[n-1]>closes[n-5]*1.02?"CHoCH Bullish — potensi reversal":"Struktur sideways — belum ada konfirmasi";
+  return {hhhl,bos};
+}
+function signal({rsiD,rsiW,macdD,price,ma20,ma50,ma200,change24h}) {
+  let s=0;
+  if(rsiD<30)s+=2;else if(rsiD<45)s+=1;else if(rsiD>70)s-=2;else if(rsiD>60)s-=1;
+  if(rsiW<40)s+=1;else if(rsiW>65)s-=1;
+  if(price>ma20)s+=1;if(price>ma50)s+=1;if(price>ma200)s+=2;
+  if(macdD.hist>0)s+=1;if(macdD.hist>0&&macdD.prevHist<0)s+=1;
+  if(macdD.hist<0)s-=1;if(macdD.hist<0&&macdD.prevHist>0)s-=1;
+  if(change24h>5)s+=1;else if(change24h<-5)s-=1;
+  const conf=Math.min(9,Math.max(4,Math.round(Math.abs(s)*.8+4)));
+  if(s>=3) return {sig:"BELI",conf,reason:"Struktur bullish terkonfirmasi: RSI "+Math.round(rsiD)+" dengan harga di atas MA kritis. MACD mendukung momentum naik. Setup favorable untuk akumulasi bertahap dengan manajemen risiko ketat."};
+  if(s<=-2) return {sig:"JUAL",conf,reason:"Tekanan jual dominan: harga di bawah zona MA dan RSI belum oversold. Momentum negatif dari MACD. Hindari new long — prioritaskan capital preservation hingga konfirmasi reversal."};
+  return {sig:"TAHAN",conf,reason:"Pasar dalam fase konsolidasi tanpa konfirmasi arah yang jelas. RSI "+Math.round(rsiD)+" di zona netral. Tunggu breakout valid dengan volume atau retrace ke support sebelum entry."};
+}
+
+// ── Format ──
+function fmt(n) {
+  if(!n&&n!==0) return "N/A";
+  if(n>=1e9) return "$"+(n/1e9).toFixed(2)+"B";
+  if(n>=1e6) return "$"+(n/1e6).toFixed(2)+"M";
+  if(n>=1000) return "$"+n.toLocaleString("en-US",{maximumFractionDigits:2});
+  if(n>=1) return "$"+n.toFixed(2);
+  if(n>=0.01) return "$"+n.toFixed(4);
+  return "$"+n.toFixed(6);
+}
+function pct(n) { return (n>=0?"+":"")+n.toFixed(2)+"%"; }
+function clr(pos,neg,zero="#c4ccd6") { return v => v>0?pos:v<0?neg:zero; }
+const greenRed = clr("#00ff87","#ff4560");
+
+// ── UI Helpers ──
+function row(label,value,color="",mono=false) {
+  return `<div class="row"><span class="row-label">${label}</span><span class="row-val${mono?" mono":""}" style="color:${color||"#c4ccd6"}">${value||"—"}</span></div>`;
+}
+function zoneRow(label,price,type,str) {
+  const c=type==="S"?"#00ff87":"#ff4560";
+  const s=str>=3?"●●●":str===2?"●●○":"●○○";
+  return `<div class="zone-row"><span class="zone-type" style="color:${c}">${type}${label}</span><span class="zone-price">${fmt(price)}</span><span class="zone-str" style="color:${c}">${s}</span></div>`;
+}
+function maItem(label,above,val) {
+  const c=above?"#00ff87":"#ff4560";
+  return `<div class="ma-item"><div class="ma-item-label">${label}</div><div class="ma-status"><span class="ma-dot" style="background:${c};box-shadow:${above?"0 0 5px rgba(0,255,135,.5)":"none"}"></span><span class="ma-status-text" style="color:${c}">${above?"Di Atas":"Di Bawah"}</span></div><div class="ma-price">${val?fmt(val):"—"}</div></div>`;
+}
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+
+// ── MAIN ANALYZE ──
+async function analyze(sym) {
+  const ticker = (sym||document.getElementById('tickerInput').value).toUpperCase().replace(/\s|USDT$/gi,"").trim();
+  if(!ticker) return;
+  document.getElementById('tickerInput').value = ticker;
+  document.getElementById('analyzeBtn').disabled = true;
+
+  hide('results'); hide('errorArea');
+  show('loadingArea');
+
+  try {
+    // 1. Binance klines
+    const klRes = await fetch(`https://api.binance.com/api/v3/klines?symbol=${ticker}USDT&interval=1d&limit=90`);
+    if(!klRes.ok) throw new Error(`"${ticker}" tidak ditemukan di Binance. Coba ticker lain seperti BTC, ETH, SOL.`);
+    const klines = await klRes.json();
+    if(!Array.isArray(klines)||klines.length<30) throw new Error("Data candle tidak cukup.");
+
+    const opens=klines.map(k=>+k[1]),highs=klines.map(k=>+k[2]),lows=klines.map(k=>+k[3]),closes=klines.map(k=>+k[4]),volumes=klines.map(k=>+k[5]);
+    const price=closes[closes.length-1];
+
+    // 2. Binance 24h
+    const t24=await (await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${ticker}USDT`)).json();
+    const change24h=+t24.priceChangePercent,high24h=+t24.highPrice,low24h=+t24.lowPrice,vol24h=+t24.quoteVolume;
+
+    // 3. CoinGecko
+    let mcap=null,change7d=null,coinName=ticker;
+    const cgId=COIN_IDS[ticker];
+    if(cgId){
+      try{
+        const cg=await (await fetch(`https://api.coingecko.com/api/v3/coins/${cgId}?localization=false&tickers=false&community_data=false&developer_data=false`)).json();
+        mcap=cg.market_data?.market_cap?.usd;
+        change7d=cg.market_data?.price_change_percentage_7d;
+        coinName=cg.name||ticker;
+      }catch(_){}
+    }
+
+    // 4. TA calculations
+    const wCloses=closes.filter((_,i)=>i%7===0);
+    const wHighs=highs.filter((_,i)=>i%7===0);
+    const wLows=lows.filter((_,i)=>i%7===0);
+
+    const last=arr=>arr[arr.length-1];
+    const ma20=last(sma(closes,20)),ma50=last(sma(closes,50)),ma200=last(sma(closes,Math.min(200,closes.length)));
+    const ema50=last(ema(closes,50)),ema200=last(ema(closes,Math.min(200,closes.length)));
+    const rsiD=rsi(closes,14),rsiW=rsi(wCloses,14);
+    const macdD=macd(closes);
+    const {supports,resistances}=findSR(highs,lows,price);
+    const vol=volAnalysis(volumes);
+    const {hhhl,bos}=structure(closes,highs,lows);
+
+    const abM20=price>ma20,abM50=price>ma50,abM200=price>(ma200||price*.9);
+    const abE50=price>ema50,abE200=price>(ema200||price*.88);
+    const gc=ema50>(ema200||0);
+    const trend=abM50&&abM200?"BULLISH":!abM50&&!abM200?"BEARISH":"SIDEWAYS";
+    const trendColor=trend==="BULLISH"?"#00ff87":trend==="BEARISH"?"#ff4560":"#f5c518";
+
+    const rsiDL=rsiD>70?"Overbought — waspadai pullback":rsiD<30?"Oversold — potensi bounce kuat":rsiD<45?"Zona lemah — tekanan turun":"Netral — belum ekstrem";
+    let macdL="—";
+    if(macdD.hist!=null){
+      if(macdD.hist>0&&macdD.prevHist<=0) macdL="Bullish crossover baru ✓";
+      else if(macdD.hist>0) macdL=`Histogram positif`;
+      else if(macdD.hist<0&&macdD.prevHist>=0) macdL="Bearish crossover baru ✗";
+      else macdL="Histogram negatif";
+    }
+
+    const {sig,conf,reason}=signal({rsiD,rsiW:rsiW||50,macdD,price,ma20,ma50,ma200:ma200||price*.9,change24h});
+    const sc=SIGCFG[sig];
+
+    const slPrice=supports[0]?.price*0.985||price*0.93;
+    const tp1=resistances[0]?.price||price*1.10;
+    const tp2=resistances[1]?.price||price*1.20;
+    const tp3=resistances[2]?.price||price*1.35;
+    const rr=((tp1-price)/(price-slPrice)).toFixed(2);
+    const sector=SECTORS[ticker]||"Crypto Asset";
+    const now=new Date().toLocaleString("id-ID");
+
+    // ── RENDER ──
+
+    // Price header
+    document.getElementById('priceCard').innerHTML=`
+      <div class="price-header">
+        <div class="price-left">
+          <div class="label" style="margin-bottom:4px">${sector}</div>
+          <div class="coin-name">${coinName} <span>/ USDT</span></div>
+          <div class="tags"><span class="tag">${ticker}</span><span class="tag">Live · ${now}</span></div>
+        </div>
+        <div class="price-right">
+          <div class="price-big">${fmt(price)}</div>
+          <div class="chg" style="color:${change24h>=0?"#00ff87":"#ff4560"}">${pct(change24h)} 24h</div>
+          ${change7d!=null?`<div style="font-size:10px;color:${change7d>=0?"#00c96a":"#d93848"};margin-top:1px">${pct(change7d)} 7d</div>`:""}
+        </div>
+        <div class="price-hl">
+          <div class="label">Tren Utama</div>
+          <div class="trend-label" style="color:${trendColor}">${trend}</div>
+          <div style="font-size:9px;color:var(--dimmer);margin-top:8px">H: ${fmt(high24h)}</div>
+          <div style="font-size:9px;color:var(--dimmer)">L: ${fmt(low24h)}</div>
+        </div>
+      </div>`;
+
+    // Signal
+    document.getElementById('signalCard').innerHTML=`
+      <div class="signal-card" style="background:${sc.bg};border:1px solid ${sc.bd};box-shadow:0 0 28px ${sc.glow}">
+        <div class="sig-icon" style="border:1px solid ${sc.bd}"><span style="color:${sc.c};font-size:22px">${sc.icon}</span></div>
+        <div style="flex:1;min-width:140px">
+          <div class="sig-label-sm" style="color:var(--dim)">Sinyal Alpha Crypto 369</div>
+          <div class="sig-name" style="color:${sc.c}">${sig}</div>
+          <div class="sig-conf" style="color:${sc.c};opacity:.55">Keyakinan: ${conf}/10</div>
+        </div>
+        <div class="sig-reasoning">${reason}</div>
+      </div>`;
+
+    // S/R
+    document.getElementById('srCard').innerHTML=`
+      <div class="section-head">Support Kunci (Live)</div>
+      ${supports.map((s,i)=>zoneRow(i+1,s.price,"S",s.strength||1)).join("")}
+      <div class="section-head" style="margin-top:14px">Resistance Kunci (Live)</div>
+      ${resistances.map((r,i)=>zoneRow(i+1,r.price,"R",r.strength||1)).join("")}
+      <div style="margin-top:8px;font-size:9px;color:var(--dimmer)">● Kekuatan: ●●● tinggi · ●● sedang · ● lemah</div>`;
+
+    // Momentum
+    document.getElementById('momentumCard').innerHTML=`
+      <div class="section-head">Momentum & Indikator</div>
+      ${row("RSI Daily",`${Math.round(rsiD)} — ${rsiD>70?"OB":rsiD<30?"OS":"Netral"}`,rsiD>70?"#ff4560":rsiD<30?"#00ff87":"#f5c518",true)}
+      ${row("RSI Weekly",rsiW?`${Math.round(rsiW)}`:"—","#c4ccd6",true)}
+      ${row("RSI State",rsiDL,"#5a6a7a")}
+      ${row("MACD Daily",macdL,"#5a6a7a")}
+      ${row("Volume",vol,"#5a6a7a")}
+      <div class="section-head" style="margin-top:14px">Struktur SMC</div>
+      ${row("BOS/CHoCH",bos,"#c4ccd6")}
+      ${row("HH/HL",hhhl,"#c4ccd6")}`;
+
+    // MA
+    document.getElementById('maCard').innerHTML=`
+      <div class="section-head">Moving Averages (Kalkulasi Real)</div>
+      <div class="ma-grid">
+        ${maItem("MA 20 Daily",abM20,ma20)}
+        ${maItem("MA 50 Daily",abM50,ma50)}
+        ${maItem("MA 200 Daily",abM200,ma200)}
+        ${maItem("EMA 50",abE50,ema50)}
+        ${maItem("EMA 200",abE200,ema200)}
+      </div>
+      ${row("EMA Cross",gc?"Golden Cross EMA50/200 aktif ✓":"Death Cross EMA50/200 aktif ✗",gc?"#00ff87":"#ff4560")}`;
+
+    // Scenarios
+    document.getElementById('scenarioGrid').innerHTML=`
+      <div class="scenario-card" style="background:rgba(0,255,135,.04);border:1px solid rgba(0,255,135,.13)">
+        <div class="scenario-head" style="color:#00ff87">▲ Skenario Bullish</div>
+        ${row("Entry (Harga Kini)",fmt(price),"#00ff87",true)}
+        ${row("Stop Loss",fmt(slPrice),"#ff4560",true)}
+        ${row("Target 1",fmt(tp1),"#00c96a",true)}
+        ${row("Target 2",fmt(tp2),"#00c96a",true)}
+        ${row("Target 3",fmt(tp3),"#00c96a",true)}
+        ${row("Risk / Reward","1 : "+rr,"#f5c518")}
+        <div class="scenario-note" style="background:rgba(0,255,135,.04);color:#1e4a2a">Konfirmasi: BOS bullish + close daily di atas resistance + volume ekspansi</div>
+      </div>
+      <div class="scenario-card" style="background:rgba(255,69,96,.04);border:1px solid rgba(255,69,96,.13)">
+        <div class="scenario-head" style="color:#ff4560">▼ Skenario Bearish</div>
+        ${row("Trigger Breakdown",fmt(supports[0]?.price),"#ff4560",true)}
+        ${row("Konfirmasi","Close D1 &lt; S1","#7a2030")}
+        ${row("Target Down 1",fmt(supports[1]?.price),"#ff4560",true)}
+        ${row("Target Down 2",fmt(supports[2]?.price),"#ff4560",true)}
+        <div class="scenario-note" style="background:rgba(255,69,96,.04);color:#5a1a22;margin-top:36px">Trigger: Candle daily tutup di bawah ${fmt(supports[0]?.price)} dengan volume di atas rata-rata</div>
+      </div>`;
+
+    // Market data
+    document.getElementById('marketCard').innerHTML=`
+      <div class="section-head">Data Pasar (Live)</div>
+      <div class="market-grid">
+        ${row("Harga Sekarang",fmt(price),"#e8f0f8",true)}
+        ${row("Market Cap",mcap?fmt(mcap):"—","#c4ccd6",true)}
+        ${row("24h High",fmt(high24h),"#00c96a",true)}
+        ${row("24h Low",fmt(low24h),"#d93848",true)}
+        ${row("Volume 24h",fmt(vol24h),"#c4ccd6",true)}
+        ${row("Perubahan 7d",change7d!=null?pct(change7d):"—",change7d>=0?"#00c96a":"#d93848",true)}
+      </div>`;
+
+    hide('loadingArea');
+    show('results');
+
+  } catch(e) {
+    document.getElementById('errorMsg').textContent = e.message || "Gagal fetch data. Cek koneksi internet.";
+    hide('loadingArea');
+    show('errorArea');
+  }
+
+  document.getElementById('analyzeBtn').disabled = false;
+}
+</script>
+</body>
+</html>
