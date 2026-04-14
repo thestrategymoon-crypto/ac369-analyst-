@@ -97,6 +97,9 @@ input[type=text]:focus{border-color:rgba(0,255,135,.4)}
   <div class="badge"><span class="bdot"></span><span class="btxt">Alpha Crypto 369 · Live · Binance + CoinGecko</span></div>
   <h1>AC369 <span class="grad">SIGNAL SYSTEM</span></h1>
   <p class="lbl" style="letter-spacing:1.5px;margin-top:3px">Analisis · Auto Tracker TP/SL · Monthly Winrate</p>
+  <div style="margin-top:10px">
+    <a href="content-funnel.html" style="color:#00ccff;font-size:9px;letter-spacing:2px;text-decoration:none;border:1px solid rgba(0,204,255,.2);border-radius:6px;padding:4px 12px">✍ Content Funnel Generator →</a>
+  </div>
 </div>
 
 <div class="nav">
@@ -201,61 +204,68 @@ input[type=text]:focus{border-color:rgba(0,255,135,.4)}
   </div>
 </div>
 
-<!-- TAB SCANNER -->
+<!-- TAB SCANNER PRO -->
 <div id="tab-scanner" class="tab">
   <div class="card">
-    <div class="sh">🔍 Market Scanner Pro — Top 100 / 150 Universe</div>
+    <div class="sh">🔍 Market Scanner PRO — Multi-Layer Analysis</div>
     <p style="font-size:11px;color:#4b5d6e;margin-bottom:14px;line-height:1.7">
-      Scan otomatis ratusan koin, pre-filter via volume & momentum, lalu TA mendalam — output: <strong style="color:#00ff87">Top 10 LONG</strong> + <strong style="color:#ff4560">Top 5 SHORT</strong> terbaik.
+      Scan otomatis hingga 250 koin · <span style="color:#00ff87">R:R minimum 1:2 enforced</span> · Funding Rate + OI + Long/Short + Taker Volume · Pisah <span style="color:#00ccff">Scalp (15m)</span> vs <span style="color:#00ff87">Swing (Daily)</span> · Probabilitas multi-layer
     </p>
 
-    <!-- Universe selector -->
+    <!-- Universe -->
     <div style="margin-bottom:12px">
       <div style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Universe Koin</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap" id="universe-btns">
-        <button class="univ-btn" onclick="setUniverse('top10')" data-u="top10" style="padding:6px 12px;border-radius:8px;font-size:9px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)">TOP 10</button>
-        <button class="univ-btn" onclick="setUniverse('top20')" data-u="top20" style="padding:6px 12px;border-radius:8px;font-size:9px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)">TOP 20</button>
-        <button class="univ-btn" onclick="setUniverse('defi')"  data-u="defi"  style="padding:6px 12px;border-radius:8px;font-size:9px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)">DEFI</button>
-        <button class="univ-btn" onclick="setUniverse('l1l2')"  data-u="l1l2"  style="padding:6px 12px;border-radius:8px;font-size:9px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)">L1 / L2</button>
-        <button class="univ-btn" onclick="setUniverse('all')"   data-u="all"   style="padding:6px 12px;border-radius:8px;font-size:9px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)">WATCHLIST (22)</button>
-        <button class="univ-btn active" onclick="setUniverse('top100')" data-u="top100" style="padding:6px 12px;border-radius:8px;font-size:9px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(0,255,135,.12);border:1px solid rgba(0,255,135,.4);color:#00ff87">🔥 TOP 100</button>
-        <button class="univ-btn" onclick="setUniverse('top150')" data-u="top150" style="padding:6px 12px;border-radius:8px;font-size:9px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)">⚡ TOP 150</button>
-      </div>
-    </div>
-
-    <!-- Mode selector: Standard vs Pro -->
-    <div style="margin-bottom:12px">
-      <div style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Mode Output</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <label id="mode-lbl-standard" style="display:flex;align-items:flex-start;gap:9px;padding:11px 13px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;cursor:pointer;transition:all .2s">
-          <input type="radio" name="scanmode" value="standard" checked onchange="setScanMode('standard')" style="accent-color:#00ff87;margin-top:2px;flex-shrink:0"/>
-          <div>
-            <div style="font-size:10px;font-weight:700;color:#e8f0f8">Standard Tier</div>
-            <div style="font-size:9px;color:var(--dmr);margin-top:2px">Tier S/A/B seperti sebelumnya</div>
-          </div>
-        </label>
-        <label id="mode-lbl-pro" style="display:flex;align-items:flex-start;gap:9px;padding:11px 13px;background:rgba(0,255,135,.06);border:1px solid rgba(0,255,135,.3);border-radius:10px;cursor:pointer;transition:all .2s">
-          <input type="radio" name="scanmode" value="pro" checked onchange="setScanMode('pro')" style="accent-color:#00ff87;margin-top:2px;flex-shrink:0"/>
-          <div>
-            <div style="font-size:10px;font-weight:700;color:#00ff87">🏆 Pro Ranking</div>
-            <div style="font-size:9px;color:#1e4a2a;margin-top:2px">Top 10 LONG + Top 5 SHORT terbaik</div>
-          </div>
-        </label>
+        <button class="univ-btn" onclick="setUniverse('top10')"  data-u="top10"  style="padding:5px 11px;border-radius:7px;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)">TOP 10</button>
+        <button class="univ-btn" onclick="setUniverse('top20')"  data-u="top20"  style="padding:5px 11px;border-radius:7px;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)">TOP 20</button>
+        <button class="univ-btn" onclick="setUniverse('defi')"   data-u="defi"   style="padding:5px 11px;border-radius:7px;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)">DEFI</button>
+        <button class="univ-btn" onclick="setUniverse('l1l2')"   data-u="l1l2"   style="padding:5px 11px;border-radius:7px;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)">L1/L2</button>
+        <button class="univ-btn active" onclick="setUniverse('top100')" data-u="top100" style="padding:5px 11px;border-radius:7px;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(0,255,135,.12);border:1px solid rgba(0,255,135,.4);color:#00ff87">🔥 TOP 100</button>
+        <button class="univ-btn" onclick="setUniverse('top200')" data-u="top200" style="padding:5px 11px;border-radius:7px;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)">TOP 200</button>
+        <button class="univ-btn" onclick="setUniverse('top250')" data-u="top250" style="padding:5px 11px;border-radius:7px;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(245,197,24,.3);color:#f5c518">⚡ TOP 250</button>
       </div>
     </div>
 
     <!-- Filters -->
     <div style="margin-bottom:14px">
-      <div style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Filter Tambahan</div>
+      <div style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Filter & Opsi</div>
       <div style="display:flex;gap:14px;flex-wrap:wrap">
-        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;color:#c4ccd6"><input type="checkbox" id="f-minrr" checked style="accent-color:#00ccff"/> R:R ≥ 1.5</label>
-        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;color:#c4ccd6"><input type="checkbox" id="f-vol" checked style="accent-color:#f5c518"/> Volume Aktif</label>
-        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;color:#c4ccd6"><input type="checkbox" id="f-excl-stable" checked style="accent-color:#00ff87"/> Exclude Stablecoin</label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;color:#00ff87">
+          <input type="checkbox" id="f-minrr" checked style="accent-color:#00ff87"/> R:R ≥ 2.0 (enforced)
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;color:#00ccff">
+          <input type="checkbox" id="f-scalp" checked style="accent-color:#00ccff"/> Tampilkan Scalp 15m
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;color:#f5c518">
+          <input type="checkbox" id="f-vol" checked style="accent-color:#f5c518"/> Volume Filter
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;color:#c4ccd6">
+          <input type="checkbox" id="f-excl-stable" checked style="accent-color:#00ff87"/> Exclude Stablecoin
+        </label>
       </div>
     </div>
 
-    <button class="btn" id="scan-btn" onclick="startScan()" style="width:100%;padding:14px;font-size:11px;letter-spacing:3px;background:linear-gradient(135deg,rgba(0,255,135,.12),rgba(0,200,255,.06));border-color:rgba(0,255,135,.4)">
-      ⚡ MULAI SCAN OTOMATIS
+    <!-- Info boxes -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:14px">
+      <div style="background:rgba(0,255,135,.04);border:1px solid rgba(0,255,135,.12);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:16px;margin-bottom:3px">📈</div>
+        <div style="font-size:9px;font-weight:700;color:#00ff87">Swing Trade</div>
+        <div style="font-size:8px;color:var(--dmr);margin-top:2px">Daily · Hold 3-14 hari</div>
+      </div>
+      <div style="background:rgba(0,204,255,.04);border:1px solid rgba(0,204,255,.12);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:16px;margin-bottom:3px">⚡</div>
+        <div style="font-size:9px;font-weight:700;color:#00ccff">Scalp Trade</div>
+        <div style="font-size:8px;color:var(--dmr);margin-top:2px">15m · Hold menit-jam</div>
+      </div>
+      <div style="background:rgba(255,69,96,.04);border:1px solid rgba(255,69,96,.12);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:16px;margin-bottom:3px">🐋</div>
+        <div style="font-size:9px;font-weight:700;color:#ff4560">Whale Monitor</div>
+        <div style="font-size:8px;color:var(--dmr);margin-top:2px">Funding · OI · L/S</div>
+      </div>
+    </div>
+
+    <button class="btn" id="scan-btn" onclick="window.startScanPro()" style="width:100%;padding:14px;font-size:11px;letter-spacing:3px;background:linear-gradient(135deg,rgba(0,255,135,.12),rgba(0,200,255,.06));border-color:rgba(0,255,135,.4)">
+      ⚡ MULAI SCAN PRO — R:R 1:2 ENFORCED
     </button>
   </div>
 
@@ -263,28 +273,33 @@ input[type=text]:focus{border-color:rgba(0,255,135,.4)}
   <div id="scan-progress" class="card hidden">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px">
       <div style="font-size:9px;letter-spacing:2px;color:var(--g);text-transform:uppercase" id="scan-status">Scanning...</div>
-      <div style="font-size:9px;color:var(--dmr)" id="scan-phase">Phase 1: Pre-filter</div>
+      <div style="font-size:9px;color:var(--dmr)" id="scan-phase">Initializing...</div>
     </div>
     <div style="background:rgba(255,255,255,.05);border-radius:4px;height:6px;overflow:hidden;margin-bottom:8px">
       <div id="scan-bar" style="height:100%;background:linear-gradient(90deg,#00ff87,#00ccff);border-radius:4px;transition:width .3s;width:0%"></div>
     </div>
     <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--dmr);margin-bottom:10px">
       <span id="scan-count">0 / 0 koin</span>
-      <span id="scan-found" style="color:#00ff87">0 kandidat kuat</span>
+      <span id="scan-found" style="color:#00ff87">0 setup valid</span>
     </div>
-    <!-- Live feed -->
-    <div id="scan-feed" style="max-height:100px;overflow-y:auto;font-size:9px;color:var(--dmr);line-height:1.8;font-family:'IBM Plex Mono',monospace"></div>
+    <div id="scan-feed" style="max-height:120px;overflow-y:auto;font-size:9px;color:var(--dmr);line-height:1.8;font-family:'IBM Plex Mono',monospace"></div>
   </div>
 
-  <!-- PRO RESULTS: Top 10 Long + Top 5 Short -->
-  <div id="pro-results" class="hidden">
-    <!-- Summary bar -->
-    <div id="pro-summary" style="margin-bottom:16px"></div>
+  <!-- Results -->
+  <div id="pro-results" class="hidden"></div>
 
-    <!-- TOP 10 LONG -->
-    <div id="long-wrap" class="hidden">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <div style="background:linear-gradient(135deg,#00ff87,#00cc6a);border-radius:8px;padding:5px 14px;font-size:11px;font-weight:800;color:#000;letter-spacing:2px">▲ TOP LONG</div>
+  <!-- Legacy standard tier results (hidden by default) -->
+  <div id="scan-results" class="hidden"></div>
+
+  <!-- Generate content button -->
+  <div id="gen-content-wrap" class="hidden" style="margin-top:10px">
+    <button onclick="openContentGenerator()" style="width:100%;padding:13px;background:linear-gradient(135deg,rgba(245,197,24,.12),rgba(255,140,0,.06));border:1px solid rgba(245,197,24,.35);border-radius:12px;color:#f5c518;font-size:10px;font-weight:700;letter-spacing:2px;cursor:pointer;font-family:'IBM Plex Mono',monospace"
+      onmouseover="this.style.background='linear-gradient(135deg,rgba(245,197,24,.2),rgba(255,140,0,.1))'"
+      onmouseout="this.style.background='linear-gradient(135deg,rgba(245,197,24,.12),rgba(255,140,0,.06))'">
+      ✍️ GENERATE KONTEN TELEGRAM & SOSMED
+    </button>
+  </div>
+</div>
         <div style="font-size:10px;color:#00ff87">Setup BELI terkuat — konfluensi tertinggi</div>
       </div>
       <div id="long-list"></div>
@@ -1859,6 +1874,37 @@ function afterScanComplete(results) {
   scanResultsCache = results;
   sh('gen-content-wrap');
 }
+
+// UNIVERSES PRO — for scanner-pro.js
+window.UNIVERSES_PRO = {
+  top10:  ["BTC","ETH","BNB","SOL","XRP","AVAX","DOGE","ADA","LINK","DOT"],
+  top20:  ["BTC","ETH","BNB","SOL","XRP","AVAX","DOGE","ADA","LINK","DOT","NEAR","ATOM","HYPE","SUI","ARB","OP","TIA","INJ","WLD","RENDER"],
+  defi:   ["HYPE","AAVE","UNI","ARB","OP","GMX","INJ","LINK","ATOM","CRV","MKR","COMP","SNX","LDO","DYDX","1INCH","SUSHI","RDNT","SSV","LQTY"],
+  l1l2:   ["ETH","SOL","BNB","AVAX","DOT","NEAR","SUI","TIA","ARB","OP","INJ","ATOM","APT","SEI","STX","METIS","MANTA","STRK","IMX","CFX"],
+  top100: ["BTC","ETH","BNB","SOL","XRP","DOGE","ADA","AVAX","TRX","LINK","DOT","MATIC","LTC","UNI","ATOM","NEAR","ICP","FIL","APT","ARB","OP","INJ","SUI","TIA","RENDER","WLD","PEPE","WIF","FET","BONK","IMX","GRT","AAVE","SNX","ENS","LDO","SAND","MANA","AXS","GALA","CHZ","FLOW","ROSE","VET","ALGO","THETA","FTM","KAVA","CELO","CRV","MKR","COMP","SUSHI","1INCH","DYDX","GMX","JTO","PYTH","SEI","STRK","BLUR","METIS","STX","BEAM","ACE","MAGIC","RDNT","SSV","OCEAN","RUNE","AGIX","NFP","PERP","STORJ","CELR","TWT","CFX","FLOKI","BAND","ANKR","MTL","ACH","CHR","BNX","GMT","APE","HFT","SKL","OGN","REEF","CTSI","BAKE","DODO","WIN","HOT","SUPER","API3","COTI","HNT","GLM","BNT"],
+  top200: ["BTC","ETH","BNB","SOL","XRP","DOGE","ADA","AVAX","TRX","LINK","DOT","MATIC","LTC","UNI","ATOM","NEAR","ICP","FIL","APT","ARB","OP","INJ","SUI","TIA","RENDER","WLD","PEPE","WIF","FET","BONK","IMX","GRT","AAVE","SNX","ENS","LDO","SAND","MANA","AXS","GALA","CHZ","FLOW","ROSE","VET","ALGO","THETA","FTM","KAVA","CELO","CRV","MKR","COMP","SUSHI","1INCH","DYDX","GMX","JTO","PYTH","SEI","STRK","BLUR","METIS","STX","BEAM","ACE","MAGIC","RDNT","SSV","OCEAN","RUNE","AGIX","NFP","PERP","STORJ","CELR","TWT","CFX","FLOKI","BAND","ANKR","MTL","ACH","CHR","BNX","GMT","APE","HFT","SKL","OGN","REEF","CTSI","BAKE","DODO","WIN","HOT","SUPER","API3","COTI","HNT","GLM","BNT","MASK","AUDIO","NMR","MOVR","LQTY","BADGER","ALPHA","OAX","PROS","AKRO","HARD","NULS","STMX","SLP","POLY","BURGER","BOND","TRIBE","INDEX","MAPS","LIKE","STEP","AMPL","PAXG","NEXO","MDT","FOR","COCOS","TROY","POND","ARPA","STPT","DUSK","KNC","BAL","CVX","YGG","MC","SFUND","MBOX","WAXP","LOOM","ALT","DYM","PIXEL","ORDI","MANTA","PORTAL","SXP","RLC","POKT","HYPE","LINA","DATA","VOXEL","PORTAL","AI","NFP","ACE","PIXEL","DYM","ALT","MANTA","STRK","BLUR","RDNT","SSV","LQTY","OCEAN","NFP","PERP","STORJ","CELR","FLOKI","BAND","ANKR","MTL","ACH","SKL","OGN","REEF","CTSI","BAKE","DODO","WIN","HOT","SUPER","API3","COTI","HNT","GLM","BNT"],
+  top250: ["BTC","ETH","BNB","SOL","XRP","DOGE","ADA","AVAX","TRX","LINK","DOT","MATIC","LTC","UNI","ATOM","NEAR","ICP","FIL","APT","ARB","OP","INJ","SUI","TIA","RENDER","WLD","PEPE","WIF","FET","BONK","IMX","GRT","AAVE","SNX","ENS","LDO","SAND","MANA","AXS","GALA","CHZ","FLOW","ROSE","VET","ALGO","THETA","FTM","KAVA","CELO","CRV","MKR","COMP","SUSHI","1INCH","DYDX","GMX","JTO","PYTH","SEI","STRK","BLUR","METIS","STX","BEAM","ACE","MAGIC","RDNT","SSV","OCEAN","RUNE","AGIX","NFP","PERP","STORJ","CELR","TWT","CFX","FLOKI","BAND","ANKR","MTL","ACH","CHR","BNX","GMT","APE","HFT","SKL","OGN","REEF","CTSI","BAKE","DODO","WIN","HOT","SUPER","API3","COTI","HNT","GLM","BNT","MASK","AUDIO","NMR","MOVR","LQTY","BADGER","ALPHA","OAX","PROS","AKRO","HARD","NULS","STMX","SLP","POLY","BURGER","BOND","TRIBE","INDEX","MAPS","LIKE","STEP","AMPL","PAXG","NEXO","MDT","FOR","COCOS","TROY","POND","ARPA","STPT","DUSK","KNC","BAL","CVX","YGG","MC","SFUND","MBOX","WAXP","LOOM","ALT","DYM","PIXEL","ORDI","MANTA","PORTAL","SXP","RLC","POKT","HYPE","LINA","DATA","VOXEL","AI","NKN","STPT","FIDA","RAY","SRM","ORCA","ATLAS","POLIS","GTC","TORN","BOND","BAKE","DODO","WIN","HOT","SUPER","REEF","CTSI","SKL","OGN","ANKR","BAND","MTL","ACH","NULS","SXP","FOR","MDT","TROY","COCOS","POND","ARPA","HARD","STMX","SLP","POLY","BURGER","TRIBE","INDEX","MAPS","LIKE","STEP","PROS","OAX","AKRO","BADGER","ALPHA","MASK","AUDIO","NMR","MOVR","LQTY","NEXO","PAXG","AMPL","AUDIO","MASK","NMR","STORJ","PERP","CELR","AGIX","RUNE","OCEAN","SSV","RDNT","MAGIC","ACE","BEAM","STX","METIS","BLUR","STRK","SEI","PYTH","JTO","GMX","DYDX","COMP","MKR","CRV","CELO","KAVA","FTM","THETA","ALGO","VET","ROSE","FLOW","CHZ","GALA","AXS","MANA","SAND","LDO","ENS","SNX","AAVE","GRT","IMX"],
+};
+
+// Expose needed functions globally for scanner-pro.js
+window.SELECTED_UNIVERSE = 'top100';
+window.scanRunning = false;
+window.scanResultsCache = scanResultsCache;
+window.selectedCoinsForContent = selectedCoinsForContent;
+window.goAnalyze = goAnalyze;
+window.quickSave = quickSave;
+window.quickTradeOpen = quickTradeOpen;
+
+// TA helper functions exposed globally for scanner-pro.js
+window.sma = sma; window.ema = ema; window.rsi = rsi;
+window.macd = macd; window.lst = lst; window.stRSI = stRSI;
+window.atrF = atrF; window.bb = bb; window.findSR = findSR;
+window.fmt = fmt; window.SC = SC;
+
+// Load scanner-pro engine
+const scannerScript = document.createElement('script');
+scannerScript.src = 'scanner-pro.js';
+document.head.appendChild(scannerScript);
 
 // Auto refresh harga setiap 5 menit saat di tab tracker
 setInterval(()=>{if(document.getElementById('tab-tracker').classList.contains('active'))RF();},300000);
