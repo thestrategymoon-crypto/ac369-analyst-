@@ -2,485 +2,469 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>AC369 · Signal System</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--g:#00ff87;--r:#ff4560;--y:#f5c518;--b:#00ccff;--bg:#060810;--card:rgba(9,12,20,.95);--brd:rgba(255,255,255,.07);--txt:#c4ccd6;--dim:#2d3d4d;--dmr:#1a2535}
+:root{
+  --g:#00ff87;--r:#ff4560;--y:#f5c518;--b:#00ccff;
+  --bg:#060810;--card:rgba(9,12,20,.95);--brd:rgba(255,255,255,.07);
+  --txt:#c4ccd6;--dim:#2d3d4d;--dmr:#1a2535
+}
 body{min-height:100vh;background:var(--bg);font-family:'IBM Plex Mono',monospace;color:var(--txt);overflow-x:hidden}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(0,255,135,.2);border-radius:4px}
-.bg-grid{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(0,255,135,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,135,.018) 1px,transparent 1px);background-size:42px 42px}
-.bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 80% 45% at 50% -5%,rgba(0,255,135,.055) 0%,transparent 65%)}
-.bg-scan{position:fixed;left:0;right:0;height:2px;pointer-events:none;z-index:0;background:linear-gradient(transparent,rgba(0,255,135,.06),transparent);animation:scan 9s linear infinite}
+.bg-grid{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(0,255,135,.018) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(0,255,135,.018) 1px,transparent 1px);
+  background-size:42px 42px}
+.bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 80% 45% at 50% -5%,rgba(0,255,135,.055) 0%,transparent 65%)}
 @keyframes scan{0%{top:-2px}100%{top:100vh}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.bg-scan{position:fixed;left:0;right:0;height:2px;pointer-events:none;z-index:0;
+  background:linear-gradient(transparent,rgba(0,255,135,.06),transparent);animation:scan 9s linear infinite}
 .wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:22px 14px 80px}
-.nav{display:flex;gap:5px;margin-bottom:18px;background:rgba(9,12,20,.9);border:1px solid var(--brd);border-radius:12px;padding:5px}
-.nb{flex:1;padding:9px 6px;background:transparent;border:none;border-radius:8px;color:var(--dim);font-size:9px;font-weight:700;letter-spacing:1.5px;cursor:pointer;font-family:inherit;text-transform:uppercase;transition:all .2s}
+
+/* NAV */
+.nav{display:flex;gap:5px;margin-bottom:18px;background:rgba(9,12,20,.9);
+  border:1px solid var(--brd);border-radius:12px;padding:5px}
+.nb{flex:1;padding:9px 4px;background:transparent;border:none;border-radius:8px;
+  color:var(--dim);font-size:8px;font-weight:700;letter-spacing:1px;cursor:pointer;
+  font-family:inherit;text-transform:uppercase;transition:all .2s;white-space:nowrap}
 .nb.active{background:rgba(0,255,135,.1);color:var(--g);border:1px solid rgba(0,255,135,.25)}
 .tab{display:none}.tab.active{display:block}
+
+/* HEADER */
 .hdr{text-align:center;margin-bottom:24px;animation:fadeUp .5s ease}
-.badge{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(0,255,135,.2);border-radius:3px;padding:4px 12px;margin-bottom:11px;background:rgba(0,255,135,.03)}
+.badge{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(0,255,135,.2);
+  border-radius:3px;padding:4px 12px;margin-bottom:11px;background:rgba(0,255,135,.03)}
 .bdot{width:5px;height:5px;border-radius:50%;background:var(--g);animation:pulse 2s infinite}
 .btxt{font-size:8px;letter-spacing:3px;color:var(--g);text-transform:uppercase}
-h1{font-size:clamp(20px,5vw,34px);font-weight:700;color:#e8f0f8;letter-spacing:-1px;line-height:1.1;margin-bottom:5px}
-.grad{background:linear-gradient(90deg,var(--g),var(--b));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.card{background:var(--card);border:1px solid var(--brd);border-radius:14px;padding:18px 20px;backdrop-filter:blur(14px);box-shadow:0 4px 32px rgba(0,0,0,.5);animation:fadeUp .35s ease both;margin-bottom:12px}
-.sh{font-size:9px;letter-spacing:3px;color:var(--g);text-transform:uppercase;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid rgba(0,255,135,.09);display:flex;align-items:center;gap:7px}
-.sh::before{content:'';width:3px;height:3px;border-radius:50%;background:var(--g);display:inline-block;flex-shrink:0}
-.row{display:flex;justify-content:space-between;align-items:flex-start;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+h1{font-size:clamp(20px,5vw,34px);font-weight:700;color:#e8f0f8;letter-spacing:-1px;
+  line-height:1.1;margin-bottom:5px}
+.grad{background:linear-gradient(90deg,var(--g),var(--b));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--brd);border-radius:14px;
+  padding:18px 20px;backdrop-filter:blur(14px);box-shadow:0 4px 32px rgba(0,0,0,.5);
+  animation:fadeUp .35s ease both;margin-bottom:12px}
+.sh{font-size:9px;letter-spacing:3px;color:var(--g);text-transform:uppercase;
+  margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid rgba(0,255,135,.09);
+  display:flex;align-items:center;gap:7px}
+.sh::before{content:'';width:3px;height:3px;border-radius:50%;background:var(--g);
+  display:inline-block;flex-shrink:0}
+.row{display:flex;justify-content:space-between;align-items:flex-start;
+  padding:5px 0;border-bottom:1px solid rgba(255,255,255,.03)}
 .rl{color:#3d4a5a;font-size:11px;flex-shrink:0;padding-right:10px}
 .rv{font-size:11px;text-align:right;font-weight:500;line-height:1.4}
 .rv.mono{font-size:12px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+
+/* INPUTS */
 .inp-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-input[type=text]{flex:1;min-width:140px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:13px 16px;font-size:20px;font-weight:700;color:var(--g);outline:none;font-family:inherit;letter-spacing:3px;caret-color:var(--g);transition:border-color .2s}
+input[type=text]{flex:1;min-width:140px;background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:13px 16px;
+  font-size:20px;font-weight:700;color:var(--g);outline:none;font-family:inherit;
+  letter-spacing:3px;caret-color:var(--g);transition:border-color .2s}
 input[type=text]:focus{border-color:rgba(0,255,135,.4)}
-.btn{padding:12px 20px;background:rgba(0,255,135,.09);border:1px solid rgba(0,255,135,.35);border-radius:10px;color:var(--g);font-size:10px;font-weight:700;letter-spacing:2px;cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap}
+.btn{padding:12px 20px;background:rgba(0,255,135,.09);border:1px solid rgba(0,255,135,.35);
+  border-radius:10px;color:var(--g);font-size:10px;font-weight:700;letter-spacing:2px;
+  cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap}
 .btn:hover:not(:disabled){background:rgba(0,255,135,.18);box-shadow:0 0 18px rgba(0,255,135,.2)}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 .btn-r{background:rgba(255,69,96,.08);border-color:rgba(255,69,96,.3);color:var(--r)}
 .btn-r:hover:not(:disabled){background:rgba(255,69,96,.18)!important}
 .qw{display:flex;gap:5px;flex-wrap:wrap}
-.qb{padding:3px 9px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;color:var(--dim);font-size:9px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.qb{padding:3px 9px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);
+  border-radius:12px;color:var(--dim);font-size:9px;font-weight:600;cursor:pointer;
+  font-family:inherit;transition:all .15s}
 .qb:hover{background:rgba(0,255,135,.07);border-color:rgba(0,255,135,.4);color:var(--g)}
-.loader{text-align:center;padding:36px}
+
+/* LOADER */
 .sw{width:46px;height:46px;margin:0 auto 14px;position:relative}
-.sp1{position:absolute;inset:0;border:2px solid rgba(0,255,135,.06);border-top:2px solid var(--g);border-radius:50%;animation:spin .75s linear infinite}
-.sp2{position:absolute;inset:7px;border:1px solid rgba(0,255,135,.04);border-bottom:1px solid rgba(0,255,135,.2);border-radius:50%;animation:spin 1.1s linear infinite reverse}
-.sig-card{border-radius:14px;padding:15px 18px;display:flex;align-items:center;gap:13px;flex-wrap:wrap;margin-bottom:12px;animation:fadeUp .35s .05s ease both}
-.sig-ico{width:50px;height:50px;border-radius:12px;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px;animation:fadeUp .35s .08s ease both}
+.sp1{position:absolute;inset:0;border:2px solid rgba(0,255,135,.06);
+  border-top:2px solid var(--g);border-radius:50%;animation:spin .75s linear infinite}
+.sp2{position:absolute;inset:7px;border:1px solid rgba(0,255,135,.04);
+  border-bottom:1px solid rgba(0,255,135,.2);border-radius:50%;
+  animation:spin 1.1s linear infinite reverse}
+
+/* SIGNAL */
+.sig-card{border-radius:14px;padding:15px 18px;display:flex;align-items:center;
+  gap:13px;flex-wrap:wrap;margin-bottom:12px}
+.cbr{height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;margin-top:4px}
+.livdot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--g);
+  animation:blink 1.5s infinite;margin-right:4px;vertical-align:middle}
+.tag{font-size:8px;color:var(--dmr);background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.05);border-radius:3px;padding:2px 6px;
+  letter-spacing:1px;text-transform:uppercase;display:inline-block}
+.lbl{font-size:8px;letter-spacing:3px;color:var(--dmr);text-transform:uppercase}
+.err{background:rgba(255,69,96,.05);border:1px solid rgba(255,69,96,.2);
+  border-radius:12px;padding:14px 18px;margin-bottom:11px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px}
 @media(max-width:540px){.g2{grid-template-columns:1fr}}
 .g2 .card{margin-bottom:0}
 .mag{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:7px;margin-bottom:9px}
-.mai{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:8px;padding:8px 10px}
-.scg{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px;animation:fadeUp .35s .16s ease both}
+.mai{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);
+  border-radius:8px;padding:8px 10px}
+.scg{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px}
 @media(max-width:540px){.scg{grid-template-columns:1fr}}
 .scc{border-radius:14px;padding:15px 17px}
-.zr{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.03)}
-.zt{font-size:9px;width:19px;flex-shrink:0;font-weight:700}
-.zp{font-size:12px;color:#e2eaf3;font-weight:700;font-family:'IBM Plex Mono',monospace;flex:1}
+.zr{display:flex;align-items:center;gap:8px;padding:5px 0;
+  border-bottom:1px solid rgba(255,255,255,.03)}
+
+/* SCANNER */
+.univ-btn{padding:5px 11px;border-radius:7px;font-size:9px;font-weight:700;
+  cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)}
+.univ-btn.active{background:rgba(0,255,135,.12);border-color:rgba(0,255,135,.4);color:var(--g)}
+.coin-card{background:rgba(9,12,20,.92);border-left:3px solid var(--g);border-radius:12px;
+  padding:13px 15px;margin-bottom:10px;animation:fadeUp .35s ease both}
+.prob-bar{height:5px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden}
+.prob-fill{height:100%;border-radius:3px;transition:width .6s}
+
 /* TRACKER */
-.tri{background:rgba(9,12,20,.8);border:1px solid var(--brd);border-radius:12px;padding:13px 15px;margin-bottom:8px;position:relative;overflow:hidden}
+.tri{background:rgba(9,12,20,.8);border:1px solid var(--brd);border-radius:12px;
+  padding:13px 15px;margin-bottom:8px;position:relative;overflow:hidden}
 .tri::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:2px 0 0 2px}
-.tri.active::before{background:var(--y);box-shadow:0 0 8px rgba(245,197,24,.4)}
-.tri.win::before{background:var(--g);box-shadow:0 0 8px rgba(0,255,135,.4)}
-.tri.loss::before{background:var(--r);box-shadow:0 0 8px rgba(255,69,96,.4)}
-.tri.expired::before{background:var(--dim)}
+.tri.active::before{background:var(--y)}
+.tri.win::before{background:var(--g)}
+.tri.loss::before{background:var(--r)}
 .trpb{height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;margin-top:4px}
 .trpf{height:100%;border-radius:2px;transition:width .6s}
+
 /* WINRATE */
-.wrm{background:rgba(9,12,20,.8);border:1px solid var(--brd);border-radius:12px;padding:15px 17px;margin-bottom:9px}
+.wrm{background:rgba(9,12,20,.8);border:1px solid var(--brd);border-radius:12px;
+  padding:15px 17px;margin-bottom:9px}
 .wrb{height:5px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;margin:6px 0 10px}
 .wrbf{height:100%;border-radius:3px;transition:width .7s}
-.wrs{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
-.wri{background:rgba(255,255,255,.02);border-radius:7px;padding:7px 8px;text-align:center}
-.wrc{display:grid;grid-template-columns:repeat(auto-fit,minmax(75px,1fr));gap:5px;margin-top:9px}
-.wrci{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:7px;padding:7px;text-align:center}
-.lbl{font-size:8px;letter-spacing:3px;color:var(--dmr);text-transform:uppercase}
-.livdot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--g);animation:blink 1.5s infinite;margin-right:4px;vertical-align:middle}
-.tag{font-size:8px;color:var(--dmr);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:3px;padding:2px 6px;letter-spacing:1px;text-transform:uppercase;display:inline-block}
-.cbr{height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;margin-top:4px}
 .hidden{display:none}
-.err{background:rgba(255,69,96,.05);border:1px solid rgba(255,69,96,.2);border-radius:12px;padding:14px 18px;margin-bottom:11px}
 </style>
 </head>
 <body>
-<div class="bg-grid"></div><div class="bg-glow"></div><div class="bg-scan"></div>
+<div class="bg-grid"></div><div class="bg-glow"></div>
+<div class="bg-scan"></div>
 <div class="wrap">
 
+<!-- HEADER -->
 <div class="hdr">
-  <div class="badge"><span class="bdot"></span><span class="btxt">Alpha Crypto 369 · Live · Binance + CoinGecko</span></div>
-  <h1>AC369 <span class="grad">SIGNAL SYSTEM</span></h1>
-  <p class="lbl" style="letter-spacing:1.5px;margin-top:3px">Analisis · Auto Tracker TP/SL · Monthly Winrate</p>
-  <div style="margin-top:10px">
-    <a href="content-funnel.html" style="color:#00ccff;font-size:9px;letter-spacing:2px;text-decoration:none;border:1px solid rgba(0,204,255,.2);border-radius:6px;padding:4px 12px">✍ Content Funnel Generator →</a>
+  <div class="badge"><span class="bdot"></span>
+    <span class="btxt">Alpha Crypto 369 · Live · Binance</span>
   </div>
+  <h1>AC369 <span class="grad">SIGNAL SYSTEM</span></h1>
+  <p class="lbl" style="letter-spacing:1.5px;margin-top:3px">
+    Analisis · Scanner · Tracker · Winrate
+  </p>
 </div>
 
+<!-- NAV -->
 <div class="nav">
   <button class="nb active" onclick="T('analyze')">📊 ANALISIS</button>
   <button class="nb" onclick="T('scanner')">🔍 SCANNER</button>
   <button class="nb" onclick="T('tracker')">🎯 TRACKER</button>
-  <button class="nb" onclick="T('content')">✍️ KONTEN</button>
   <button class="nb" onclick="T('winrate')">📈 WINRATE</button>
 </div>
 
-<!-- TAB ANALISIS -->
+<!-- ═══ TAB ANALISIS ═══ -->
 <div id="tab-analyze" class="tab active">
   <div class="card">
     <div class="lbl" style="margin-bottom:10px">↗ Masukkan Ticker</div>
     <div class="inp-row">
-      <input id="ti" type="text" placeholder="BTC / ETH / SOL..." maxlength="10" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')AN()"/>
+      <input id="ti" type="text" placeholder="BTC / ETH / SOL..." maxlength="10"
+        oninput="this.value=this.value.toUpperCase()"
+        onkeydown="if(event.key==='Enter')AN()"/>
       <button class="btn" id="ab" onclick="AN()">▶ ANALISIS</button>
     </div>
     <div class="qw" id="qw"></div>
   </div>
-  <div id="la" class="card hidden"><div class="loader"><div class="sw"><div class="sp1"></div><div class="sp2"></div></div><div style="color:var(--g);font-size:9px;letter-spacing:3px;text-transform:uppercase;margin-bottom:4px">Fetching 300 Candle</div><div style="color:var(--dmr);font-size:9px">Binance OHLCV · CoinGecko · Kalkulasi TA...</div></div></div>
-  <div id="ea" class="err hidden"><div style="color:var(--r);font-size:10px;font-weight:700;margin-bottom:4px">⚠ GAGAL FETCH DATA</div><div id="em" style="color:#7a2030;font-size:11px;word-break:break-word;line-height:1.6"></div></div>
+  <div id="la" class="card hidden">
+    <div style="text-align:center;padding:32px">
+      <div class="sw"><div class="sp1"></div><div class="sp2"></div></div>
+      <div style="color:var(--g);font-size:9px;letter-spacing:3px;text-transform:uppercase">
+        Fetching Data...</div>
+    </div>
+  </div>
+  <div id="ea" class="err hidden">
+    <div style="color:var(--r);font-size:10px;font-weight:700;margin-bottom:4px">⚠ ERROR</div>
+    <div id="em" style="color:#7a2030;font-size:11px;line-height:1.6"></div>
+  </div>
   <div id="res" class="hidden">
     <div class="card" id="prc"></div>
     <div id="sgc"></div>
-    <!-- TRADE EXECUTION PANEL -->
     <div id="sva" class="hidden" style="margin-bottom:11px">
-      <div id="trade-panel" style="background:rgba(9,12,20,.96);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:18px 20px;backdrop-filter:blur(14px);box-shadow:0 4px 32px rgba(0,0,0,.5)">
-        <div style="font-size:9px;letter-spacing:3px;color:var(--g);text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid rgba(0,255,135,.09);display:flex;align-items:center;gap:7px">
-          <span style="width:3px;height:3px;border-radius:50%;background:var(--g);display:inline-block"></span>
-          Eksekusi Trade
-        </div>
-
-        <!-- Order params display -->
-        <div id="trade-params" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:7px;margin-bottom:14px"></div>
-
-        <!-- Size input -->
-        <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
-          <div style="flex:1;min-width:160px">
-            <div style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px">Ukuran Posisi (USDT)</div>
-            <div style="display:flex;gap:6px;align-items:center">
-              <input type="number" id="trade-size" value="100" min="10" step="10"
-                style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 12px;font-size:14px;font-weight:700;color:#e8f0f8;outline:none;font-family:'IBM Plex Mono',monospace;width:100%;max-width:130px"
-                oninput="UTP()"/>
-              <span style="font-size:11px;color:var(--dim)">USDT</span>
-            </div>
+      <div style="background:rgba(9,12,20,.96);border:1px solid rgba(255,255,255,.08);
+        border-radius:14px;padding:18px 20px">
+        <div class="sh" style="margin-bottom:12px">⚡ Eksekusi Trade</div>
+        <div id="trade-params" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:7px;margin-bottom:12px"></div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+          <div>
+            <div class="lbl" style="margin-bottom:5px">Ukuran (USDT)</div>
+            <input type="number" id="ts" value="100" min="10" step="10" oninput="UTP()"
+              style="width:110px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+              border-radius:8px;padding:8px 12px;font-size:14px;font-weight:700;color:#e8f0f8;
+              outline:none;font-family:'IBM Plex Mono',monospace"/>
           </div>
-          <!-- Leverage -->
-          <div style="flex:1;min-width:140px">
-            <div style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px">Leverage</div>
-            <div style="display:flex;gap:5px">
-              ${[1,2,3,5,10].map(x=>`<button onclick="setLev(${x})" id="lev-${x}" class="lev-btn" style="padding:6px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:6px;color:var(--dim);font-size:10px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .15s">${x}x</button>`).join("")}
+          <div>
+            <div class="lbl" style="margin-bottom:5px">Leverage</div>
+            <div style="display:flex;gap:5px" id="lev-btns">
+              <!-- filled by JS -->
             </div>
           </div>
         </div>
-
-        <!-- Risk/Reward preview -->
-        <div id="rr-preview" style="background:rgba(255,255,255,.03);border-radius:9px;padding:10px 13px;margin-bottom:14px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px 12px;text-align:center"></div>
-
-        <!-- Exchange buttons -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px">
-          <button onclick="openBybit('LONG')" id="btn-bybit-long"
-            style="padding:13px 10px;background:linear-gradient(135deg,rgba(0,255,135,.12),rgba(0,200,100,.06));border:1px solid rgba(0,255,135,.4);border-radius:10px;color:#00ff87;font-size:10px;font-weight:700;letter-spacing:1.5px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px">
-            <span style="font-size:16px">▲</span>
-            <span>BYBIT LONG</span>
-            <span style="font-size:8px;opacity:.6;letter-spacing:1px">Buka di Bybit →</span>
-          </button>
-          <button onclick="openBybit('SHORT')" id="btn-bybit-short"
-            style="padding:13px 10px;background:linear-gradient(135deg,rgba(255,69,96,.12),rgba(200,50,70,.06));border:1px solid rgba(255,69,96,.4);border-radius:10px;color:#ff4560;font-size:10px;font-weight:700;letter-spacing:1.5px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px">
-            <span style="font-size:16px">▼</span>
-            <span>BYBIT SHORT</span>
-            <span style="font-size:8px;opacity:.6;letter-spacing:1px">Buka di Bybit →</span>
-          </button>
+        <div id="rr-prev" style="background:rgba(255,255,255,.03);border-radius:8px;
+          padding:10px 12px;margin-bottom:12px;display:grid;grid-template-columns:repeat(4,1fr);
+          gap:8px;text-align:center"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <button onclick="openBybit('LONG')" id="bl"
+            style="padding:12px;background:rgba(0,255,135,.1);border:1px solid rgba(0,255,135,.4);
+            border-radius:10px;color:#00ff87;font-size:10px;font-weight:700;cursor:pointer;
+            font-family:inherit;transition:all .2s">▲ BYBIT LONG</button>
+          <button onclick="openBybit('SHORT')" id="bs"
+            style="padding:12px;background:rgba(255,69,96,.1);border:1px solid rgba(255,69,96,.4);
+            border-radius:10px;color:#ff4560;font-size:10px;font-weight:700;cursor:pointer;
+            font-family:inherit;transition:all .2s">▼ BYBIT SHORT</button>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px">
-          <button onclick="openBinance('BUY')"
-            style="padding:11px 10px;background:rgba(245,197,24,.08);border:1px solid rgba(245,197,24,.3);border-radius:10px;color:#f5c518;font-size:10px;font-weight:700;letter-spacing:1.5px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s">
-            ⚡ BINANCE FUTURES BUY
-          </button>
-          <button onclick="openBinance('SELL')"
-            style="padding:11px 10px;background:rgba(245,197,24,.04);border:1px solid rgba(245,197,24,.2);border-radius:10px;color:#9a8a30;font-size:10px;font-weight:700;letter-spacing:1.5px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s">
-            ⚡ BINANCE FUTURES SELL
-          </button>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button onclick="cpOrd()"
+            style="padding:9px;background:rgba(0,204,255,.07);border:1px solid rgba(0,204,255,.25);
+            border-radius:9px;color:#00ccff;font-size:9px;font-weight:700;cursor:pointer;
+            font-family:inherit">📋 COPY ORDER</button>
+          <button onclick="SV()"
+            style="padding:9px;background:rgba(0,255,135,.07);border:1px solid rgba(0,255,135,.25);
+            border-radius:9px;color:var(--g);font-size:9px;font-weight:700;cursor:pointer;
+            font-family:inherit">＋ SAVE TRACKER</button>
         </div>
-
-        <!-- Copy order detail -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px">
-          <button onclick="copyOrder()" style="padding:9px 10px;background:rgba(0,204,255,.07);border:1px solid rgba(0,204,255,.25);border-radius:9px;color:#00ccff;font-size:9px;font-weight:700;letter-spacing:1.5px;cursor:pointer;font-family:'IBM Plex Mono',monospace">📋 COPY ORDER DETAIL</button>
-          <button onclick="SV()" style="padding:9px 10px;background:rgba(0,255,135,.07);border:1px solid rgba(0,255,135,.25);border-radius:9px;color:var(--g);font-size:9px;font-weight:700;letter-spacing:1.5px;cursor:pointer;font-family:'IBM Plex Mono',monospace">＋ SIMPAN KE TRACKER</button>
-        </div>
-
-        <div style="font-size:9px;color:#1e2d3d;text-align:center;letter-spacing:.5px;line-height:1.7">
-          ⚠ Kamu tetap yang approve order di exchange · Selalu gunakan SL · Tidak ada eksekusi otomatis
+        <div style="margin-top:10px;font-size:9px;color:#1e2d3d;text-align:center">
+          ⚠ Kamu tetap approve order di exchange · Bukan eksekusi otomatis
         </div>
       </div>
     </div>
     <div class="g2"><div class="card" id="src"></div><div class="card" id="mmc"></div></div>
     <div class="card" id="mac"></div>
-    <div class="scg" id="scg"></div>
+    <div class="scg" id="scg2"></div>
     <div class="card" id="mkc"></div>
-    <div style="text-align:center;padding:8px"><p style="font-size:8px;color:#111d2a;letter-spacing:1.5px;text-transform:uppercase;line-height:1.9">Alpha Crypto 369 · @Alphacrypto_id · Bukan Saran Investasi</p></div>
+    <div style="text-align:center;padding:8px">
+      <p style="font-size:8px;color:#111d2a;letter-spacing:1.5px;text-transform:uppercase">
+        Alpha Crypto 369 · @Alphacrypto_id · Bukan Saran Investasi</p>
+    </div>
   </div>
 </div>
 
-<!-- TAB SCANNER PRO -->
+<!-- ═══ TAB SCANNER ═══ -->
 <div id="tab-scanner" class="tab">
   <div class="card">
-    <div class="sh">🔍 Market Scanner PRO — Multi-Layer Analysis</div>
+    <div class="sh">🔍 Market Scanner PRO</div>
     <p style="font-size:11px;color:#4b5d6e;margin-bottom:14px;line-height:1.7">
-      Scan otomatis hingga 250 koin · <span style="color:#00ff87">R:R minimum 1:2 enforced</span> · Funding Rate + OI + Long/Short + Taker Volume · Pisah <span style="color:#00ccff">Scalp (15m)</span> vs <span style="color:#00ff87">Swing (Daily)</span> · Probabilitas multi-layer
+      Scan otomatis · Outperform BTC 2x+ · Inverse BTC · R:R≥1:2 ·
+      <span style="color:var(--g)">Swing Daily</span> +
+      <span style="color:var(--b)">Scalp 15m</span> · Probabilitas multi-layer
     </p>
-
-    <!-- Universe -->
     <div style="margin-bottom:12px">
-      <div style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Universe Koin</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap" id="universe-btns">
-        <button class="univ-btn" onclick="setUniverse('top10')"  data-u="top10"  style="padding:5px 11px;border-radius:7px;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)">TOP 10</button>
-        <button class="univ-btn" onclick="setUniverse('top20')"  data-u="top20"  style="padding:5px 11px;border-radius:7px;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)">TOP 20</button>
-        <button class="univ-btn" onclick="setUniverse('defi')"   data-u="defi"   style="padding:5px 11px;border-radius:7px;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)">DEFI</button>
-        <button class="univ-btn" onclick="setUniverse('l1l2')"   data-u="l1l2"   style="padding:5px 11px;border-radius:7px;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)">L1/L2</button>
-        <button class="univ-btn active" onclick="setUniverse('top100')" data-u="top100" style="padding:5px 11px;border-radius:7px;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(0,255,135,.12);border:1px solid rgba(0,255,135,.4);color:#00ff87">🔥 TOP 100</button>
-        <button class="univ-btn" onclick="setUniverse('top200')" data-u="top200" style="padding:5px 11px;border-radius:7px;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)">TOP 200</button>
-        <button class="univ-btn" onclick="setUniverse('top250')" data-u="top250" style="padding:5px 11px;border-radius:7px;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(245,197,24,.3);color:#f5c518">⚡ TOP 250</button>
-        <button class="univ-btn" onclick="setUniverse('dynamic')" data-u="dynamic" style="padding:5px 11px;border-radius:7px;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,69,96,.3);color:#ff4560">🌐 DYNAMIC 400+</button>
+      <div class="lbl" style="margin-bottom:8px">Universe Koin</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="ubtns">
+        <button class="univ-btn active" onclick="setU('top20')" data-u="top20">TOP 20</button>
+        <button class="univ-btn" onclick="setU('top50')" data-u="top50">TOP 50</button>
+        <button class="univ-btn" onclick="setU('top100')" data-u="top100">🔥 TOP 100</button>
+        <button class="univ-btn" onclick="setU('defi')" data-u="defi">DEFI</button>
+        <button class="univ-btn" onclick="setU('l1l2')" data-u="l1l2">L1/L2</button>
+        <button class="univ-btn" onclick="setU('meme')" data-u="meme">MEME</button>
+        <button class="univ-btn" onclick="setU('all')" data-u="all">⚡ ALL 200</button>
       </div>
     </div>
-
-    <!-- Filters -->
-    <div style="margin-bottom:14px">
-      <div style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Filter & Opsi</div>
-      <div style="display:flex;gap:14px;flex-wrap:wrap">
-        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;color:#00ff87">
-          <input type="checkbox" id="f-minrr" checked style="accent-color:#00ff87"/> R:R ≥ 2.0 (enforced)
-        </label>
-        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;color:#00ccff">
-          <input type="checkbox" id="f-scalp" checked style="accent-color:#00ccff"/> Tampilkan Scalp 15m
-        </label>
-        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;color:#f5c518">
-          <input type="checkbox" id="f-vol" checked style="accent-color:#f5c518"/> Volume Filter
-        </label>
-        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;color:#c4ccd6">
-          <input type="checkbox" id="f-excl-stable" checked style="accent-color:#00ff87"/> Exclude Stablecoin
-        </label>
-      </div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px">
+      <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;color:var(--g)">
+        <input type="checkbox" id="f-rr" checked style="accent-color:var(--g)"/> R:R ≥ 2.0
+      </label>
+      <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;color:var(--b)">
+        <input type="checkbox" id="f-scalp" checked style="accent-color:var(--b)"/> Scalp 15m
+      </label>
+      <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;color:var(--y)">
+        <input type="checkbox" id="f-anomaly" checked style="accent-color:var(--y)"/> Anomali BTC
+      </label>
     </div>
-
-    <!-- Info boxes -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:14px">
-      <div style="background:rgba(0,255,135,.04);border:1px solid rgba(0,255,135,.12);border-radius:8px;padding:10px;text-align:center">
-        <div style="font-size:16px;margin-bottom:3px">📈</div>
-        <div style="font-size:9px;font-weight:700;color:#00ff87">Swing Trade</div>
-        <div style="font-size:8px;color:var(--dmr);margin-top:2px">Daily · Hold 3-14 hari</div>
-      </div>
-      <div style="background:rgba(0,204,255,.04);border:1px solid rgba(0,204,255,.12);border-radius:8px;padding:10px;text-align:center">
-        <div style="font-size:16px;margin-bottom:3px">⚡</div>
-        <div style="font-size:9px;font-weight:700;color:#00ccff">Scalp Trade</div>
-        <div style="font-size:8px;color:var(--dmr);margin-top:2px">15m · Hold menit-jam</div>
-      </div>
-      <div style="background:rgba(255,69,96,.04);border:1px solid rgba(255,69,96,.12);border-radius:8px;padding:10px;text-align:center">
-        <div style="font-size:16px;margin-bottom:3px">🐋</div>
-        <div style="font-size:9px;font-weight:700;color:#ff4560">Whale Monitor</div>
-        <div style="font-size:8px;color:var(--dmr);margin-top:2px">Funding · OI · L/S</div>
-      </div>
-    </div>
-
-    <button class="btn" id="scan-btn" onclick="window.startScanPro()" style="width:100%;padding:14px;font-size:11px;letter-spacing:3px;background:linear-gradient(135deg,rgba(0,255,135,.12),rgba(0,200,255,.06));border-color:rgba(0,255,135,.4)">
-      ⚡ MULAI SCAN PRO — R:R 1:2 ENFORCED
+    <button class="btn" id="scan-btn" onclick="startScan()"
+      style="width:100%;padding:14px;font-size:11px;letter-spacing:2px;
+      background:linear-gradient(135deg,rgba(0,255,135,.12),rgba(0,200,255,.06));
+      border-color:rgba(0,255,135,.4)">
+      ⚡ MULAI SCAN
     </button>
   </div>
-
-  <!-- Progress -->
-  <div id="scan-progress" class="card hidden">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px">
-      <div style="font-size:9px;letter-spacing:2px;color:var(--g);text-transform:uppercase" id="scan-status">Scanning...</div>
-      <div style="font-size:9px;color:var(--dmr)" id="scan-phase">Initializing...</div>
+  <div id="scan-prog" class="card hidden">
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:5px">
+      <span id="scan-stat" style="font-size:9px;color:var(--g);letter-spacing:2px;text-transform:uppercase">
+        Scanning...</span>
+      <span id="scan-phase" style="font-size:9px;color:var(--dmr)"></span>
     </div>
     <div style="background:rgba(255,255,255,.05);border-radius:4px;height:6px;overflow:hidden;margin-bottom:8px">
-      <div id="scan-bar" style="height:100%;background:linear-gradient(90deg,#00ff87,#00ccff);border-radius:4px;transition:width .3s;width:0%"></div>
+      <div id="scan-bar" style="height:100%;background:linear-gradient(90deg,#00ff87,#00ccff);
+        border-radius:4px;transition:width .3s;width:0%"></div>
     </div>
-    <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--dmr);margin-bottom:10px">
-      <span id="scan-count">0 / 0 koin</span>
-      <span id="scan-found" style="color:#00ff87">0 setup valid</span>
+    <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--dmr);margin-bottom:8px">
+      <span id="scan-cnt">0 / 0</span>
+      <span id="scan-fnd" style="color:var(--g)">0 setup valid</span>
     </div>
-    <div id="scan-feed" style="max-height:120px;overflow-y:auto;font-size:9px;color:var(--dmr);line-height:1.8;font-family:'IBM Plex Mono',monospace"></div>
+    <div id="scan-feed" style="max-height:110px;overflow-y:auto;font-size:9px;
+      color:var(--dmr);line-height:1.8;font-family:'IBM Plex Mono',monospace"></div>
   </div>
-
-  <!-- Results -->
-  <div id="pro-results" class="hidden"></div>
-
-  <!-- Legacy standard tier results (hidden by default) -->
-  <div id="scan-results" class="hidden"></div>
-
-  <!-- Generate content button -->
-  <div id="gen-content-wrap" class="hidden" style="margin-top:10px">
-    <button onclick="openContentGenerator()" style="width:100%;padding:13px;background:linear-gradient(135deg,rgba(245,197,24,.12),rgba(255,140,0,.06));border:1px solid rgba(245,197,24,.35);border-radius:12px;color:#f5c518;font-size:10px;font-weight:700;letter-spacing:2px;cursor:pointer;font-family:'IBM Plex Mono',monospace"
-      onmouseover="this.style.background='linear-gradient(135deg,rgba(245,197,24,.2),rgba(255,140,0,.1))'"
-      onmouseout="this.style.background='linear-gradient(135deg,rgba(245,197,24,.12),rgba(255,140,0,.06))'">
-      ✍️ GENERATE KONTEN TELEGRAM & SOSMED
-    </button>
-  </div>
-</div>
-        <div style="font-size:10px;color:#00ff87">Setup BELI terkuat — konfluensi tertinggi</div>
-      </div>
-      <div id="long-list"></div>
-    </div>
-
-    <!-- TOP 5 SHORT -->
-    <div id="short-wrap" class="hidden" style="margin-top:8px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <div style="background:linear-gradient(135deg,#ff4560,#cc2240);border-radius:8px;padding:5px 14px;font-size:11px;font-weight:800;color:#fff;letter-spacing:2px">▼ TOP SHORT</div>
-        <div style="font-size:10px;color:#ff4560">Setup JUAL terkuat — konfluensi bearish</div>
-      </div>
-      <div id="short-list"></div>
-    </div>
-
-    <!-- Generate content button -->
-    <div id="gen-content-wrap" class="hidden" style="margin-top:12px">
-      <button onclick="openContentGenerator()" style="width:100%;padding:14px;background:linear-gradient(135deg,rgba(245,197,24,.12),rgba(255,140,0,.06));border:1px solid rgba(245,197,24,.4);border-radius:12px;color:#f5c518;font-size:11px;font-weight:700;letter-spacing:2px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s">
-        ✍️ GENERATE KONTEN TELEGRAM & SOSMED
-      </button>
-    </div>
-  </div>
-
-  <!-- STANDARD RESULTS (Tier S/A/B) -->
-  <div id="scan-results" class="hidden">
-    <div id="tier-s-wrap" class="hidden">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;margin-top:4px">
-        <div style="background:linear-gradient(135deg,#ffd700,#ff8c00);border-radius:6px;padding:4px 12px;font-size:10px;font-weight:800;color:#000;letter-spacing:2px">TIER S</div>
-        <div style="font-size:10px;color:#ffd700">Setup terbaik — entry sekarang</div>
-      </div>
-      <div id="tier-s"></div>
-    </div>
-    <div id="tier-a-wrap" class="hidden">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;margin-top:16px">
-        <div style="background:linear-gradient(135deg,#00ff87,#00cc6a);border-radius:6px;padding:4px 12px;font-size:10px;font-weight:800;color:#000;letter-spacing:2px">TIER A</div>
-        <div style="font-size:10px;color:#00ff87">Potensi tinggi — pantau ketat</div>
-      </div>
-      <div id="tier-a"></div>
-    </div>
-    <div id="tier-b-wrap" class="hidden">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;margin-top:16px">
-        <div style="background:linear-gradient(135deg,#00ccff,#0088cc);border-radius:6px;padding:4px 12px;font-size:10px;font-weight:800;color:#000;letter-spacing:2px">TIER B</div>
-        <div style="font-size:10px;color:#00ccff">Potensi sedang — tunggu konfirmasi</div>
-      </div>
-      <div id="tier-b"></div>
-    </div>
-    <div id="tier-skip-wrap" class="hidden" style="margin-top:16px">
-      <div style="font-size:9px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.04)">⊘ Tidak Memenuhi Kriteria</div>
-      <div id="tier-skip" style="display:flex;gap:6px;flex-wrap:wrap"></div>
-    </div>
-    <div style="margin-top:16px;padding:10px;text-align:center;font-size:9px;color:var(--dmr)">Tap koin untuk analisis detail · Semua data dari Binance live</div>
-    <div id="gen-content-wrap2" class="hidden" style="margin-top:8px">
-      <button onclick="openContentGenerator()" style="width:100%;padding:14px;background:linear-gradient(135deg,rgba(245,197,24,.12),rgba(255,140,0,.06));border:1px solid rgba(245,197,24,.4);border-radius:12px;color:#f5c518;font-size:11px;font-weight:700;letter-spacing:2px;cursor:pointer;font-family:'IBM Plex Mono',monospace">
-        ✍️ GENERATE KONTEN TELEGRAM & SOSMED
-      </button>
-    </div>
-  </div>
+  <div id="scan-out"></div>
 </div>
 
-<!-- TAB CONTENT GENERATOR -->
-<div id="tab-content" class="tab">
-  <div class="card">
-    <div class="sh">✍️ Content Generator · Alpha Crypto 369</div>
-    <p style="font-size:11px;color:#4b5d6e;margin-bottom:16px;line-height:1.7">
-      Generate caption siap-posting untuk Telegram publik, story, dan thread — otomatis dari hasil scan. Copy satu klik, posting langsung.
-    </p>
-
-    <!-- Content type selector -->
-    <div style="margin-bottom:14px">
-      <div style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Format Konten</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px" id="content-type-grid"></div>
-    </div>
-
-    <!-- Coin selector for content -->
-    <div style="margin-bottom:14px" id="content-coin-selector">
-      <div style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Pilih Koin (dari hasil scan)</div>
-      <div id="content-coin-list" style="display:flex;gap:6px;flex-wrap:wrap">
-        <div style="font-size:11px;color:var(--dmr)">Jalankan scanner dulu untuk memilih koin.</div>
-      </div>
-    </div>
-
-    <!-- Tone selector -->
-    <div style="margin-bottom:16px">
-      <div style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Tone Konten</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="tone-btn active" data-tone="institutional" onclick="setTone('institutional')" style="padding:6px 12px;border-radius:8px;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(0,255,135,.12);border:1px solid rgba(0,255,135,.4);color:#00ff87">Institusional</button>
-        <button class="tone-btn" data-tone="casual" onclick="setTone('casual')" style="padding:6px 12px;border-radius:8px;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)">Santai</button>
-        <button class="tone-btn" data-tone="hype" onclick="setTone('hype')" style="padding:6px 12px;border-radius:8px;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)">Hype</button>
-        <button class="tone-btn" data-tone="educational" onclick="setTone('educational')" style="padding:6px 12px;border-radius:8px;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--dim)">Edukatif</button>
-      </div>
-    </div>
-
-    <button onclick="generateContent()" id="gen-btn" style="width:100%;padding:13px;background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.35);border-radius:10px;color:#f5c518;font-size:10px;font-weight:700;letter-spacing:2.5px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;margin-bottom:14px"
-      onmouseover="this.style.background='rgba(245,197,24,.2)'" onmouseout="this.style.background='rgba(245,197,24,.1)'">
-      ⚡ GENERATE SEKARANG
-    </button>
-  </div>
-
-  <!-- Generated content output -->
-  <div id="content-output" class="hidden"></div>
-</div>
-
-<!-- TAB TRACKER -->
+<!-- ═══ TAB TRACKER ═══ -->
 <div id="tab-tracker" class="tab">
   <div class="card">
-    <div class="sh">🎯 Signal Aktif & Closed</div>
-    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-      <button class="btn" style="font-size:9px;padding:7px 13px" onclick="RF()">↺ Update Harga Live</button>
-      <button class="btn btn-r" style="font-size:9px;padding:7px 13px" onclick="CC()">✕ Hapus Semua Closed</button>
+    <div class="sh">🎯 Signal Tracker</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <button class="btn" style="font-size:9px;padding:7px 13px" onclick="RF()">↺ Update Live</button>
+      <button class="btn btn-r" style="font-size:9px;padding:7px 13px" onclick="CC()">✕ Clear Closed</button>
     </div>
-    <div id="ts" style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px"></div>
+    <div id="ts2" style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px"></div>
     <div id="tl"></div>
   </div>
 </div>
 
-<!-- TAB WINRATE -->
+<!-- ═══ TAB WINRATE ═══ -->
 <div id="tab-winrate" class="tab">
   <div class="card">
-    <div class="sh">📈 Monthly Winrate Report</div>
+    <div class="sh">📈 Monthly Winrate</div>
     <div id="wo" style="margin-bottom:14px"></div>
     <div id="wm"></div>
-    <div id="wb" style="margin-top:13px"></div>
+    <div id="wb" style="margin-top:12px"></div>
   </div>
 </div>
 
-</div>
+</div><!-- /wrap -->
 <script>
-const TICKERS=["BTC","ETH","SOL","BNB","XRP","AVAX","ARB","OP","LINK","DOT","HYPE","SUI","WIF","PEPE","TIA","RENDER","WLD","INJ","ATOM","NEAR","DOGE","ADA"];
-const CGID={BTC:"bitcoin",ETH:"ethereum",SOL:"solana",BNB:"binancecoin",XRP:"ripple",AVAX:"avalanche-2",ARB:"arbitrum",OP:"optimism",LINK:"chainlink",DOT:"polkadot",HYPE:"hyperliquid",SUI:"sui",WIF:"dogwifhat",PEPE:"pepe",TIA:"celestia",RENDER:"render-token",WLD:"worldcoin-wld",INJ:"injective-protocol",ATOM:"cosmos",NEAR:"near",DOGE:"dogecoin",ADA:"cardano"};
-const SEC={BTC:"Store of Value",ETH:"Smart Contract L1",SOL:"High-Perf L1",BNB:"Exchange Token",XRP:"Payment Network",AVAX:"Smart Contract L1",ARB:"Ethereum L2",OP:"Ethereum L2",LINK:"Oracle Network",DOT:"Cross-Chain",HYPE:"Perpetual DEX",SUI:"High-Perf L1",WIF:"Meme Coin",PEPE:"Meme Coin",TIA:"Data Availability",RENDER:"Decentralized GPU",WLD:"Identity Protocol",INJ:"DeFi L1",ATOM:"IBC Ecosystem",NEAR:"AI L1",DOGE:"Meme Coin",ADA:"Smart Contract L1"};
-const SC={BELI:{c:"#00ff87",bg:"rgba(0,255,135,.07)",bd:"rgba(0,255,135,.22)",gw:"rgba(0,255,135,.18)",ic:"▲"},TAHAN:{c:"#f5c518",bg:"rgba(245,197,24,.07)",bd:"rgba(245,197,24,.22)",gw:"rgba(245,197,24,.18)",ic:"◆"},JUAL:{c:"#ff4560",bg:"rgba(255,69,96,.07)",bd:"rgba(255,69,96,.22)",gw:"rgba(255,69,96,.18)",ic:"▼"}};
-let CSD=null;
+// ═══════════════════════════════════════════════
+// CONSTANTS & CONFIG
+// ═══════════════════════════════════════════════
+const TICKERS_ALL = [
+  "BTC","ETH","BNB","SOL","XRP","DOGE","ADA","AVAX","TRX","LINK",
+  "DOT","MATIC","LTC","UNI","ATOM","NEAR","ICP","APT","ARB","OP",
+  "INJ","SUI","TIA","RENDER","WLD","PEPE","WIF","FET","BONK","HYPE",
+  "IMX","GRT","AAVE","SNX","ENS","LDO","SAND","MANA","AXS","GALA",
+  "CHZ","ROSE","VET","ALGO","THETA","FTM","KAVA","CELO","CRV","MKR",
+  "COMP","SUSHI","1INCH","DYDX","GMX","JTO","PYTH","SEI","STRK","BLUR",
+  "METIS","STX","BEAM","ACE","MAGIC","RDNT","SSV","OCEAN","RUNE","AGIX",
+  "NFP","STORJ","CELR","TWT","CFX","FLOKI","BAND","ANKR","MTL","ACH",
+  "CHR","BNX","VOXEL","GMT","APE","HFT","SKL","OGN","REEF","CTSI",
+  "BAKE","WIN","HOT","SUPER","MANTA","ALT","DYM","PIXEL","ORDI","API3",
+  "COTI","HNT","GLM","BNT","MASK","AUDIO","NMR","LQTY","BADGER","ALPHA",
+  "STMX","SLP","COCOS","TROY","ARPA","STPT","DUSK","KNC","BAL","CVX",
+  "YGG","MC","SFUND","MBOX","WAXP","MDT","FOR","NULS","BOND","TRIBE",
+  "INDEX","STEP","AMPL","PAXG","NEXO","PORTAL","SXP","RLC","LOOM","DATA"
+];
+const UNIVERSES = {
+  top20:  TICKERS_ALL.slice(0,20),
+  top50:  TICKERS_ALL.slice(0,50),
+  top100: TICKERS_ALL.slice(0,100),
+  defi:   ["HYPE","AAVE","UNI","ARB","OP","GMX","INJ","LINK","ATOM","CRV","MKR","COMP","SNX","LDO","DYDX","1INCH","SUSHI","RDNT","SSV","LQTY"],
+  l1l2:   ["ETH","SOL","BNB","AVAX","DOT","NEAR","SUI","TIA","ARB","OP","INJ","ATOM","APT","SEI","STX","METIS","MANTA","STRK","IMX","CFX"],
+  meme:   ["DOGE","PEPE","WIF","BONK","FLOKI"],
+  all:    TICKERS_ALL,
+};
+const SC = {
+  BELI:  {c:"#00ff87",bg:"rgba(0,255,135,.07)",bd:"rgba(0,255,135,.22)",gw:"rgba(0,255,135,.18)",ic:"▲"},
+  TAHAN: {c:"#f5c518",bg:"rgba(245,197,24,.07)",bd:"rgba(245,197,24,.22)",gw:"rgba(245,197,24,.18)",ic:"◆"},
+  JUAL:  {c:"#ff4560",bg:"rgba(255,69,96,.07)",bd:"rgba(255,69,96,.22)",gw:"rgba(255,69,96,.18)",ic:"▼"},
+};
+const QTICKERS = ["BTC","ETH","SOL","BNB","XRP","AVAX","ARB","OP","LINK","DOT","HYPE","SUI","WIF","PEPE","TIA","RENDER","INJ","NEAR","DOGE","ADA"];
 
-// Quick buttons
-const qw=document.getElementById('qw');
-TICKERS.forEach(t=>{const b=document.createElement('button');b.className='qb';b.textContent=t;b.onclick=()=>{document.getElementById('ti').value=t;AN(t);};qw.appendChild(b);});
+// ── State ──
+let CSD = null, LEV = 3, SELUNIV = 'top50';
+let scanRunning = false, scanResultsCache = [];
 
-// Tab switch
-function T(tab){
+// ── Tab switch ──
+function T(tab) {
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
-  const idx={analyze:0,scanner:1,tracker:2,content:3,winrate:4}[tab];
+  const idx={analyze:0,scanner:1,tracker:2,winrate:3}[tab];
   if(idx!==undefined) document.querySelectorAll('.nb')[idx].classList.add('active');
-  if(tab==='tracker')RT();
-  if(tab==='winrate')RW();
-  if(tab==='content')initContentTab();
+  if(tab==='tracker') RT();
+  if(tab==='winrate')  RW();
 }
 
-// TA
+// ── Quick buttons ──
+const qw=document.getElementById('qw');
+QTICKERS.forEach(t=>{
+  const b=document.createElement('button');
+  b.className='qb'; b.textContent=t;
+  b.onclick=()=>{document.getElementById('ti').value=t; AN(t);};
+  qw.appendChild(b);
+});
+
+// ── Leverage buttons ──
+const levWrap=document.getElementById('lev-btns');
+[1,2,3,5,10].forEach(x=>{
+  const b=document.createElement('button');
+  b.id='lev-'+x; b.textContent=x+'x';
+  b.style.cssText='padding:6px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:6px;color:var(--dim);font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s';
+  b.onclick=()=>setLev(x);
+  levWrap.appendChild(b);
+});
+function setLev(x) {
+  LEV=x;
+  document.querySelectorAll('[id^="lev-"]').forEach(b=>{
+    const bx=parseInt(b.id.split('-')[1]);
+    b.style.background=bx===x?'rgba(0,255,135,.15)':'rgba(255,255,255,.03)';
+    b.style.borderColor=bx===x?'rgba(0,255,135,.5)':'rgba(255,255,255,.07)';
+    b.style.color=bx===x?'#00ff87':'var(--dim)';
+  });
+  UTP();
+}
+setTimeout(()=>setLev(3),100);
+
+// ── Universe selector ──
+function setU(u) {
+  SELUNIV=u;
+  document.querySelectorAll('.univ-btn').forEach(b=>{
+    const active=b.dataset.u===u;
+    b.style.background=active?'rgba(0,255,135,.12)':'rgba(255,255,255,.03)';
+    b.style.borderColor=active?'rgba(0,255,135,.4)':'rgba(255,255,255,.08)';
+    b.style.color=active?'#00ff87':'var(--dim)';
+    b.classList.toggle('active',active);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// DATA FETCH — with CORS proxy fallback
+// ═══════════════════════════════════════════════
+const PROXY = 'https://corsproxy.io/?';
+
+async function binanceFetch(path, useProxy=false) {
+  const base = 'https://api.binance.com';
+  const url = useProxy ? PROXY + encodeURIComponent(base+path) : base+path;
+  const res = await fetch(url, {signal: AbortSignal.timeout(8000)});
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+async function bFetch(path) {
+  try { return await binanceFetch(path, false); }
+  catch(e) {
+    try { return await binanceFetch(path, true); }
+    catch(e2) { throw new Error('Binance unreachable: '+e2.message); }
+  }
+}
+
+// ═══════════════════════════════════════════════
+// TA FUNCTIONS
+// ═══════════════════════════════════════════════
 function sma(a,p){return a.map((_,i)=>i<p-1?null:a.slice(i-p+1,i+1).reduce((x,y)=>x+y,0)/p)}
 function ema(a,p){const k=2/(p+1);let e=null,r=[];a.forEach(v=>{if(v==null){r.push(null);return;}e=e===null?v:v*k+e*(1-k);r.push(e);});return r}
 function rsi(c,p=14){if(c.length<p+1)return null;let g=0,l=0;for(let i=1;i<=p;i++){const d=c[i]-c[i-1];d>0?g+=d:l-=d;}let ag=g/p,al=l/p;for(let i=p+1;i<c.length;i++){const d=c[i]-c[i-1];ag=(ag*(p-1)+Math.max(d,0))/p;al=(al*(p-1)+Math.max(-d,0))/p;}return al===0?100:100-100/(1+ag/al)}
 function macd(c){const e12=ema(c,12),e26=ema(c,26);const ml=e12.map((v,i)=>v!=null&&e26[i]!=null?v-e26[i]:null).filter(v=>v!=null);const sg=ema(ml,9);return{h:ml[ml.length-1]!=null&&sg[sg.length-1]!=null?ml[ml.length-1]-sg[sg.length-1]:null,ph:ml.length>1&&sg.length>1?ml[ml.length-2]-sg[sg.length-2]:null}}
-function lst(a){return a.filter(v=>v!=null).slice(-1)[0]}
-function stRSI(c){
-  const ra=[];for(let i=14;i<c.length;i++)ra.push(rsi(c.slice(i-14,i+1),14));
-  const st=[];for(let i=13;i<ra.length;i++){const s=ra.slice(i-13,i+1),mn=Math.min(...s),mx=Math.max(...s);st.push(mx===mn?50:(ra[i]-mn)/(mx-mn)*100);}
-  const ka=sma(st,3).filter(v=>v!=null),da=sma(ka,3).filter(v=>v!=null);
-  return{k:ka[ka.length-1],d:da[da.length-1]}
-}
+function lst(a){return(a||[]).filter(v=>v!=null).slice(-1)[0]}
+function stRSI(c){const ra=[];for(let i=14;i<c.length;i++)ra.push(rsi(c.slice(i-14,i+1),14));const st=[];for(let i=13;i<ra.length;i++){const s=ra.slice(i-13,i+1),mn=Math.min(...s),mx=Math.max(...s);st.push(mx===mn?50:(ra[i]-mn)/(mx-mn)*100);}const ka=sma(st,3).filter(v=>v!=null),da=sma(ka,3).filter(v=>v!=null);return{k:ka[ka.length-1],d:da[da.length-1]}}
 function atrF(hi,lo,cl,p=14){const tr=hi.map((h,i)=>i===0?h-lo[i]:Math.max(h-lo[i],Math.abs(h-cl[i-1]),Math.abs(lo[i]-cl[i-1])));return lst(sma(tr,p))}
 function bb(c){const ma=sma(c,20);const bd=c.map((_,i)=>{if(i<19)return null;const s=c.slice(i-19,i+1),m=ma[i],sd=Math.sqrt(s.reduce((a,v)=>a+(v-m)**2,0)/20);return{u:m+2*sd,m,l:m-2*sd};}).filter(v=>v!=null);return bd[bd.length-1]}
-function findSR(hi,lo,price){
-  const pv=[];for(let i=2;i<hi.length-2;i++){if(hi[i]>hi[i-1]&&hi[i]>hi[i-2]&&hi[i]>hi[i+1]&&hi[i]>hi[i+2])pv.push({price:hi[i],t:"R"});if(lo[i]<lo[i-1]&&lo[i]<lo[i-2]&&lo[i]<lo[i+1]&&lo[i]<lo[i+2])pv.push({price:lo[i],t:"S"});}
-  const us=new Set(),cl2=[];pv.forEach((p2,i)=>{if(us.has(i))return;const g=[p2];pv.forEach((q,j)=>{if(i!==j&&!us.has(j)&&Math.abs(p2.price-q.price)/p2.price<0.02){g.push(q);us.add(j);}});us.add(i);cl2.push({price:g.reduce((a,b)=>a+b.price,0)/g.length,t:p2.t,s:g.length});});
-  let sp=cl2.filter(z=>z.price<price*1.01).sort((a,b)=>b.price-a.price).slice(0,3);
-  let rs=cl2.filter(z=>z.price>price*0.99).sort((a,b)=>a.price-b.price).slice(0,3);
-  while(sp.length<3)sp.push({price:price*(0.88-sp.length*0.07),t:"S",s:1});
-  while(rs.length<3)rs.push({price:price*(1.08+rs.length*0.07),t:"R",s:1});
-  return{sp:sp.slice(0,3),rs:rs.slice(0,3)}
-}
-function volA(v){const avg=v.slice(-20).reduce((a,b)=>a+b,0)/20,r=v.slice(-5).reduce((a,b)=>a+b,0)/5/avg;return r>1.5?"Volume surge ✓":r>1.1?"Di atas rata-rata":r<0.6?"Volume kering":"Normal"}
-function strA(c,hi,lo){
-  const lh=Math.max(...hi.slice(-3)),pvh=Math.max(...hi.slice(-6,-3)),ll=Math.min(...lo.slice(-3)),pvl=Math.min(...lo.slice(-6,-3));
-  const hh=lh>pvh&&ll>pvl?"HH/HL — uptrend valid":lh<pvh&&ll<pvl?"LH/LL — downtrend":"Transisi";
-  const n=c.length,r5h=Math.max(...hi.slice(-10,-5)),r5l=Math.min(...lo.slice(-10,-5));
-  const bs=c[n-1]>r5h?"BOS Bullish ✓":c[n-1]<r5l?"BOS Bearish ✗":c[n-1]>c[n-5]*1.02?"CHoCH Bullish":"Sideways";
-  return{hh,bs}
-}
-function score({rD,rW,st,md,price,m20,m50,m200,e50,e200,bbd,ch}){
+function findSR(hi,lo,price){const pv=[];for(let i=2;i<hi.length-2;i++){if(hi[i]>hi[i-1]&&hi[i]>hi[i-2]&&hi[i]>hi[i+1]&&hi[i]>hi[i+2])pv.push({price:hi[i],t:'R'});if(lo[i]<lo[i-1]&&lo[i]<lo[i-2]&&lo[i]<lo[i+1]&&lo[i]<lo[i+2])pv.push({price:lo[i],t:'S'});}const us=new Set(),cl2=[];pv.forEach((p2,i)=>{if(us.has(i))return;const g=[p2];pv.forEach((q,j)=>{if(i!==j&&!us.has(j)&&Math.abs(p2.price-q.price)/p2.price<0.02){g.push(q);us.add(j);}});us.add(i);cl2.push({price:g.reduce((a,b)=>a+b.price,0)/g.length,t:p2.t,s:g.length});});let sp=cl2.filter(z=>z.price<price*1.01).sort((a,b)=>b.price-a.price).slice(0,3);let rs=cl2.filter(z=>z.price>price*0.99).sort((a,b)=>a.price-b.price).slice(0,3);while(sp.length<3)sp.push({price:price*(0.88-sp.length*0.07),t:'S',s:1});while(rs.length<3)rs.push({price:price*(1.08+rs.length*0.07),t:'R',s:1});return{sp:sp.slice(0,3),rs:rs.slice(0,3)}}
+
+// ── Score & Signal ──
+function scoreSignal({rD,rW,st,md,price,m20,m50,m200,e50,e200,bbd,ch}){
   const F=[];
   if(rD<30)F.push({n:"RSI OS",v:2,b:1});else if(rD<45)F.push({n:"RSI Lemah",v:1,b:1});else if(rD>75)F.push({n:"RSI OB",v:2,b:0});else if(rD>65)F.push({n:"RSI Tinggi",v:1,b:0});
   if(rW){if(rW<35)F.push({n:"RSI-W OS",v:2,b:1});else if(rW>70)F.push({n:"RSI-W OB",v:2,b:0});}
@@ -501,102 +485,106 @@ function score({rD,rW,st,md,price,m20,m50,m200,e50,e200,bbd,ch}){
   if(net>=3){sig="BELI";const tp=F.filter(f=>f.b).sort((a,b)=>b.v-a.v).slice(0,3).map(f=>f.n).join(", ");rsn=`${tp}. ${F.filter(f=>f.b).length} faktor bullish. Konfluensi ${cp}%.`;}
   else if(net<=-3){sig="JUAL";const tp=F.filter(f=>!f.b).sort((a,b)=>b.v-a.v).slice(0,3).map(f=>f.n).join(", ");rsn=`${tp}. ${F.filter(f=>!f.b).length} faktor bearish. Konfluensi ${cp}%.`;}
   else{sig="TAHAN";rsn=`Mixed: ${F.filter(f=>f.b).length}B vs ${F.filter(f=>!f.b).length}R. RSI ${Math.round(rD)} netral.`;}
-  return{sig,conf,rsn,bN:F.filter(f=>f.b).length,rN:F.filter(f=>!f.b).length,cp}
+  return{sig,conf,rsn,bN:F.filter(f=>f.b).length,rN:F.filter(f=>!f.b).length,cp,factors:F}
 }
+
+// ── Format ──
 function fmt(n){if(!n&&n!==0)return"N/A";if(n>=1e9)return"$"+(n/1e9).toFixed(2)+"B";if(n>=1e6)return"$"+(n/1e6).toFixed(2)+"M";if(n>=1000)return"$"+n.toLocaleString("en-US",{maximumFractionDigits:2});if(n>=1)return"$"+n.toFixed(2);if(n>=0.01)return"$"+n.toFixed(4);return"$"+n.toFixed(6)}
 function pct(n){return(n>=0?"+":"")+n.toFixed(2)+"%"}
 function R(l,v,c="",m=false){return`<div class="row"><span class="rl">${l}</span><span class="rv${m?" mono":""}" style="color:${c||"var(--txt)"}">${v||"—"}</span></div>`}
-function ZR(l,p,t,s){const c=t==="S"?"var(--g)":"var(--r)";const ss=s>=3?"●●●":s===2?"●●○":"●○○";return`<div class="zr"><span class="zt" style="color:${c}">${t}${l}</span><span class="zp">${fmt(p)}</span><span style="font-size:9px;opacity:.5;color:${c}">${ss}</span></div>`}
+function ZR(l,p,t,s){const c=t==="S"?"var(--g)":"var(--r)";const ss=s>=3?"●●●":s===2?"●●○":"●○○";return`<div class="zr"><span style="font-size:9px;width:19px;flex-shrink:0;font-weight:700;color:${c}">${t}${l}</span><span style="font-size:12px;color:#e2eaf3;font-weight:700;font-family:'IBM Plex Mono',monospace;flex:1">${fmt(p)}</span><span style="font-size:9px;opacity:.5;color:${c}">${ss}</span></div>`}
 function MI(l,a,v){const c=a?"var(--g)":"var(--r)";return`<div class="mai"><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase">${l}</div><div style="display:flex;align-items:center;margin-bottom:2px"><span style="width:6px;height:6px;border-radius:50%;background:${c};margin-right:5px;display:inline-block;box-shadow:${a?"0 0 5px rgba(0,255,135,.5)":"none"}"></span><span style="font-size:9px;font-weight:700;color:${c}">${a?"Di Atas":"Di Bawah"}</span></div><div style="font-size:9px;color:var(--dim);font-family:'IBM Plex Mono',monospace">${v?fmt(v):"—"}</div></div>`}
 function $(i){return document.getElementById(i)}
-function sh(i){$(i).classList.remove('hidden')}
-function hd(i){$(i).classList.add('hidden')}
+function sh(i){$(i)?.classList.remove('hidden')}
+function hd(i){$(i)?.classList.add('hidden')}
 
+// ═══════════════════════════════════════════════
 // ANALYZE
-async function AN(sym){
+// ═══════════════════════════════════════════════
+async function AN(sym) {
   const tk=(sym||$('ti').value).toUpperCase().replace(/\s|USDT$/gi,"").trim();
-  if(!tk)return;
-  $('ti').value=tk;$('ab').disabled=true;
-  hd('res');hd('ea');hd('sva');sh('la');
-  try{
-    const kR=await fetch(`https://api.binance.com/api/v3/klines?symbol=${tk}USDT&interval=1d&limit=300`);
-    if(!kR.ok)throw new Error(`"${tk}" tidak ditemukan di Binance.`);
-    const kl=await kR.json();
-    if(!Array.isArray(kl)||kl.length<50)throw new Error("Data candle tidak cukup.");
+  if(!tk) return;
+  $('ti').value=tk; $('ab').disabled=true;
+  hd('res'); hd('ea'); hd('sva'); sh('la');
+
+  try {
+    // Daily 300 candles
+    const kl = await bFetch(`/api/v3/klines?symbol=${tk}USDT&interval=1d&limit=300`);
+    if(!Array.isArray(kl)||kl.length<30) throw new Error(`"${tk}" tidak ditemukan.`);
     const hi=kl.map(k=>+k[2]),lo=kl.map(k=>+k[3]),cl=kl.map(k=>+k[4]),vol=kl.map(k=>+k[5]);
     const price=cl[cl.length-1];
 
+    // Weekly
     let wC=[],wH=[],wL=[];
-    try{const wR=await fetch(`https://api.binance.com/api/v3/klines?symbol=${tk}USDT&interval=1w&limit=60`);if(wR.ok){const wk=await wR.json();wC=wk.map(k=>+k[4]);wH=wk.map(k=>+k[2]);wL=wk.map(k=>+k[3]);}}catch(_){}
-    if(wC.length<10){wC=cl.filter((_,i)=>i%7===0);wH=hi.filter((_,i)=>i%7===0);wL=lo.filter((_,i)=>i%7===0);}
+    try{const wk=await bFetch(`/api/v3/klines?symbol=${tk}USDT&interval=1w&limit=60`);
+      if(Array.isArray(wk)){wC=wk.map(k=>+k[4]);wH=wk.map(k=>+k[2]);wL=wk.map(k=>+k[3]);}}catch(_){}
+    if(wC.length<10){wC=cl.filter((_,i)=>i%7===0);}
 
-    const t2=await(await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${tk}USDT`)).json();
+    // 24h
+    const t2=await bFetch(`/api/v3/ticker/24hr?symbol=${tk}USDT`);
     const ch24=+t2.priceChangePercent,hi24=+t2.highPrice,lo24=+t2.lowPrice,v24=+t2.quoteVolume;
 
+    // CoinGecko
     let mcap=null,ch7d=null,cName=tk;
+    const CGID={BTC:"bitcoin",ETH:"ethereum",SOL:"solana",BNB:"binancecoin",XRP:"ripple",AVAX:"avalanche-2",ARB:"arbitrum",OP:"optimism",LINK:"chainlink",DOT:"polkadot",HYPE:"hyperliquid",SUI:"sui",WIF:"dogwifhat",PEPE:"pepe",TIA:"celestia",RENDER:"render-token",WLD:"worldcoin-wld",INJ:"injective-protocol",ATOM:"cosmos",NEAR:"near",DOGE:"dogecoin",ADA:"cardano"};
     try{const cg=await(await fetch(`https://api.coingecko.com/api/v3/coins/${CGID[tk]||tk}?localization=false&tickers=false&community_data=false&developer_data=false`)).json();mcap=cg.market_data?.market_cap?.usd;ch7d=cg.market_data?.price_change_percentage_7d;cName=cg.name||tk;}catch(_){}
 
+    // TA
     const m20=lst(sma(cl,20)),m50=lst(sma(cl,50)),m200=lst(sma(cl,200));
     const e50=lst(ema(cl,50)),e200=lst(ema(cl,200));
     const wm20=lst(sma(wC,20));
     const rD=rsi(cl.slice(-50),14),rW=wC.length>=15?rsi(wC.slice(-30),14):null;
     const st=stRSI(cl);
-    const aV=atrF(hi,lo,cl,14);const aP=(aV/price*100).toFixed(2);
+    const aV=atrF(hi,lo,cl,14);
     const bbd=bb(cl);
-    const bbP=bbd?((price-bbd.l)/(bbd.u-bbd.l)*100).toFixed(1):null;
-    const bbS=bbd?(price>bbd.u?"Di atas upper band":price<bbd.l?"Di bawah lower band":bbP>70?"Mendekati upper":"Netral / Mendekati lower"):"—";
     const md=macd(cl);
     const {sp,rs}=findSR(hi,lo,price);
-    const vS=volA(vol);const{hh,bs}=strA(cl,hi,lo);
-    const aM20=price>m20,aM50=price>m50,aM200=m200?price>m200:null;
-    const aE50=price>e50,aE200=e200?price>e200:null;
+    const vS=vol.slice(-5).reduce((a,b)=>a+b,0)/5/(vol.slice(-20).reduce((a,b)=>a+b,0)/20||1);
+
+    const abM20=price>m20,abM50=price>m50,abM200=m200?price>m200:null;
+    const abE50=price>e50,abE200=e200?price>e200:null;
     const gc=e200?e50>e200:null;
-    const trend=aM50&&aM200?"BULLISH":(!aM50&&aM200===false)?"BEARISH":"SIDEWAYS";
+    const trend=abM50&&abM200?"BULLISH":(!abM50&&abM200===false)?"BEARISH":"SIDEWAYS";
     const tC=trend==="BULLISH"?"#00ff87":trend==="BEARISH"?"#ff4560":"#f5c518";
-    const rDL=rD>70?"Overbought — waspadai pullback":rD<30?"Oversold — potensi bounce":rD<45?"Zona lemah":"Netral";
-    let mdL="—";if(md.h!=null){if(md.h>0&&md.ph<=0)mdL="Bullish crossover ✓";else if(md.h>0)mdL="Histogram positif";else if(md.h<0&&md.ph>=0)mdL="Bearish crossover ✗";else mdL="Histogram negatif";}
+
+    const rDL=rD>70?"Overbought":rD<30?"Oversold":rD<45?"Zona lemah":"Netral";
+    let mdL="—";
+    if(md.h!=null){if(md.h>0&&md.ph<=0)mdL="Bullish crossover ✓";else if(md.h>0)mdL="Histogram positif";else if(md.h<0&&md.ph>=0)mdL="Bearish crossover ✗";else mdL="Histogram negatif";}
     const stK=st.k?Math.round(st.k):null,stD=st.d?Math.round(st.d):null;
     const stS=stK?(stK<20?"Oversold zone":stK>80?"Overbought zone":stK>stD?"K>D bullish":"K<D bearish"):"—";
-    const{sig,conf,rsn,bN,rN,cp}=score({rD,rW:rW||50,st,md,price,m20,m50,m200,e50,e200,bbd,ch:ch24});
+    const bbS=bbd?(price<bbd.l?"OS":price>bbd.u?"OB":"Netral"):"—";
+    const bbP=bbd?((price-bbd.l)/(bbd.u-bbd.l)*100).toFixed(1):null;
+
+    // SL/TP — R:R 1:2 enforced
+    const s1=sp[0]?.price;
+    const slP=s1?s1*0.993:price-aV*1.8;
+    const risk=Math.max(price-slP,aV*0.4);
+    const tp1base=price+risk*2;
+    const vR=rs.find(r=>r.price>=tp1base);
+    const tp1=vR?.price||tp1base, tp2=price+risk*3, tp3=price+risk*5;
+    const rrV=risk>0?(tp1-price)/risk:0;
+
+    const {sig,conf,rsn,bN,rN,cp,factors}=scoreSignal({
+      rD,rW:rW||50,st,md,price,m20,m50,m200,e50,e200,bbd,ch:ch24
+    });
     const sc=SC[sig];
-
-    // ── SL: bawah S1 dengan buffer 0.5%, minimal ATR×1 dari entry ──
-    const s1Price = sp[0]?.price;
-    const s2Price = sp[1]?.price;
-    const slFromS1 = s1Price ? s1Price * 0.995 : null;
-    const slFromATR = price - (aV * 1.5);
-    // Pilih SL yang lebih dekat ke entry tapi tidak lebih dari ATR×3
-    let sl = slFromS1 || slFromATR;
-    if(sl > price * 0.99) sl = price * 0.97;       // minimal 3% di bawah entry
-    if(sl < price - aV*3) sl = price - aV*3;        // maksimal ATR×3 (tidak terlalu jauh)
-    const riskAmt = price - sl;                      // jarak risk dalam USD
-
-    // ── TP: berbasis R:R minimum, dikombinasikan dengan resistance level ──
-    // TP1 = min R:R 1:1.5 ATAU resistance terdekat yang lebih dari 1.5× risk
-    const minTP1 = price + riskAmt * 1.5;
-    const minTP2 = price + riskAmt * 2.5;
-    const minTP3 = price + riskAmt * 4.0;
-
-    // Ambil resistance yang berada di atas minimum R:R
-    const validR1 = rs.find(r => r.price >= minTP1);
-    const validR2 = rs.find(r => r.price >= minTP2);
-    const validR3 = rs.find(r => r.price >= minTP3);
-
-    const tp1 = validR1?.price || minTP1;
-    const tp2 = validR2?.price || minTP2;
-    const tp3 = validR3?.price || minTP3;
-
-    const rr = (tp1 - price) / riskAmt;
-    const rrFmt = rr > 0 ? rr.toFixed(2) : "—";
     const now=new Date().toLocaleString("id-ID");
 
-    CSD={id:Date.now(),ticker:tk,coinName:cName,sig,conf,cp,price,entry:price,sl,tp1,tp2,tp3,rD:Math.round(rD),rW:rW?Math.round(rW):null,trend,timestamp:Date.now(),status:"active",currentPrice:price,hitLevel:null,hitPrice:null,hitTime:null};
+    CSD={id:Date.now(),ticker:tk,coinName:cName,sig,conf,cp,price,
+      entry:price,sl:slP,tp1,tp2,tp3,rr:rrV,trend,
+      timestamp:Date.now(),status:"active",currentPrice:price,
+      hitLevel:null,hitPrice:null,hitTime:null};
 
+    // Render price header
     $('prc').innerHTML=`<div style="display:flex;align-items:flex-start;gap:13px;flex-wrap:wrap">
       <div style="flex:1;min-width:150px">
-        <div class="lbl" style="margin-bottom:3px">${SEC[tk]||"Crypto Asset"}</div>
-        <div style="font-size:19px;font-weight:700;color:#e8f0f8;letter-spacing:-.5px;margin-bottom:5px">${cName} <span style="color:var(--dim);font-weight:400;font-size:13px">/ USDT</span></div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag">${tk}</span><span class="tag"><span class="livdot"></span>Live · ${now}</span></div>
+        <div class="lbl" style="margin-bottom:3px">Crypto Asset</div>
+        <div style="font-size:19px;font-weight:700;color:#e8f0f8;letter-spacing:-.5px;margin-bottom:5px">
+          ${cName} <span style="color:var(--dim);font-weight:400;font-size:13px">/ USDT</span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span class="tag">${tk}</span>
+          <span class="tag"><span class="livdot"></span>${now}</span>
+        </div>
       </div>
       <div style="text-align:right">
         <div style="font-size:24px;font-weight:700;color:#e8f0f8;letter-spacing:-1px;font-family:'IBM Plex Mono',monospace">${fmt(price)}</div>
@@ -611,21 +599,33 @@ async function AN(sym){
       </div>
     </div>`;
 
+    // Signal card
     $('sgc').innerHTML=`<div class="sig-card" style="background:${sc.bg};border:1px solid ${sc.bd};box-shadow:0 0 28px ${sc.gw}">
-      <div class="sig-ico" style="border:1px solid ${sc.bd};color:${sc.c};font-size:20px">${sc.ic}</div>
+      <div style="width:50px;height:50px;border-radius:12px;background:rgba(0,0,0,.3);
+        border:1px solid ${sc.bd};display:flex;align-items:center;justify-content:center;
+        font-size:20px;color:${sc.c};flex-shrink:0">${sc.ic}</div>
       <div style="flex:1;min-width:120px">
         <div style="font-size:8px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:2px">Sinyal Alpha Crypto 369</div>
         <div style="font-size:24px;font-weight:800;letter-spacing:4px;color:${sc.c};line-height:1">${sig}</div>
         <div style="font-size:9px;color:${sc.c};opacity:.65;margin-top:2px">Keyakinan: ${conf}/10</div>
-        <div style="display:flex;gap:8px;margin-top:4px"><span style="font-size:9px;color:#00ff87">▲ ${bN}</span><span style="font-size:9px;color:#ff4560">▼ ${rN}</span></div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <span style="font-size:9px;color:#00ff87">▲ ${bN}</span>
+          <span style="font-size:9px;color:#ff4560">▼ ${rN}</span>
+        </div>
         <div class="cbr"><div style="height:100%;width:${cp}%;background:${sc.c};border-radius:2px"></div></div>
         <div style="font-size:8px;color:var(--dim);margin-top:2px;letter-spacing:1px">KONFLUENSI ${cp}%</div>
       </div>
-      <div style="max-width:240px;font-size:10px;color:#4b5d6e;line-height:1.6;font-style:italic">${rsn}</div>
+      <div style="max-width:220px;font-size:10px;color:#4b5d6e;line-height:1.6;font-style:italic">${rsn}</div>
     </div>`;
 
-    $('src').innerHTML=`<div class="sh">Support Kunci</div>${sp.map((s,i)=>ZR(i+1,s.price,"S",s.s||1)).join("")}<div class="sh" style="margin-top:11px">Resistance Kunci</div>${rs.map((r,i)=>ZR(i+1,r.price,"R",r.s||1)).join("")}<div style="margin-top:6px;font-size:9px;color:var(--dmr)">●●● tinggi · ●● sedang · ● lemah</div>`;
+    // S/R
+    $('src').innerHTML=`<div class="sh">Support Kunci</div>
+      ${sp.map((s,i)=>ZR(i+1,s.price,"S",s.s||1)).join("")}
+      <div class="sh" style="margin-top:11px">Resistance Kunci</div>
+      ${rs.map((r,i)=>ZR(i+1,r.price,"R",r.s||1)).join("")}
+      <div style="margin-top:6px;font-size:9px;color:var(--dmr)">●●● kuat · ●● sedang · ● lemah</div>`;
 
+    // Momentum
     $('mmc').innerHTML=`<div class="sh">Momentum & Indikator</div>
       ${R("RSI Daily",`${Math.round(rD)} — ${rD>70?"OB":rD<30?"OS":"Netral"}`,rD>70?"#ff4560":rD<30?"#00ff87":"#f5c518",true)}
       ${R("RSI Weekly",rW?`${Math.round(rW)}`:"—",rW&&rW>65?"#ff4560":rW&&rW<35?"#00ff87":"var(--txt)",true)}
@@ -633,34 +633,47 @@ async function AN(sym){
       ${R("Stoch RSI K/D",stK?`${stK} / ${stD||"—"}`:  "—",stK&&stK<20?"#00ff87":stK&&stK>80?"#ff4560":"#f5c518",true)}
       ${R("Stoch State",stS,"#5a6a7a")}
       ${R("MACD Daily",mdL,"#5a6a7a")}
-      ${R("ATR(14)",`${fmt(aV)} · ${aP}%`,"#5a6a7a")}
+      ${R("ATR(14)",`${fmt(aV)} · ${(aV/price*100).toFixed(2)}%`,"#5a6a7a")}
       ${R("Bollinger %B",bbP?`${bbP}% — ${bbS}`:"—","#5a6a7a")}
-      ${R("Volume",vS,"#5a6a7a")}
+      ${R("Volume",vS>1.5?"Surge "+vS.toFixed(1)+"x":"Normal","#5a6a7a")}
       <div class="sh" style="margin-top:11px">Struktur SMC</div>
-      ${R("BOS/CHoCH",bs,"var(--txt)")}${R("HH/HL",hh,"var(--txt)")}`;
+      ${R("BOS/CHoCH",cl[cl.length-1]>Math.max(...hi.slice(-10,-5))?"BOS Bullish ✓":cl[cl.length-1]<Math.min(...lo.slice(-10,-5))?"BOS Bearish ✗":"Sideways","var(--txt)")}`;
 
-    $('mac').innerHTML=`<div class="sh">Moving Averages · 300 Candle · EMA200 Akurat</div>
-      <div class="mag">${MI("MA 20 Daily",aM20,m20)}${MI("MA 50 Daily",aM50,m50)}${MI("MA 200 Daily",aM200,m200)}${MI("EMA 50",aE50,e50)}${MI("EMA 200",aE200,e200)}</div>
+    // MA
+    $('mac').innerHTML=`<div class="sh">Moving Averages · 300 Candle</div>
+      <div class="mag">
+        ${MI("MA 20 Daily",abM20,m20)}${MI("MA 50 Daily",abM50,m50)}${MI("MA 200 Daily",abM200,m200)}
+        ${MI("EMA 50",abE50,e50)}${MI("EMA 200",abE200,e200)}
+      </div>
       ${R("EMA Cross",gc===true?"Golden Cross ✓":gc===false?"Death Cross ✗":"—",gc===true?"#00ff87":gc===false?"#ff4560":"#f5c518")}
-      ${R("BB Upper / Lower",bbd?`${fmt(bbd.u)} / ${fmt(bbd.l)}`:"—","#5a6a7a",true)}
+      ${R("BB Upper/Lower",bbd?`${fmt(bbd.u)} / ${fmt(bbd.l)}`:"—","#5a6a7a",true)}
       ${R("Weekly MA20",wm20?fmt(wm20):"—",wm20&&price>wm20?"#00ff87":"#ff4560",true)}`;
 
-    $('scg').innerHTML=`
+    // Scenarios
+    $('scg2').innerHTML=`
       <div class="scc" style="background:rgba(0,255,135,.04);border:1px solid rgba(0,255,135,.13)">
         <div style="font-size:9px;letter-spacing:2px;color:#00ff87;text-transform:uppercase;margin-bottom:11px">▲ Skenario Bullish</div>
-        ${R("Entry",fmt(price),"#00ff87",true)}${R("Stop Loss (ATR×2)",fmt(sl),"#ff4560",true)}
-        ${R("Target 1 / R1",fmt(tp1),"#00c96a",true)}${R("Target 2 / R2",fmt(tp2),"#00c96a",true)}${R("Target 3 / R3",fmt(tp3),"#00c96a",true)}
-        ${R("Risk / Reward","1 : "+rrFmt,"#f5c518")}
-        <div style="margin-top:8px;padding:7px 9px;background:rgba(0,255,135,.04);border-radius:7px;font-size:10px;color:#1e4a2a;line-height:1.6">BOS bullish + close atas R1 + StochRSI cross + volume ekspansi<br/>SL di bawah S1: ${fmt(sl)} (jarak ${((price-sl)/price*100).toFixed(2)}% dari entry)</div>
+        ${R("Entry",fmt(price),"#00ff87",true)}${R("Stop Loss (S1-0.7%)",fmt(slP),"#ff4560",true)}
+        ${R("Target 1 / TP1",fmt(tp1),"#00c96a",true)}${R("Target 2 / TP2",fmt(tp2),"#00c96a",true)}
+        ${R("Target 3 / TP3",fmt(tp3),"#00c96a",true)}
+        ${R("Risk/Reward","1 : "+rrV.toFixed(2),"#f5c518")}
+        <div style="margin-top:8px;padding:7px 9px;background:rgba(0,255,135,.04);border-radius:7px;
+          font-size:10px;color:#1e4a2a;line-height:1.6">
+          R:R ${rrV.toFixed(2)} · SL di bawah S1: ${fmt(slP)} (${((price-slP)/price*100).toFixed(2)}%)
+        </div>
       </div>
       <div class="scc" style="background:rgba(255,69,96,.04);border:1px solid rgba(255,69,96,.13)">
         <div style="font-size:9px;letter-spacing:2px;color:#ff4560;text-transform:uppercase;margin-bottom:11px">▼ Skenario Bearish</div>
-        ${R("Trigger Break",fmt(sp[0]?.price),"#ff4560",true)}${R("Konfirmasi","Close D1 < S1","#7a2030")}
+        ${R("Trigger",fmt(sp[0]?.price),"#ff4560",true)}${R("Konfirmasi","Close D1 < S1","#7a2030")}
         ${R("Target Down 1",fmt(sp[1]?.price),"#ff4560",true)}${R("Target Down 2",fmt(sp[2]?.price),"#ff4560",true)}
         ${R("BB Lower",bbd?fmt(bbd.l):"—","#ff4560",true)}
-        <div style="margin-top:8px;padding:7px 9px;background:rgba(255,69,96,.04);border-radius:7px;font-size:10px;color:#5a1a22;line-height:1.6">Close di bawah ${fmt(sp[0]?.price)} + MACD cross- + volume spike</div>
+        <div style="margin-top:8px;padding:7px 9px;background:rgba(255,69,96,.04);border-radius:7px;
+          font-size:10px;color:#5a1a22;line-height:1.6">
+          Close di bawah ${fmt(sp[0]?.price)} + volume spike = konfirmasi full
+        </div>
       </div>`;
 
+    // Market data
     $('mkc').innerHTML=`<div class="sh">Data Pasar Live</div>
       <div style="display:grid;grid-template-columns:1fr 1fr">
         ${R("Harga",fmt(price),"#e8f0f8",true)}${R("Market Cap",mcap?fmt(mcap):"—","var(--txt)",true)}
@@ -668,131 +681,415 @@ async function AN(sym){
         ${R("Volume 24h",fmt(v24),"var(--txt)",true)}${R("Perubahan 7d",ch7d!=null?pct(ch7d):"—",ch7d>=0?"#00c96a":"#d93848",true)}
       </div>`;
 
-    hd('la');sh('res');sh('sva');
-    setTimeout(()=>setLev(LEV),50); // init trade panel
-  }catch(e){$('em').textContent=e.message||"Gagal fetch data.";hd('la');sh('ea');}
+    // Trade panel
+    hd('la'); sh('res'); sh('sva');
+    setTimeout(()=>setLev(LEV),50);
+
+  } catch(e) {
+    $('em').textContent=e.message||"Gagal fetch.";
+    hd('la'); sh('ea');
+  }
   $('ab').disabled=false;
 }
 
-// TRACKER STORAGE
-function GS(){try{return JSON.parse(localStorage.getItem('ac369_sigs')||'[]')}catch(_){return[]}}
-function SS(a){localStorage.setItem('ac369_sigs',JSON.stringify(a))}
+// ═══════════════════════════════════════════════
+// TRADE PANEL
+// ═══════════════════════════════════════════════
+function UTP() {
+  if(!CSD) return;
+  const size=parseFloat($('ts').value)||100;
+  const p=CSD.price,sl=CSD.sl,tp1=CSD.tp1,tp2=CSD.tp2,tp3=CSD.tp3;
+  const qty=(size*LEV/p);
+  const qF=qty>=1?qty.toFixed(3):qty.toFixed(6);
+  const riskU=size*(p-sl)/p*LEV;
+  const profTP1=size*(tp1-p)/p*LEV;
+  const profTP2=size*(tp2-p)/p*LEV;
+  const rrTP1=riskU>0?profTP1/riskU:0;
+  const rrC=rrTP1>=2?"#00ff87":rrTP1>=1.5?"#00c96a":"#f5c518";
+  const rrLbl=rrTP1>=2?"✓ Excellent":rrTP1>=1.5?"✓ Good":rrTP1>=1?"⚠ Minimal":"✗ Skip";
+  $('trade-params').innerHTML=[
+    {l:"Entry",v:fmt(p),c:"#e8f0f8"},{l:"Stop Loss",v:fmt(sl),c:"#ff4560"},
+    {l:"TP1",v:fmt(tp1),c:"#00ff87"},{l:"TP2",v:fmt(tp2),c:"#00c96a"},
+    {l:"Leverage",v:LEV+"x",c:"#f5c518"},{l:"Qty",v:qF,c:"#00ccff"},
+    {l:"Notional",v:fmt(size*LEV),c:"#c4ccd6"},{l:"Modal",v:"$"+size.toFixed(0),c:"#c4ccd6"},
+  ].map(x=>`<div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);
+    border-radius:7px;padding:7px 9px;text-align:center">
+    <div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">${x.l}</div>
+    <div style="font-size:11px;font-weight:700;color:${x.c};font-family:'IBM Plex Mono',monospace">${x.v}</div>
+  </div>`).join("");
+  $('rr-prev').innerHTML=[
+    {l:"Modal",v:"$"+size.toFixed(0),c:"#c4ccd6"},
+    {l:"Max Risk",v:"-$"+riskU.toFixed(1),c:"#ff4560"},
+    {l:"Profit TP1",v:"+$"+profTP1.toFixed(1),c:"#00ff87"},
+    {l:"R:R TP1",v:"1:"+rrTP1.toFixed(2)+" "+rrLbl,c:rrC},
+  ].map(x=>`<div><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">${x.l}</div>
+    <div style="font-size:12px;font-weight:800;color:${x.c};font-family:'IBM Plex Mono',monospace;line-height:1.2">${x.v}</div></div>`).join("");
+}
+function openBybit(side){
+  if(!CSD) return;
+  const size=parseFloat($('ts').value)||100;
+  const sym=CSD.ticker+"USDT";
+  const qty=(size*LEV/CSD.price);
+  const qS=qty>=1?qty.toFixed(3):qty.toFixed(6);
+  const txt=`AC369 SIGNAL — ${side}\nPair: ${sym}\nEntry: ${fmt(CSD.price)}\nSL: ${fmt(CSD.sl)}\nTP1: ${fmt(CSD.tp1)} | TP2: ${fmt(CSD.tp2)} | TP3: ${fmt(CSD.tp3)}\nLev: ${LEV}x | Size: $${size}\nKonfluensi: ${CSD.cp}% | @Alphacrypto_id`;
+  navigator.clipboard.writeText(txt).catch(()=>{});
+  window.open(`https://www.bybit.com/trade/usdt/${sym}`,'_blank');
+}
+function cpOrd(){
+  if(!CSD) return;
+  const size=parseFloat($('ts').value)||100;
+  const txt=`═══ AC369 SIGNAL ═══\n${CSD.ticker}/USDT · ${CSD.sig} · ${CSD.cp}%\nEntry: ${fmt(CSD.price)}\nSL: ${fmt(CSD.sl)}\nTP1: ${fmt(CSD.tp1)}\nTP2: ${fmt(CSD.tp2)}\nTP3: ${fmt(CSD.tp3)}\nLev: ${LEV}x · $${size}\n${new Date().toLocaleString('id-ID')}\n@Alphacrypto_id`;
+  navigator.clipboard.writeText(txt).then(()=>{const b=event.target;b.textContent="✓ COPIED!";setTimeout(()=>b.textContent="📋 COPY ORDER",2000);}).catch(()=>alert(txt));
+}
+document.addEventListener('input',e=>{if(e.target.id==='ts')UTP();});
 
-function SV(){
-  if(!CSD)return;
-  const sigs=GS();
-  const dup=sigs.find(s=>s.ticker===CSD.ticker&&s.status==="active"&&Date.now()-s.timestamp<7200000);
-  if(dup){if(!confirm(`Signal ${CSD.ticker} aktif sudah ada. Timpa?`))return;sigs.splice(sigs.indexOf(dup),1);}
-  sigs.unshift(CSD);SS(sigs);
-  alert(`✓ Signal ${CSD.ticker} tersimpan!`);
-  T('tracker');
+// ═══════════════════════════════════════════════
+// SCANNER — uses bFetch with CORS proxy fallback
+// ═══════════════════════════════════════════════
+async function quickScan(ticker, btcChange) {
+  try {
+    const kl = await bFetch(`/api/v3/klines?symbol=${ticker}USDT&interval=1d&limit=120`);
+    if(!Array.isArray(kl)||kl.length<25) return null;
+    const hi=kl.map(k=>+k[2]),lo=kl.map(k=>+k[3]),cl=kl.map(k=>+k[4]),vol=kl.map(k=>+k[5]);
+    const price=cl[cl.length-1];
+
+    // 24h data from prefetch map
+    const t2k = window._ticker24Map?.[ticker] || {};
+    const ch24=+(t2k.priceChangePercent||0);
+    const vol24=+(t2k.quoteVolume||0);
+
+    const m50=lst(sma(cl,50)), m200=lst(sma(cl,Math.min(100,cl.length)));
+    const e50=lst(ema(cl,50)), e200=lst(ema(cl,Math.min(100,cl.length)));
+    const rD=rsi(cl.slice(-30),14);
+    const st=stRSI(cl);
+    const aV=atrF(hi,lo,cl,14);
+    const bbd=bb(cl);
+    const md=macd(cl);
+    const {sp,rs}=findSR(hi,lo,price);
+    const avgV=vol.slice(-20).reduce((a,b)=>a+b,0)/20;
+    const vR=vol.slice(-3).reduce((a,b)=>a+b,0)/3/(avgV||1);
+
+    // SL/TP enforced R:R 1:2
+    const s1=sp[0]?.price;
+    const slSw=s1?s1*0.993:price-aV*1.8;
+    const risk=Math.max(price-slSw,aV*0.4);
+    const tp1b=price+risk*2;
+    const vRs=rs.find(r=>r.price>=tp1b);
+    const tp1=vRs?.price||tp1b, tp2=price+risk*3, tp3=price+risk*5;
+    const rrSw=risk>0?(tp1-price)/risk:0;
+
+    // Score
+    let sc=0;
+    if(rD<30)sc+=4;else if(rD<40)sc+=2;else if(rD<50)sc+=1;
+    else if(rD>70)sc-=3;else if(rD>65)sc-=1;
+    if(st.k&&st.d){if(st.k<20&&st.d<20)sc+=2;if(st.k>st.d&&st.k<40)sc+=1;if(st.k>80)sc-=2;}
+    if(m200&&price>m200)sc+=2;else if(m200)sc-=1;
+    if(price>m50)sc+=1;else sc-=1;
+    if(e200&&e50>e200)sc+=2;else if(e200)sc-=1;
+    if(md.h>0&&md.ph<=0)sc+=2;else if(md.h>0)sc+=1;
+    else if(md.h<0&&md.ph>=0)sc-=2;else if(md.h<0)sc-=1;
+    if(bbd&&price<bbd.l)sc+=2;else if(bbd&&price>bbd.u)sc-=1;
+    if(vR>1.5)sc+=1; if(ch24>3)sc+=1;else if(ch24<-8)sc-=1;
+
+    // Anomaly detection
+    let anomaly=null;
+    const ratio24=btcChange!==0?ch24/Math.abs(btcChange):0;
+    if(btcChange<-1.5&&ch24>2){anomaly={type:"INVERSE_BTC",label:`Naik ${ch24.toFixed(1)}% saat BTC -${Math.abs(btcChange).toFixed(1)}%`,score:10};sc+=2;}
+    else if(ch24>0&&ratio24>=4){anomaly={type:"OUTPERFORM_4X",label:`Outperform BTC ${ratio24.toFixed(1)}x`,score:12};sc+=2;}
+    else if(ch24>0&&ratio24>=2){anomaly={type:"OUTPERFORM_2X",label:`Outperform BTC ${ratio24.toFixed(1)}x`,score:9};sc+=1;}
+    else if(Math.abs(btcChange)<1&&ch24>6){anomaly={type:"DECORRELATED",label:`+${ch24.toFixed(1)}% mandiri (BTC flat)`,score:8};sc+=1;}
+
+    const maxSc=15;
+    const confP=Math.min(99,Math.round(Math.max(0,sc)/maxSc*100));
+    const swSig=sc>=5?"BELI":sc<=-3?"JUAL":"TAHAN";
+
+    return {
+      ticker,price,ch24,vol24,vR,swSig,sc,confP,
+      slSw,tp1,tp2,tp3,rrSw,
+      rsiD:Math.round(rD||0),stK:st.k?Math.round(st.k):null,
+      macd:md.h>0?"▲":"▼",
+      abM200:m200?price>m200:null,gx:e200?e50>e200:null,
+      bbS:bbd?(price<bbd.l?"OS":price>bbd.u?"OB":"Netral"):"—",
+      atrP:(aV/price*100).toFixed(1),anomaly,
+    };
+  } catch(_){ return null; }
 }
 
-async function RF(){
+async function startScan() {
+  if(scanRunning) return;
+  scanRunning=true;
+
+  const coins=UNIVERSES[SELUNIV]||UNIVERSES.top50;
+  const minRR=document.getElementById('f-rr')?.checked!==false?2.0:1.0;
+  const showAnomaly=document.getElementById('f-anomaly')?.checked!==false;
+
+  const btn=$('scan-btn');
+  if(btn){btn.disabled=true;btn.textContent="⏳ SCANNING...";}
+  $('scan-out').innerHTML='';
+  hd('scan-out');
+  const feed=$('scan-feed');
+  const bar=$('scan-bar');
+  const cnt=$('scan-cnt');
+  const fnd=$('scan-fnd');
+  const stat=$('scan-stat');
+  const phase=$('scan-phase');
+  if(feed)feed.innerHTML=''; if(bar)bar.style.width='0%';
+  sh('scan-prog');
+
+  // Step 1: Batch fetch all 24h tickers
+  if(stat)stat.textContent='Fetching market data...';
+  if(phase)phase.textContent='1 API call untuk semua koin';
+  window._ticker24Map={};
+  try {
+    const allT=await bFetch('/api/v3/ticker/24hr');
+    if(Array.isArray(allT)){allT.forEach(t=>{if(t.symbol.endsWith('USDT'))window._ticker24Map[t.symbol.replace('USDT','')]=t;});}
+    if(feed)feed.innerHTML+=`<span style="color:#00ff87">✓ ${Object.keys(window._ticker24Map).length} ticker fetched</span><br/>`;
+  } catch(e){
+    if(feed)feed.innerHTML+=`<span style="color:#ff4560">⚠ Ticker batch failed, using individual fetch</span><br/>`;
+  }
+
+  // BTC reference
+  const btcT=window._ticker24Map['BTC'];
+  const btcChange=btcT?+btcT.priceChangePercent:0;
+  if(feed)feed.innerHTML+=`<span style="color:#f5c518">BTC 24h: ${btcChange>=0?"+":""}${btcChange.toFixed(2)}% — anomali baseline</span><br/>`;
+
+  // Step 2: Deep TA per coin
+  if(stat)stat.textContent='Analisis TA...';
+  if(phase)phase.textContent='Daily candles + indicators';
+
+  const results=[];
+  let done=0;
+  const BATCH=5;
+
+  for(let i=0;i<coins.length;i+=BATCH){
+    const batch=coins.slice(i,i+BATCH);
+    const bRes=await Promise.allSettled(batch.map(c=>quickScan(c,btcChange)));
+    bRes.forEach(res=>{
+      done++;
+      if(bar)bar.style.width=Math.round(done/coins.length*100)+'%';
+      if(cnt)cnt.textContent=`${done} / ${coins.length}`;
+      if(res.status==='fulfilled'&&res.value){
+        const r=res.value;
+        results.push(r);
+        if(feed){
+          const sc2=r.swSig==='BELI'?'#00ff87':r.swSig==='JUAL'?'#ff4560':'#5a6a7a';
+          const aF=r.anomaly?`<span style="color:#f5c518">[${r.anomaly.type}]</span> `:'';
+          feed.innerHTML+=`${aF}<span style="color:#c4ccd6">${r.ticker}</span> · <span style="color:${sc2}">${r.swSig}</span> · ${r.confP}% · RR:${r.rrSw.toFixed(1)}<br/>`;
+          feed.scrollTop=feed.scrollHeight;
+        }
+        const valid=results.filter(r=>r.rrSw>=minRR&&r.confP>=50).length;
+        if(fnd)fnd.textContent=`${valid} valid · ${results.filter(r=>r.anomaly).length} anomali`;
+      }
+    });
+    await new Promise(res=>setTimeout(res,150));
+  }
+
+  scanResultsCache=results;
+
+  // Classify
+  const swingBuy=results.filter(r=>r.swSig==='BELI'&&r.rrSw>=minRR).sort((a,b)=>b.confP-a.confP).slice(0,15);
+  const anomRes=showAnomaly?results.filter(r=>r.anomaly&&r.swSig!=='JUAL').sort((a,b)=>b.anomaly.score-a.anomaly.score).slice(0,12):[];
+  const shorts=results.filter(r=>r.swSig==='JUAL').sort((a,b)=>b.confP-a.confP).slice(0,8);
+  const watch=results.filter(r=>r.swSig==='TAHAN'&&r.confP>=55).sort((a,b)=>b.confP-a.confP).slice(0,10);
+
+  renderScanResults(swingBuy,anomRes,shorts,watch,results.length,btcChange);
+
+  hd('scan-prog');
+  sh('scan-out');
+  if(btn){btn.disabled=false;btn.textContent="⚡ SCAN LAGI";}
+  scanRunning=false;
+}
+
+function renderScanResults(swingList,anomList,shortList,watchlist,total,btcChange){
+  const el=$('scan-out');if(!el)return;
+  let html=`
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
+    ${[
+      {l:"Di-scan",v:total,c:"#e8f0f8"},{l:"Swing Buy",v:swingList.length,c:"#00ff87"},
+      {l:"Anomali",v:anomList.length,c:"#f5c518"},{l:"Short",v:shortList.length,c:"#ff4560"},
+    ].map(x=>`<div style="background:rgba(9,12,20,.9);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:11px;text-align:center">
+      <div style="font-size:18px;font-weight:800;color:${x.c};font-family:'IBM Plex Mono',monospace">${x.v}</div>
+      <div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-top:2px">${x.l}</div>
+    </div>`).join('')}
+  </div>
+  <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:9px 13px;margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <span class="lbl">BTC 24h</span>
+    <span style="font-size:14px;font-weight:800;color:${btcChange>=0?"#00ff87":"#ff4560"};font-family:'IBM Plex Mono',monospace">${btcChange>=0?"+":""}${btcChange.toFixed(2)}%</span>
+    <span style="font-size:10px;color:#4b5d6e">${btcChange<-2?"Bear — inverse BTC lebih signifikan":btcChange>3?"Bull — cari outperform 2x":"Sideways — decorrelated moves menarik"}</span>
+  </div>`;
+
+  const sections=[
+    {list:swingList, color:"#00ff87", icon:"📈", label:"SWING TRADE", sub:"Daily · R:R≥1:2 · Hold 3-14 hari"},
+    {list:anomList,  color:"#f5c518", icon:"⚠️", label:"ANOMALI BTC",  sub:"Outperform 2x+ · Inverse · Decorrelated"},
+    {list:shortList, color:"#ff4560", icon:"▼",  label:"SHORT",        sub:"Setup bearish terkonfirmasi"},
+  ];
+
+  sections.forEach(s=>{
+    if(!s.list.length)return;
+    html+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:11px;margin-top:${s.icon==="📈"?"4":"18"}px">
+      <div style="background:${s.color}22;border:1px solid ${s.color}44;border-radius:8px;padding:5px 12px;font-size:10px;font-weight:800;color:${s.color};letter-spacing:2px">${s.icon} ${s.label}</div>
+      <div style="font-size:10px;color:${s.color};opacity:.7">${s.sub}</div>
+    </div>
+    ${s.list.map((r,i)=>scanCard(r,i,s.color)).join('')}`;
+  });
+
+  if(watchlist.length){
+    html+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;margin-top:18px">
+      <div style="background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.3);border-radius:8px;padding:5px 12px;font-size:10px;font-weight:800;color:#f5c518;letter-spacing:2px">👁 WATCHLIST</div>
+    </div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px">
+      ${watchlist.map(r=>`<div onclick="goAN('${r.ticker}')" style="padding:8px 13px;background:rgba(245,197,24,.04);border:1px solid rgba(245,197,24,.15);border-radius:10px;cursor:pointer">
+        <div style="font-size:12px;font-weight:700;color:#e8f0f8">${r.ticker}</div>
+        <div style="font-size:9px;color:#f5c518;margin-top:1px">${r.confP}% · ${r.rsiD} RSI</div>
+        ${r.anomaly?`<div style="font-size:8px;color:#f5c518;margin-top:2px">${r.anomaly.type}</div>`:''}
+      </div>`).join('')}
+    </div>`;
+  }
+  el.innerHTML=html;
+}
+
+function scanCard(r,rank,color){
+  const sc=SC[r.swSig]||SC.TAHAN;
+  const gc=r.confP>=75?"#ffd700":r.confP>=60?"#00ff87":r.confP>=45?"#f5c518":"#ff4560";
+  const rrC=r.rrSw>=3?"#00ff87":r.rrSw>=2?"#00c96a":"#f5c518";
+  return`<div class="coin-card" style="border-left-color:${color}">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;flex-wrap:wrap">
+    <span style="font-size:13px;color:#5a6a7a">#${rank+1}</span>
+    <span style="font-size:16px;font-weight:800;color:${color}">${r.ticker}</span>
+    <span style="font-size:14px;font-weight:700;color:#e8f0f8;font-family:'IBM Plex Mono',monospace">${fmt(r.price)}</span>
+    <span style="font-size:11px;font-weight:700;color:${r.ch24>=0?"#00ff87":"#ff4560"}">${r.ch24>=0?"+":""}${r.ch24.toFixed(2)}%</span>
+    <span style="padding:2px 8px;background:${sc.bg};border:1px solid ${sc.bd};border-radius:5px;font-size:9px;font-weight:700;color:${sc.c}">${r.swSig}</span>
+    ${r.anomaly?`<span style="padding:2px 8px;background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.3);border-radius:5px;font-size:9px;color:#f5c518">${r.anomaly.label}</span>`:''}
+    <span style="margin-left:auto;padding:2px 9px;background:${gc}18;border:1px solid ${gc}40;border-radius:5px;font-size:10px;font-weight:800;color:${gc}">${r.confP}%</span>
+  </div>
+  <div style="background:rgba(255,255,255,.03);border-radius:7px;padding:8px 11px;margin-bottom:9px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span class="lbl">Konfluensi</span>
+      <span style="font-size:14px;font-weight:800;color:${gc};font-family:'IBM Plex Mono',monospace">${r.confP}%</span>
+    </div>
+    <div class="prob-bar"><div class="prob-fill" style="width:${r.confP}%;background:linear-gradient(90deg,${gc}88,${gc})"></div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px">
+    <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:8px;padding:8px 10px">
+      <div class="lbl" style="margin-bottom:6px">📊 Teknikal</div>
+      ${[
+        {l:"RSI",v:r.rsiD,c:r.rsiD>70?"#ff4560":r.rsiD<35?"#00ff87":"#f5c518"},
+        {l:"MACD",v:r.macd,c:r.macd==="▲"?"#00ff87":"#ff4560"},
+        {l:"MA200",v:r.abM200===true?"Atas":r.abM200===false?"Bawah":"—",c:r.abM200===true?"#00ff87":r.abM200===false?"#ff4560":"#f5c518"},
+        {l:"EMA X",v:r.gx===true?"Golden✓":r.gx===false?"Death✗":"—",c:r.gx===true?"#00ff87":r.gx===false?"#ff4560":"#5a6a7a"},
+        {l:"BB",v:r.bbS,c:r.bbS==="OS"?"#00ff87":r.bbS==="OB"?"#ff4560":"#5a6a7a"},
+        {l:"Vol",v:r.vR?(r.vR>1.5?"Surge "+r.vR.toFixed(1)+"x":"Normal"):"—",c:r.vR>1.5?"#00ff87":"#5a6a7a"},
+      ].map(x=>`<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.03)">
+        <span style="font-size:10px;color:#3d4a5a">${x.l}</span>
+        <span style="font-size:10px;font-weight:700;color:${x.c||"#c4ccd6"}">${x.v}</span>
+      </div>`).join("")}
+    </div>
+    <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:8px;padding:8px 10px">
+      <div class="lbl" style="margin-bottom:6px">🎯 Levels</div>
+      ${[
+        {l:"SL",v:fmt(r.slSw),c:"#ff4560"},{l:"TP1",v:fmt(r.tp1),c:"#00ff87"},
+        {l:"TP2",v:fmt(r.tp2),c:"#00c96a"},{l:"TP3",v:fmt(r.tp3),c:"#009955"},
+        {l:"R:R",v:"1:"+r.rrSw.toFixed(2),c:rrC},
+        {l:"ATR",v:r.atrP+"%",c:"#5a6a7a"},
+      ].map(x=>`<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.03)">
+        <span style="font-size:10px;color:#3d4a5a">${x.l}</span>
+        <span style="font-size:10px;font-weight:700;color:${x.c};font-family:'IBM Plex Mono',monospace">${x.v}</span>
+      </div>`).join("")}
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+    <button onclick="goAN('${r.ticker}')" style="padding:8px;background:rgba(0,255,135,.07);border:1px solid rgba(0,255,135,.22);border-radius:8px;color:#00ff87;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace">📊 DETAIL</button>
+    <button onclick="qkSave('${r.ticker}','${r.swSig}',${r.price},${r.slSw||0},${r.tp1||0},${r.tp2||0},${r.tp3||0},${r.confP})" style="padding:8px;background:rgba(0,204,255,.07);border:1px solid rgba(0,204,255,.22);border-radius:8px;color:#00ccff;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace">＋ TRACKER</button>
+    <button onclick="qkTrade('${r.ticker}','${r.swSig}',${r.price},${r.slSw||0},${r.tp1||0},${r.tp2||0},${r.tp3||0})" style="padding:8px;background:rgba(245,197,24,.07);border:1px solid rgba(245,197,24,.22);border-radius:8px;color:#f5c518;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace">⚡ BYBIT</button>
+  </div>
+</div>`;
+}
+
+function goAN(tk){$('ti').value=tk;T('analyze');setTimeout(()=>AN(tk),100);}
+function qkSave(tk,sig,price,sl,tp1,tp2,tp3,cp){
   const sigs=GS();
-  const actv=sigs.filter(s=>s.status==="active");
-  if(!actv.length){RT();return;}
+  if(sigs.find(s=>s.ticker===tk&&s.status==="active"&&Date.now()-s.timestamp<7200000)){alert(`Signal ${tk} sudah ada.`);return;}
+  sigs.unshift({id:Date.now(),ticker:tk,coinName:tk,sig,conf:7,cp,price,entry:price,sl,tp1,tp2,tp3,timestamp:Date.now(),status:"active",currentPrice:price,hitLevel:null,hitPrice:null,hitTime:null});
+  SS(sigs); const b=event.target;b.textContent="✓ Saved!";setTimeout(()=>b.textContent="＋ TRACKER",2000);
+}
+function qkTrade(tk,sig,price,sl,tp1,tp2,tp3){
+  CSD={ticker:tk,sig,conf:7,cp:70,price,entry:price,sl,tp1,tp2,tp3,trend:"—"};
+  navigator.clipboard.writeText(`AC369 ${sig}\n${tk}/USDT\nEntry:${fmt(price)}\nSL:${fmt(sl)}\nTP1:${fmt(tp1)}\n@Alphacrypto_id`).catch(()=>{});
+  window.open(`https://www.bybit.com/trade/usdt/${tk}USDT`,'_blank');
+}
+
+// ═══════════════════════════════════════════════
+// TRACKER
+// ═══════════════════════════════════════════════
+function GS(){try{return JSON.parse(localStorage.getItem('ac369_sigs')||'[]')}catch(_){return[]}}
+function SS(a){localStorage.setItem('ac369_sigs',JSON.stringify(a))}
+function SV(){if(!CSD)return;const sigs=GS();const dup=sigs.find(s=>s.ticker===CSD.ticker&&s.status==="active"&&Date.now()-s.timestamp<7200000);if(dup){if(!confirm(`Signal ${CSD.ticker} aktif sudah ada. Timpa?`))return;sigs.splice(sigs.indexOf(dup),1);}sigs.unshift(CSD);SS(sigs);alert(`✓ Signal ${CSD.ticker} tersimpan!`);T('tracker');}
+async function RF(){
+  const sigs=GS();const actv=sigs.filter(s=>s.status==="active");
   for(const s of actv){
-    try{
-      const r=await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${s.ticker}USDT`);
-      if(!r.ok)continue;
-      const d=await r.json();const lp=+d.price;
-      s.currentPrice=lp;
-      s.pnlPct=((lp-s.entry)/s.entry*100).toFixed(2);
-      // Check TP/SL hits
+    try{const r=await bFetch(`/api/v3/ticker/price?symbol=${s.ticker}USDT`);const lp=+r.price;s.currentPrice=lp;s.pnlPct=((lp-s.entry)/s.entry*100).toFixed(2);
       if(lp<=s.sl){s.status="loss";s.hitLevel="SL";s.hitPrice=lp;s.hitTime=Date.now();}
       else if(lp>=s.tp3){s.status="win";s.hitLevel="TP3";s.hitPrice=lp;s.hitTime=Date.now();}
       else if(lp>=s.tp2&&s.hitLevel!=="TP3"){s.hitLevel="TP2";s.hitPrice=lp;s.hitTime=Date.now();}
       else if(lp>=s.tp1&&!s.hitLevel){s.hitLevel="TP1";s.hitPrice=lp;s.hitTime=Date.now();}
-      // Mark win if TP1 or TP2 hit and time>7days
-      if((s.hitLevel==="TP1"||s.hitLevel==="TP2")&&Date.now()-s.timestamp>7*86400000){s.status="win";}
-      // Expired after 30 days
-      if(s.status==="active"&&Date.now()-s.timestamp>30*86400000){s.status="expired";}
+      if((s.hitLevel==="TP1"||s.hitLevel==="TP2")&&Date.now()-s.timestamp>7*86400000)s.status="win";
+      if(s.status==="active"&&Date.now()-s.timestamp>30*86400000)s.status="expired";
     }catch(_){}
   }
   SS(sigs);RT();
 }
-
 function RT(){
   const sigs=GS();
   const tot=sigs.length,w=sigs.filter(s=>s.status==="win").length,l=sigs.filter(s=>s.status==="loss").length,a=sigs.filter(s=>s.status==="active").length;
-  const wr=Math.round(w/(w+l||1)*100);
-  const wC=wr>=60?"#00ff87":wr>=45?"#f5c518":"#ff4560";
-  $('ts').innerHTML=`
+  const wr=Math.round(w/(w+l||1)*100);const wC=wr>=60?"#00ff87":wr>=45?"#f5c518":"#ff4560";
+  $('ts2').innerHTML=`
     <div style="background:rgba(0,255,135,.06);border:1px solid rgba(0,255,135,.15);border-radius:9px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:800;color:${wC};font-family:'IBM Plex Mono',monospace">${wr}%</div><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-top:2px">Winrate</div></div>
     <div style="background:rgba(255,255,255,.03);border:1px solid var(--brd);border-radius:9px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:800;color:#e8f0f8;font-family:'IBM Plex Mono',monospace">${w}</div><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-top:2px">Win</div></div>
     <div style="background:rgba(255,69,96,.06);border:1px solid rgba(255,69,96,.15);border-radius:9px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:800;color:#ff4560;font-family:'IBM Plex Mono',monospace">${l}</div><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-top:2px">Loss</div></div>
     <div style="background:rgba(245,197,24,.06);border:1px solid rgba(245,197,24,.15);border-radius:9px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:800;color:#f5c518;font-family:'IBM Plex Mono',monospace">${a}</div><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-top:2px">Aktif</div></div>`;
-
-  if(!sigs.length){$('tl').innerHTML=`<div style="color:var(--dmr);font-size:11px;text-align:center;padding:24px">Belum ada signal.<br/>Analisis koin lalu tap Simpan ke Tracker.</div>`;return;}
-
+  if(!sigs.length){$('tl').innerHTML=`<div style="color:var(--dmr);font-size:11px;text-align:center;padding:24px">Belum ada signal. Analisis koin lalu Save.</div>`;return;}
   $('tl').innerHTML=sigs.map(s=>{
     const stc=s.status==="active"?"#f5c518":s.status==="win"?"#00ff87":s.status==="loss"?"#ff4560":"#3d4a5a";
     const stl=s.status==="active"?"AKTIF":s.status==="win"?"WIN ✓":s.status==="loss"?"LOSS ✗":"EXPIRED";
-    const cp=s.currentPrice||s.entry;
-    const pp=s.pnlPct||((cp-s.entry)/s.entry*100).toFixed(2);
-    const pC=pp>=0?"#00ff87":"#ff4560";
-    const range=s.tp1-s.sl,prog=range>0?Math.min(100,Math.max(0,(cp-s.sl)/range*100)):50;
-    const age=Math.floor((Date.now()-s.timestamp)/86400000);
+    const cp=s.currentPrice||s.entry;const pp=s.pnlPct||((cp-s.entry)/s.entry*100).toFixed(2);const pC=pp>=0?"#00ff87":"#ff4560";
+    const prog=s.tp1&&s.sl?(Math.min(100,Math.max(0,(cp-s.sl)/(s.tp1-s.sl)*100))):50;
     const sc=SC[s.sig]||SC.TAHAN;
     return`<div class="tri ${s.status}">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:5px">
         <div style="display:flex;align-items:center;gap:9px">
           <span style="font-size:15px;font-weight:700;color:${sc.c}">${s.ticker}</span>
-          <span style="font-size:9px;color:${sc.c};background:${sc.bg};border:1px solid ${sc.bd};border-radius:4px;padding:2px 7px;letter-spacing:1px">${s.sig}</span>
+          <span style="font-size:9px;color:${sc.c};background:${sc.bg};border:1px solid ${sc.bd};border-radius:4px;padding:2px 7px">${s.sig}</span>
         </div>
         <div style="display:flex;align-items:center;gap:7px">
           <span style="font-size:11px;font-weight:700;color:${pC};font-family:'IBM Plex Mono',monospace">${pp>=0?"+":""}${pp}%</span>
-          <span style="font-size:9px;font-weight:700;color:${stc};background:${stc}18;border:1px solid ${stc}40;border-radius:10px;padding:2px 8px;letter-spacing:1px">${stl}</span>
+          <span style="font-size:9px;font-weight:700;color:${stc};background:${stc}18;border:1px solid ${stc}40;border-radius:10px;padding:2px 8px">${stl}</span>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(85px,1fr));gap:5px;margin-bottom:8px">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:7px">
         <div style="background:rgba(255,255,255,.03);border-radius:6px;padding:6px 8px"><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">Entry</div><div style="font-size:11px;font-weight:700;color:#e8f0f8;font-family:'IBM Plex Mono',monospace">${fmt(s.entry)}</div></div>
-        <div style="background:rgba(255,255,255,.03);border-radius:6px;padding:6px 8px"><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">Stop Loss</div><div style="font-size:11px;font-weight:700;color:#ff4560;font-family:'IBM Plex Mono',monospace">${fmt(s.sl)}</div></div>
-        <div style="background:rgba(255,255,255,.03);border-radius:6px;padding:6px 8px"><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">TP1 ${s.hitLevel==="TP1"||s.hitLevel==="TP2"||s.hitLevel==="TP3"?"✓":""}</div><div style="font-size:11px;font-weight:700;color:#00ff87;font-family:'IBM Plex Mono',monospace">${fmt(s.tp1)}</div></div>
-        <div style="background:rgba(255,255,255,.03);border-radius:6px;padding:6px 8px"><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">TP2 ${s.hitLevel==="TP2"||s.hitLevel==="TP3"?"✓":""}</div><div style="font-size:11px;font-weight:700;color:#00ff87;font-family:'IBM Plex Mono',monospace">${fmt(s.tp2)}</div></div>
-        <div style="background:rgba(255,255,255,.03);border-radius:6px;padding:6px 8px"><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">TP3 ${s.hitLevel==="TP3"?"✓":""}</div><div style="font-size:11px;font-weight:700;color:#00ff87;font-family:'IBM Plex Mono',monospace">${fmt(s.tp3)}</div></div>
         <div style="background:rgba(255,255,255,.03);border-radius:6px;padding:6px 8px"><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">Live</div><div style="font-size:11px;font-weight:700;color:${pC};font-family:'IBM Plex Mono',monospace">${fmt(cp)}</div></div>
+        <div style="background:rgba(255,255,255,.03);border-radius:6px;padding:6px 8px"><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">TP1 ${s.hitLevel==="TP1"||s.hitLevel==="TP2"||s.hitLevel==="TP3"?"✓":""}</div><div style="font-size:11px;font-weight:700;color:#00ff87;font-family:'IBM Plex Mono',monospace">${fmt(s.tp1)}</div></div>
       </div>
-      <div>
-        <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--dmr);margin-bottom:3px"><span>SL</span><span>Entry</span><span>TP1</span></div>
-        <div class="trpb"><div class="trpf" style="width:${prog}%;background:${prog>50?"#00ff87":"#ff4560"}"></div></div>
-      </div>
+      <div><div style="display:flex;justify-content:space-between;font-size:8px;color:var(--dmr);margin-bottom:3px"><span>SL ${fmt(s.sl)}</span><span>TP1 ${fmt(s.tp1)}</span></div>
+      <div class="trpb"><div class="trpf" style="width:${prog}%;background:${prog>50?"#00ff87":"#ff4560"}"></div></div></div>
       <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:3px;margin-top:6px;font-size:9px;color:var(--dmr)">
         <span>Konfluensi: ${s.cp||"—"}%</span>
-        <span>${age===0?"Hari ini":age+"hr lalu"}</span>
+        <span>${Math.floor((Date.now()-s.timestamp)/86400000)===0?"Hari ini":Math.floor((Date.now()-s.timestamp)/86400000)+"hr lalu"}</span>
         ${s.hitLevel?`<span style="color:${stc}">Hit: ${s.hitLevel} @ ${fmt(s.hitPrice)}</span>`:""}
-        <button onclick="DS(${s.id})" style="background:none;border:none;color:#3d4a5a;cursor:pointer;font-size:9px;font-family:inherit;padding:0">✕ Hapus</button>
-        <button onclick="QT('${s.ticker}','${s.sig}',${s.entry},${s.sl},${s.tp1},${s.tp2},${s.tp3})" style="background:rgba(0,255,135,.07);border:1px solid rgba(0,255,135,.2);border-radius:5px;color:var(--g);cursor:pointer;font-size:9px;font-family:inherit;padding:2px 8px;letter-spacing:1px">⚡ TRADE</button>
+        <button onclick="DS(${s.id})" style="background:none;border:none;color:#3d4a5a;cursor:pointer;font-size:9px;font-family:inherit;padding:0">✕</button>
       </div>
     </div>`;
-  }).join("");
+  }).join('');
 }
+function DS(id){if(!confirm("Hapus?"))return;SS(GS().filter(s=>s.id!==id));RT();}
+function CC(){if(!confirm("Hapus semua closed?"))return;SS(GS().filter(s=>s.status==="active"));RT();}
 
-function DS(id){if(!confirm("Hapus signal ini?"))return;SS(GS().filter(s=>s.id!==id));RT();}
-function CC(){if(!confirm("Hapus semua win/loss/expired?"))return;SS(GS().filter(s=>s.status==="active"));RT();}
-
-// Quick trade from tracker — set CSD then open Bybit
-function QT(ticker,sig,entry,sl,tp1,tp2,tp3){
-  CSD={ticker,sig,conf:7,cp:70,price:entry,entry,sl,tp1,tp2,tp3,trend:"—"};
-  T('analyze');
-  // Scroll to top
-  window.scrollTo({top:0,behavior:'smooth'});
-  sh('sva');
-  setTimeout(()=>setLev(LEV),80);
-  setTimeout(()=>{
-    const panel=document.getElementById('trade-panel');
-    if(panel)panel.scrollIntoView({behavior:'smooth',block:'center'});
-  },300);
-}
-
+// ═══════════════════════════════════════════════
 // WINRATE
+// ═══════════════════════════════════════════════
 function RW(){
   const sigs=GS().filter(s=>s.status!=="active");
-  if(!sigs.length){
-    $('wo').innerHTML=`<div style="color:var(--dmr);font-size:11px;text-align:center;padding:20px">Belum ada signal closed.<br/>Winrate muncul setelah hit TP atau SL.</div>`;
-    $('wm').innerHTML="";$('wb').innerHTML="";return;
-  }
+  if(!sigs.length){$('wo').innerHTML=`<div style="color:var(--dmr);font-size:11px;text-align:center;padding:20px">Belum ada signal closed.</div>`;$('wm').innerHTML='';$('wb').innerHTML='';return;}
   const tot=sigs.length,w=sigs.filter(s=>s.status==="win").length,l=sigs.filter(s=>s.status==="loss").length;
   const wr=Math.round(w/(w+l||1)*100);const wC=wr>=60?"#00ff87":wr>=45?"#f5c518":"#ff4560";
   $('wo').innerHTML=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px">
@@ -801,1113 +1098,28 @@ function RW(){
     <div style="background:rgba(0,255,135,.04);border:1px solid rgba(0,255,135,.1);border-radius:10px;padding:11px;text-align:center"><div style="font-size:20px;font-weight:800;color:#00ff87;font-family:'IBM Plex Mono',monospace">${w}</div><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-top:2px">Win</div></div>
     <div style="background:rgba(255,69,96,.04);border:1px solid rgba(255,69,96,.1);border-radius:10px;padding:11px;text-align:center"><div style="font-size:20px;font-weight:800;color:#ff4560;font-family:'IBM Plex Mono',monospace">${l}</div><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-top:2px">Loss</div></div>
   </div>`;
-
   const bm={};sigs.forEach(s=>{const d=new Date(s.hitTime||s.timestamp);const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;if(!bm[k])bm[k]=[];bm[k].push(s);});
   const MN=["","Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agt","Sep","Okt","Nov","Des"];
   $('wm').innerHTML=Object.keys(bm).sort().reverse().map(m=>{
-    const a=bm[m],mw=a.filter(s=>s.status==="win").length,ml=a.filter(s=>s.status==="loss").length,me=a.filter(s=>s.status==="expired").length;
+    const a=bm[m],mw=a.filter(s=>s.status==="win").length,ml=a.filter(s=>s.status==="loss").length;
     const mwr=Math.round(mw/(mw+ml||1)*100);const mc=mwr>=60?"#00ff87":mwr>=45?"#f5c518":"#ff4560";
     const[yr,mo]=m.split("-");
-    return`<div class="wrm">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px">
-        <div><div style="font-size:12px;font-weight:700;color:#e8f0f8">${MN[+mo]} ${yr}</div><div style="font-size:9px;color:var(--dmr);margin-top:1px">${a.length} signal</div></div>
-        <div style="font-size:20px;font-weight:800;color:${mc};font-family:'IBM Plex Mono',monospace">${mwr}%</div>
-      </div>
-      <div class="wrb"><div class="wrbf" style="width:${mwr}%;background:${mc}"></div></div>
-      <div class="wrs">
-        <div class="wri"><div style="font-size:14px;font-weight:700;color:${mc};font-family:'IBM Plex Mono',monospace">${mwr}%</div><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-top:2px">WR</div></div>
-        <div class="wri"><div style="font-size:14px;font-weight:700;color:#00ff87;font-family:'IBM Plex Mono',monospace">${mw}</div><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-top:2px">Win</div></div>
-        <div class="wri"><div style="font-size:14px;font-weight:700;color:#ff4560;font-family:'IBM Plex Mono',monospace">${ml}</div><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-top:2px">Loss</div></div>
-        <div class="wri"><div style="font-size:14px;font-weight:700;color:#3d4a5a;font-family:'IBM Plex Mono',monospace">${me}</div><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-top:2px">Exp</div></div>
-      </div>
-      <div style="margin-top:9px">${a.map(s=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.03)"><span style="font-size:10px;color:#e8f0f8;font-weight:700">${s.ticker}</span><span style="font-size:9px;color:${SC[s.sig]?.c||"#c4ccd6"}">${s.sig}</span><span style="font-size:9px;font-weight:700;color:${s.status==="win"?"#00ff87":"#ff4560"}">${s.status==="win"?"WIN ✓":"LOSS ✗"}</span>${s.hitLevel?`<span style="font-size:9px;color:var(--dmr)">${s.hitLevel}</span>`:"<span></span>"}</div>`).join("")}</div>
+    return`<div class="wrm"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;flex-wrap:wrap;gap:6px"><div><div style="font-size:12px;font-weight:700;color:#e8f0f8">${MN[+mo]} ${yr}</div><div style="font-size:9px;color:var(--dmr);margin-top:1px">${a.length} signal</div></div><div style="font-size:20px;font-weight:800;color:${mc};font-family:'IBM Plex Mono',monospace">${mwr}%</div></div>
+    <div class="wrb"><div class="wrbf" style="width:${mwr}%;background:${mc}"></div></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px">
+      <div style="text-align:center"><div style="font-size:13px;font-weight:700;color:${mc};font-family:'IBM Plex Mono',monospace">${mwr}%</div><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-top:2px">WR</div></div>
+      <div style="text-align:center"><div style="font-size:13px;font-weight:700;color:#00ff87;font-family:'IBM Plex Mono',monospace">${mw}</div><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-top:2px">Win</div></div>
+      <div style="text-align:center"><div style="font-size:13px;font-weight:700;color:#ff4560;font-family:'IBM Plex Mono',monospace">${ml}</div><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-top:2px">Loss</div></div>
+    </div>
+    <div style="margin-top:8px">${a.map(s=>`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.03)"><span style="font-size:10px;color:#e8f0f8;font-weight:700">${s.ticker}</span><span style="font-size:9px;color:${SC[s.sig]?.c||"#c4ccd6"}">${s.sig}</span><span style="font-size:9px;font-weight:700;color:${s.status==="win"?"#00ff87":"#ff4560"}">${s.status==="win"?"WIN ✓":"LOSS ✗"}</span></div>`).join("")}</div>
     </div>`;
-  }).join("");
-
+  }).join('');
   const bc={};sigs.forEach(s=>{if(!bc[s.ticker])bc[s.ticker]={w:0,l:0};if(s.status==="win")bc[s.ticker].w++;else if(s.status==="loss")bc[s.ticker].l++;});
   const ck=Object.keys(bc).sort((a,b)=>{const wa=bc[a].w/(bc[a].w+bc[a].l||1),wb2=bc[b].w/(bc[b].w+bc[b].l||1);return wb2-wa;});
-  if(ck.length){$('wb').innerHTML=`<div class="sh">Winrate Per Koin</div><div class="wrc">${ck.map(c=>{const n=bc[c],wr2=Math.round(n.w/(n.w+n.l||1)*100);const c2=wr2>=60?"#00ff87":wr2>=45?"#f5c518":"#ff4560";return`<div class="wrci"><div style="font-size:10px;font-weight:700;color:#e8f0f8;margin-bottom:2px">${c}</div><div style="font-size:11px;font-weight:700;color:${c2}">${wr2}%</div><div style="font-size:8px;color:var(--dmr)">${n.w}W/${n.l}L</div></div>`;}).join("")}</div>`;}
+  if(ck.length)$('wb').innerHTML=`<div class="sh">Per Koin</div><div style="display:flex;gap:6px;flex-wrap:wrap">${ck.map(c=>{const n=bc[c],wr2=Math.round(n.w/(n.w+n.l||1)*100);const c2=wr2>=60?"#00ff87":wr2>=45?"#f5c518":"#ff4560";return`<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:7px;padding:7px;text-align:center;min-width:70px"><div style="font-size:10px;font-weight:700;color:#e8f0f8;margin-bottom:2px">${c}</div><div style="font-size:11px;font-weight:700;color:${c2}">${wr2}%</div><div style="font-size:8px;color:var(--dmr)">${n.w}W/${n.l}L</div></div>`;}).join('')}</div>`;
 }
 
-// ═══════════════════════════════════════════════
-// TRADE EXECUTION — LEVEL 1
-// ═══════════════════════════════════════════════
-let LEV=3; // default leverage
-
-function setLev(x){
-  LEV=x;
-  document.querySelectorAll('.lev-btn').forEach(b=>{
-    const bx=parseInt(b.id.split('-')[1]);
-    b.style.background=bx===x?'rgba(0,255,135,.15)':'rgba(255,255,255,.03)';
-    b.style.borderColor=bx===x?'rgba(0,255,135,.5)':'rgba(255,255,255,.07)';
-    b.style.color=bx===x?'#00ff87':'var(--dim)';
-  });
-  UTP();
-}
-
-function UTP(){
-  if(!CSD)return;
-  const size=parseFloat(document.getElementById('trade-size').value)||100;
-  const p=CSD.price,sl=CSD.sl,tp1=CSD.tp1,tp2=CSD.tp2,tp3=CSD.tp3;
-
-  // Qty in base asset
-  const qty=(size*LEV/p);
-  const qtyFmt=qty>=1?qty.toFixed(3):qty.toFixed(6);
-
-  // Risk/reward calculations
-  const riskUSDT = size * (p - sl) / p * LEV;
-  const profTP1  = size * (tp1 - p) / p * LEV;
-  const profTP2  = size * (tp2 - p) / p * LEV;
-  const profTP3  = size * (tp3 - p) / p * LEV;
-  const rrTP1    = riskUSDT > 0 ? (profTP1 / riskUSDT) : 0;
-  const rrTP2    = riskUSDT > 0 ? (profTP2 / riskUSDT) : 0;
-  const rrLabel  = rrTP1 >= 2 ? "✓ Excellent" : rrTP1 >= 1.5 ? "✓ Good" : rrTP1 >= 1 ? "⚠ Minimal" : "✗ Skip";
-  const rrColor  = rrTP1 >= 2 ? "#00ff87" : rrTP1 >= 1.5 ? "#00c96a" : rrTP1 >= 1 ? "#f5c518" : "#ff4560";
-
-  // Params display
-  document.getElementById('trade-params').innerHTML=[
-    {l:"Entry",v:fmt(p),c:"#e8f0f8"},
-    {l:"Stop Loss",v:fmt(sl),c:"#ff4560"},
-    {l:"TP1",v:fmt(tp1),c:"#00ff87"},
-    {l:"TP2",v:fmt(tp2),c:"#00c96a"},
-    {l:"TP3",v:fmt(tp3),c:"#009955"},
-    {l:"Leverage",v:LEV+"x",c:"#f5c518"},
-    {l:"Qty Koin",v:qtyFmt,c:"#00ccff"},
-    {l:"Nilai",v:fmt(size*LEV),c:"#c4ccd6"},
-  ].map(x=>`<div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);border-radius:7px;padding:7px 9px;text-align:center">
-    <div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">${x.l}</div>
-    <div style="font-size:11px;font-weight:700;color:${x.c};font-family:'IBM Plex Mono',monospace">${x.v}</div>
-  </div>`).join("");
-
-  // RR preview
-  document.getElementById('rr-preview').innerHTML=[
-    {l:"Modal",        v:"$"+size.toFixed(0),              c:"#c4ccd6"},
-    {l:"Max Risk",     v:"-$"+riskUSDT.toFixed(1),         c:"#ff4560"},
-    {l:"Profit TP1",  v:"+$"+profTP1.toFixed(1),          c:"#00ff87"},
-    {l:"R:R → TP1",   v:"1:"+rrTP1.toFixed(2)+" "+rrLabel, c:rrColor},
-    {l:"Profit TP2",  v:"+$"+profTP2.toFixed(1),           c:"#00c96a"},
-    {l:"R:R → TP2",   v:"1:"+rrTP2.toFixed(2),             c:rrTP2>=2.5?"#00ff87":"#f5c518"},
-    {l:"Profit TP3",  v:"+$"+profTP3.toFixed(1),           c:"#009955"},
-    {l:"Jarak SL",    v:((p-sl)/p*100).toFixed(2)+"%",     c:"#5a6a7a"},
-  ].map(x=>`<div><div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">${x.l}</div><div style="font-size:12px;font-weight:800;color:${x.c};font-family:'IBM Plex Mono',monospace;line-height:1.2">${x.v}</div></div>`).join("");
-}
-
-function openBybit(side){
-  if(!CSD)return;
-  const size=parseFloat(document.getElementById('trade-size').value)||100;
-  const sym=CSD.ticker+"USDT";
-  const qty=(size*LEV/CSD.price);
-  const qtyStr=qty>=1?qty.toFixed(3):qty.toFixed(6);
-  const slStr=CSD.sl.toFixed(CSD.sl>=1?2:4);
-  const tpStr=CSD.tp1.toFixed(CSD.tp1>=1?2:4);
-
-  // Bybit deep link — opens trade page with symbol pre-selected
-  // Parameters: type=1 (perpetual), symbol, leverage
-  const url=`https://www.bybit.com/trade/usdt/${sym}?lever=${LEV}&orderType=Limit&price=${CSD.price.toFixed(CSD.price>=1?2:4)}&qty=${qtyStr}&side=${side==="LONG"?"Buy":"Sell"}&stopLoss=${slStr}&takeProfit=${tpStr}`;
-
-  // Build order summary for clipboard
-  const orderText=`AC369 SIGNAL — ${side}
-Pair: ${sym} (PERP)
-Entry: ${fmt(CSD.price)}
-Stop Loss: ${fmt(CSD.sl)}
-TP1: ${fmt(CSD.tp1)}
-TP2: ${fmt(CSD.tp2)}
-TP3: ${fmt(CSD.tp3)}
-Leverage: ${LEV}x
-Size: $${size} (Notional: $${(size*LEV).toFixed(0)})
-Qty: ${qtyStr} ${CSD.ticker}
-Signal: ${CSD.sig} | Konfluensi: ${CSD.cp}%
----
-@Alphacrypto_id | AC369 Signal System`;
-
-  // Copy to clipboard then open Bybit
-  navigator.clipboard.writeText(orderText).catch(()=>{});
-  window.open(url,'_blank');
-
-  // Visual feedback
-  const btn=document.getElementById(side==="LONG"?'btn-bybit-long':'btn-bybit-short');
-  const origText=btn.innerHTML;
-  btn.innerHTML=`<span>✓</span><span>MEMBUKA BYBIT...</span><span style="font-size:8px;opacity:.6">Order detail di-copy</span>`;
-  setTimeout(()=>btn.innerHTML=origText,2500);
-}
-
-function openBinance(side){
-  if(!CSD)return;
-  const sym=CSD.ticker+"USDT";
-  // Binance Futures deep link
-  const url=`https://www.binance.com/en/futures/${sym}`;
-  // Copy order detail
-  const size=parseFloat(document.getElementById('trade-size').value)||100;
-  const orderText=`AC369 SIGNAL — ${side}
-Pair: ${sym} (PERP)
-Entry: ${fmt(CSD.price)}
-Stop Loss: ${fmt(CSD.sl)}
-TP1: ${fmt(CSD.tp1)} | TP2: ${fmt(CSD.tp2)} | TP3: ${fmt(CSD.tp3)}
-Leverage: ${LEV}x | Size: $${size}
-Signal: ${CSD.sig} | Konfluensi: ${CSD.cp}%
-@Alphacrypto_id`;
-  navigator.clipboard.writeText(orderText).catch(()=>{});
-  window.open(url,'_blank');
-}
-
-function copyOrder(){
-  if(!CSD)return;
-  const size=parseFloat(document.getElementById('trade-size').value)||100;
-  const qty=(size*LEV/CSD.price);
-  const text=`═══════════════════════
-AC369 SIGNAL SYSTEM
-═══════════════════════
-Pair   : ${CSD.ticker}/USDT (PERP)
-Signal : ${CSD.sig} | Keyakinan: ${CSD.conf}/10
-Konflu : ${CSD.cp}%
-Tren   : ${CSD.trend}
-───────────────────────
-Entry  : ${fmt(CSD.price)}
-SL     : ${fmt(CSD.sl)}
-TP1    : ${fmt(CSD.tp1)}
-TP2    : ${fmt(CSD.tp2)}
-TP3    : ${fmt(CSD.tp3)}
-───────────────────────
-Lev    : ${LEV}x
-Size   : $${size} USDT
-Notional: $${(size*LEV).toFixed(0)}
-Qty    : ${qty>=1?qty.toFixed(3):qty.toFixed(6)} ${CSD.ticker}
-───────────────────────
-${new Date().toLocaleString('id-ID')}
-@Alphacrypto_id | Alpha Crypto 369
-═══════════════════════`;
-  navigator.clipboard.writeText(text).then(()=>{
-    const btn=event.target;
-    btn.textContent="✓ TERSALIN!";
-    btn.style.color="#00ff87";
-    setTimeout(()=>{btn.textContent="📋 COPY ORDER DETAIL";btn.style.color="#00ccff";},2000);
-  }).catch(()=>alert(text));
-}
-
-// Init leverage UI
-setTimeout(()=>setLev(3),100);
-
-// Auto-update trade params when size changes
-document.addEventListener('input',e=>{if(e.target.id==='trade-size')UTP();});
-
-// ═══════════════════════════════════════════════
-// MARKET SCANNER PRO ENGINE
-// ═══════════════════════════════════════════════
-
-// Top 100 USDT perpetual futures symbols (curated, liquidity-filtered)
-const TOP100 = [
-  "BTC","ETH","BNB","SOL","XRP","DOGE","ADA","AVAX","LINK","DOT",
-  "MATIC","LTC","UNI","ATOM","NEAR","ICP","APT","FIL","ARB","OP",
-  "INJ","SUI","TIA","HYPE","RENDER","WLD","PEPE","WIF","BONK","FLOKI",
-  "STX","IMX","GRT","AAVE","SNX","ENS","LDO","RPL","CVX","BAL",
-  "SAND","MANA","AXS","GALA","CHZ","FLOW","ROSE","ONE","ZIL","THETA",
-  "VET","ALGO","XTZ","EOS","TRX","IOTA","NEO","WAVES","DASH","ZEC",
-  "FTM","KAVA","CELO","BAND","ANKR","CRV","MKR","COMP","YFI","SUSHI",
-  "1INCH","DYDX","GMX","JTO","PYTH","SEI","MANTA","ALT","DYM","PIXEL",
-  "PORTAL","STRK","METIS","BLUR","NFT","LOOM","SKL","OGN","REEF","CTSI",
-  "BAKE","DODO","HARD","BEAM","SUPER","ACE","XAI","VANRY","NFP","AI"
-];
-
-const TOP150_EXTRA = [
-  "MASK","AUDIO","RUNE","OCEAN","NMR","RLC","MDT","DATA","LINA","BNX",
-  "VOXEL","GMT","APE","HFT","LQTY","SSV","RDNT","MAGIC","HOP","AGIX",
-  "FET","RNDR","STORJ","ORN","PERP","DENT","CELR","STMX","SLP","WIN",
-  "HOT","TWT","POLY","ACH","FOR","MTL","OAX","PROS","IDEX","AKRO",
-  "BADGER","ALPHA","FARM","MIR","BOND","FODL","TORN","RAMP","BURGER","CFX",
-  "MOVR"
-];
-
-const STABLES = new Set(["USDT","USDC","BUSD","DAI","TUSD","USDP","FDUSD","FRAX","LUSD","USDD"]);
-
-const UNIVERSES = {
-  top10:  ["BTC","ETH","BNB","SOL","XRP","AVAX","DOGE","ADA","LINK","DOT"],
-  top20:  ["BTC","ETH","BNB","SOL","XRP","AVAX","DOGE","ADA","LINK","DOT","NEAR","ATOM","HYPE","SUI","ARB","OP","TIA","INJ","WLD","RENDER"],
-  defi:   ["HYPE","AAVE","UNI","ARB","OP","GMX","INJ","LINK","ATOM","CRV","MKR","COMP","SNX","LDO"],
-  l1l2:   ["ETH","SOL","BNB","AVAX","DOT","NEAR","SUI","TIA","ARB","OP","INJ","ATOM","APT","SEI","STX"],
-  all:    ["BTC","ETH","SOL","BNB","XRP","AVAX","ARB","OP","LINK","DOT","HYPE","SUI","WIF","PEPE","TIA","RENDER","WLD","INJ","ATOM","NEAR","DOGE","ADA"],
-  top100: TOP100,
-  top150: [...TOP100, ...TOP150_EXTRA],
-};
-
-let SELECTED_UNIVERSE = "top100";
-let SCAN_MODE = "pro"; // "standard" | "pro"
-let scanRunning = false;
-
-function setUniverse(u) {
-  SELECTED_UNIVERSE = u;
-  document.querySelectorAll('.univ-btn').forEach(b => {
-    const active = b.dataset.u === u;
-    b.style.background = active ? "rgba(0,255,135,.12)" : "rgba(255,255,255,.03)";
-    b.style.borderColor = active ? "rgba(0,255,135,.4)" : "rgba(255,255,255,.08)";
-    b.style.color = active ? "#00ff87" : "var(--dim)";
-  });
-}
-
-function setScanMode(mode) {
-  SCAN_MODE = mode;
-  const lblPro = document.getElementById('mode-lbl-pro');
-  const lblStd = document.getElementById('mode-lbl-standard');
-  if(lblPro) { lblPro.style.background = mode==="pro"?"rgba(0,255,135,.06)":"rgba(255,255,255,.03)"; lblPro.style.borderColor = mode==="pro"?"rgba(0,255,135,.3)":"rgba(255,255,255,.07)"; }
-  if(lblStd) { lblStd.style.background = mode==="standard"?"rgba(0,255,135,.06)":"rgba(255,255,255,.03)"; lblStd.style.borderColor = mode==="standard"?"rgba(0,255,135,.3)":"rgba(255,255,255,.07)"; }
-}
-
-// ── PHASE 1: Batch pre-filter via 24h tickers ──
-async function preFilterCoins(candidates) {
-  try {
-    // Fetch all USDT perpetual 24h tickers in one call
-    const res = await fetch('https://api.binance.com/api/v3/ticker/24hr');
-    if(!res.ok) return candidates;
-    const all = await res.json();
-    const map = {};
-    all.forEach(t => { if(t.symbol.endsWith('USDT')) map[t.symbol.replace('USDT','')] = t; });
-
-    const filterVol = document.getElementById('f-vol')?.checked;
-    const filterStable = document.getElementById('f-excl-stable')?.checked;
-
-    // Score each candidate by pre-filter criteria
-    const scored = candidates
-      .filter(c => {
-        if(filterStable && STABLES.has(c)) return false;
-        return map[c]; // must have 24h data
-      })
-      .map(c => {
-        const t = map[c];
-        const ch24 = parseFloat(t.priceChangePercent);
-        const vol24 = parseFloat(t.quoteVolume);
-        const hi = parseFloat(t.highPrice), lo = parseFloat(t.lowPrice), price = parseFloat(t.lastPrice);
-        const range = hi > 0 ? (hi-lo)/lo*100 : 0;
-
-        // Pre-filter score: volume activity + momentum signals
-        let preScore = 0;
-        if(vol24 > 50000000) preScore += 3;      // >$50M volume
-        else if(vol24 > 10000000) preScore += 2;  // >$10M
-        else if(vol24 > 1000000) preScore += 1;   // >$1M
-        else if(filterVol) return null;            // skip low volume
-
-        if(Math.abs(ch24) > 3) preScore += 2;     // significant move
-        if(Math.abs(ch24) > 8) preScore += 1;     // strong move
-        if(range > 4) preScore += 1;               // good range for TA
-
-        return { ticker: c, preScore, ch24, vol24, price };
-      })
-      .filter(Boolean);
-
-    // Sort by preScore, take top 35 candidates for deep analysis
-    scored.sort((a,b) => b.preScore - a.preScore);
-    return scored.slice(0, 35).map(s => s.ticker);
-  } catch(_) {
-    return candidates.slice(0, 35);
-  }
-}
-
-// ── PHASE 2: Deep TA on candidates ──
-async function quickTA(ticker) {
-  const kR = await fetch(`https://api.binance.com/api/v3/klines?symbol=${ticker}USDT&interval=1d&limit=120`);
-  if(!kR.ok) return null;
-  const kl = await kR.json();
-  if(!Array.isArray(kl)||kl.length<30) return null;
-
-  const hi=kl.map(k=>+k[2]),lo=kl.map(k=>+k[3]),cl=kl.map(k=>+k[4]),vol=kl.map(k=>+k[5]);
-  const price=cl[cl.length-1];
-
-  const t2=await(await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${ticker}USDT`)).json();
-  const ch24=+t2.priceChangePercent, vol24=+t2.quoteVolume;
-
-  const m20=lst(sma(cl,20)),m50=lst(sma(cl,50)),m200=lst(sma(cl,Math.min(100,cl.length)));
-  const e50=lst(ema(cl,50)),e200=lst(ema(cl,Math.min(100,cl.length)));
-  const rD=rsi(cl.slice(-30),14);
-  const st=stRSI(cl);
-  const aV=atrF(hi,lo,cl,14);
-  const bbd=bb(cl);
-  const md=macd(cl);
-  const {sp,rs}=findSR(hi,lo,price);
-
-  // LONG score
-  let longScore=0;
-  if(rD<30)longScore+=3;else if(rD<40)longScore+=2;else if(rD<50)longScore+=1;
-  else if(rD>70)longScore-=3;else if(rD>65)longScore-=1;
-  if(st.k&&st.d){if(st.k<20&&st.d<20)longScore+=2;if(st.k>st.d&&st.k<40)longScore+=1;if(st.k>80)longScore-=2;}
-  if(m200&&price>m200)longScore+=2;else if(m200&&price<m200)longScore-=1;
-  if(price>m50)longScore+=1;else longScore-=1;
-  if(e200&&e50>e200)longScore+=2;else if(e200&&e50<e200)longScore-=1;
-  if(md.h>0&&md.ph<=0)longScore+=2;else if(md.h>0)longScore+=1;else if(md.h<0&&md.ph>=0)longScore-=2;else if(md.h<0)longScore-=1;
-  if(bbd&&price<bbd.l)longScore+=2;if(bbd&&price>bbd.u)longScore-=1;
-  const avgVol=vol.slice(-20).reduce((a,b)=>a+b,0)/20;
-  if(vol.slice(-3).reduce((a,b)=>a+b,0)/3>avgVol*1.5)longScore+=1;
-  if(ch24>3)longScore+=1;else if(ch24<-8)longScore-=1;
-
-  // SHORT score (inverse)
-  let shortScore = -longScore;
-  // Extra short signals
-  if(rD>70)shortScore+=3;else if(rD>65)shortScore+=1;
-  if(st.k&&st.k>80&&st.d>80)shortScore+=2;
-  if(m200&&price<m200)shortScore+=1;
-  if(e200&&e50<e200)shortScore+=1;
-  if(md.h<0&&md.ph>=0)shortScore+=2;
-  if(bbd&&price>bbd.u)shortScore+=2;
-  if(ch24<-5)shortScore+=1;
-
-  // SL/TP for long
-  const s1=sp[0]?.price;
-  const slLong=s1?s1*0.995:price-(aV*2);
-  const riskLong=price-slLong;
-  const tp1Long=price+riskLong*1.5,tp2Long=price+riskLong*2.5,tp3Long=price+riskLong*4;
-  const rrLong=riskLong>0?(tp1Long-price)/riskLong:0;
-
-  // SL/TP for short
-  const r1=rs[0]?.price;
-  const slShort=r1?r1*1.005:price+(aV*2);
-  const riskShort=slShort-price;
-  const tp1Short=price-riskShort*1.5,tp2Short=price-riskShort*2.5,tp3Short=price-riskShort*4;
-  const rrShort=riskShort>0?(price-tp1Short)/riskShort:0;
-
-  const maxScore=15;
-  const longConf=Math.min(99,Math.round(Math.max(0,longScore)/maxScore*100));
-  const shortConf=Math.min(99,Math.round(Math.max(0,shortScore)/maxScore*100));
-
-  return {
-    ticker,price,ch24,vol24,
-    longScore,shortScore,longConf,shortConf,
-    rD:Math.round(rD||0),stK:st.k?Math.round(st.k):null,
-    macdDir:md.h>0?"▲":"▼",
-    aboveM200:m200?price>m200:null,
-    goldenX:e200?e50>e200:null,
-    bbState:bbd?(price<bbd.l?"OS":price>bbd.u?"OB":"Netral"):"—",
-    atrPct:(aV/price*100).toFixed(1),
-    // Long setup
-    slLong,tp1Long,tp2Long,tp3Long,rrLong,
-    // Short setup
-    slShort,tp1Short,tp2Short,tp3Short,rrShort,
-  };
-}
-
-async function startScan() {
-  if(scanRunning) return;
-  scanRunning = true;
-
-  const allCoins = UNIVERSES[SELECTED_UNIVERSE] || TOP100;
-  const filterRR = document.getElementById('f-minrr')?.checked;
-
-  // Reset UI
-  const btn = document.getElementById('scan-btn');
-  btn.disabled = true; btn.textContent = "⏳ SCANNING...";
-  document.getElementById('pro-results')?.classList.add('hidden');
-  document.getElementById('scan-results')?.classList.add('hidden');
-  ['long-wrap','short-wrap','gen-content-wrap','gen-content-wrap2'].forEach(id=>{document.getElementById(id)?.classList.add('hidden');});
-  ['tier-s-wrap','tier-a-wrap','tier-b-wrap','tier-skip-wrap'].forEach(id=>{document.getElementById(id)?.classList.add('hidden');});
-  ['tier-s','tier-a','tier-b','tier-skip','long-list','short-list'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='';});
-  document.getElementById('scan-feed').innerHTML = "";
-  document.getElementById('scan-bar').style.width = "0%";
-  sh('scan-progress');
-
-  // PHASE 1: Pre-filter (fast, 1-2 API calls for large universes)
-  let candidates = allCoins;
-  if(allCoins.length > 25) {
-    document.getElementById('scan-phase').textContent = "Phase 1: Pre-filter volume & momentum...";
-    document.getElementById('scan-count').textContent = `Pre-filtering ${allCoins.length} koin...`;
-    candidates = await preFilterCoins(allCoins);
-    document.getElementById('scan-found').textContent = `${candidates.length} kandidat kuat`;
-    const feed = document.getElementById('scan-feed');
-    feed.innerHTML += `<span style="color:#00ff87">✓ Pre-filter selesai: ${candidates.length} dari ${allCoins.length} lolos seleksi awal</span><br/>`;
-  }
-
-  // PHASE 2: Deep TA
-  document.getElementById('scan-phase').textContent = "Phase 2: Analisis TA mendalam...";
-  const results = [];
-  let done = 0;
-
-  for(const ticker of candidates) {
-    document.getElementById('scan-status').textContent = `Analisis ${ticker}...`;
-    try {
-      const r = await quickTA(ticker);
-      done++;
-      document.getElementById('scan-bar').style.width = Math.round(done/candidates.length*100)+"%";
-      document.getElementById('scan-count').textContent = `${done} / ${candidates.length} koin`;
-
-      if(r) {
-        results.push(r);
-        const feed = document.getElementById('scan-feed');
-        const longClr = r.longScore>=5?"#00ff87":r.longScore>=2?"#f5c518":"#3d4a5a";
-        const shortClr = r.shortScore>=5?"#ff4560":r.shortScore>=2?"#f5c518":"#3d4a5a";
-        feed.innerHTML += `<span style="color:#c4ccd6">${ticker}</span> · <span style="color:${longClr}">L:${r.longScore>0?"+":""}${r.longScore}</span> · <span style="color:${shortClr}">S:${r.shortScore>0?"+":""}${r.shortScore}</span> · RSI:${r.rD} · <span style="color:${r.rrLong>=1.5?"#00ff87":"#5a6a7a"}">RR:${r.rrLong.toFixed(1)}</span><br/>`;
-        feed.scrollTop = feed.scrollHeight;
-      }
-    } catch(_) { done++; }
-    await new Promise(res=>setTimeout(res,180));
-  }
-
-  // Cache results
-  scanResultsCache = results;
-
-  // ── RANK & RENDER ──
-  if(SCAN_MODE === "pro") {
-    // TOP LONG: sorted by longScore, filter by RR
-    const longList = results
-      .filter(r => r.longScore > 0 && (!filterRR || r.rrLong >= 1.5))
-      .sort((a,b) => (b.longScore*2+b.rrLong) - (a.longScore*2+a.rrLong))
-      .slice(0, 10);
-
-    // TOP SHORT: sorted by shortScore, filter by RR
-    const shortList = results
-      .filter(r => r.shortScore > 0 && (!filterRR || r.rrShort >= 1.5))
-      .sort((a,b) => (b.shortScore*2+b.rrShort) - (a.shortScore*2+a.rrShort))
-      .slice(0, 5);
-
-    // Summary bar
-    const avgLongConf = longList.length ? Math.round(longList.reduce((a,r)=>a+r.longConf,0)/longList.length) : 0;
-    document.getElementById('pro-summary').innerHTML = `
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-        <div style="background:rgba(9,12,20,.9);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:11px;text-align:center">
-          <div style="font-size:18px;font-weight:800;color:#e8f0f8;font-family:'IBM Plex Mono',monospace">${results.length}</div>
-          <div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-top:2px">Di-scan</div>
-        </div>
-        <div style="background:rgba(0,255,135,.06);border:1px solid rgba(0,255,135,.2);border-radius:10px;padding:11px;text-align:center">
-          <div style="font-size:18px;font-weight:800;color:#00ff87;font-family:'IBM Plex Mono',monospace">${longList.length}</div>
-          <div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-top:2px">Top Long</div>
-        </div>
-        <div style="background:rgba(255,69,96,.06);border:1px solid rgba(255,69,96,.2);border-radius:10px;padding:11px;text-align:center">
-          <div style="font-size:18px;font-weight:800;color:#ff4560;font-family:'IBM Plex Mono',monospace">${shortList.length}</div>
-          <div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-top:2px">Top Short</div>
-        </div>
-        <div style="background:rgba(245,197,24,.06);border:1px solid rgba(245,197,24,.2);border-radius:10px;padding:11px;text-align:center">
-          <div style="font-size:18px;font-weight:800;color:#f5c518;font-family:'IBM Plex Mono',monospace">${avgLongConf}%</div>
-          <div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-top:2px">Avg Conf</div>
-        </div>
-      </div>`;
-
-    renderProList('long-list', 'long-wrap', longList, 'long');
-    renderProList('short-list', 'short-wrap', shortList, 'short');
-
-    // Auto-select top coins for content
-    selectedCoinsForContent = new Set(longList.slice(0,4).map(r=>r.ticker));
-
-    hd('scan-progress');
-    sh('pro-results');
-    sh('gen-content-wrap');
-
-  } else {
-    // Standard tier mode
-    results.sort((a,b)=>b.longScore-a.longScore);
-    const tierS=[],tierA=[],tierB=[],tierSkip=[];
-    results.forEach(r=>{
-      const rFmt={...r,sig:r.longScore>=5?"BELI":r.longScore<=-3?"JUAL":"TAHAN",score:r.longScore,conf_pct:r.longConf,sl:r.slLong,tp1:r.tp1Long,tp2:r.tp2Long,tp3:r.tp3Long,rr:r.rrLong,s:1};
-      if(r.longScore>=7&&r.rrLong>=2)tierS.push(rFmt);
-      else if(r.longScore>=4&&r.rrLong>=1.5)tierA.push(rFmt);
-      else if(r.longScore>=1)tierB.push(rFmt);
-      else tierSkip.push(rFmt);
-    });
-    renderTier('tier-s',tierS,'tier-s-wrap','#ffd700','TIER S');
-    renderTier('tier-a',tierA,'tier-a-wrap','#00ff87','TIER A');
-    renderTier('tier-b',tierB,'tier-b-wrap','#00ccff','TIER B');
-    if(tierSkip.length){sh('tier-skip-wrap');document.getElementById('tier-skip').innerHTML=tierSkip.map(r=>`<span style="padding:3px 9px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:10px;font-size:9px;color:#3d4a5a;cursor:pointer" onclick="goAnalyze('${r.ticker}')">${r.ticker}</span>`).join("");}
-    selectedCoinsForContent=new Set(tierS.concat(tierA).slice(0,4).map(r=>r.ticker));
-    hd('scan-progress');
-    sh('scan-results');
-    sh('gen-content-wrap2');
-  }
-
-  btn.disabled=false; btn.textContent="⚡ SCAN LAGI";
-  scanRunning=false;
-}
-
-function renderProList(containerId, wrapId, items, direction) {
-  if(!items.length) return;
-  sh(wrapId);
-  const isLong = direction === 'long';
-  const accentColor = isLong ? "#00ff87" : "#ff4560";
-  const scoreKey = isLong ? "longScore" : "shortScore";
-  const confKey  = isLong ? "longConf"  : "shortConf";
-  const slKey    = isLong ? "slLong"    : "slShort";
-  const tp1Key   = isLong ? "tp1Long"   : "tp1Short";
-  const tp2Key   = isLong ? "tp2Long"   : "tp2Short";
-  const tp3Key   = isLong ? "tp3Long"   : "tp3Short";
-  const rrKey    = isLong ? "rrLong"    : "rrShort";
-
-  document.getElementById(containerId).innerHTML = items.map((r,idx)=>{
-    const score = r[scoreKey], conf = r[confKey], rr = r[rrKey];
-    const sl=r[slKey],tp1=r[tp1Key],tp2=r[tp2Key],tp3=r[tp3Key];
-    const rrColor = rr>=2.5?"#00ff87":rr>=1.5?"#00c96a":"#f5c518";
-    const maColor = r.aboveM200===true?"#00ff87":r.aboveM200===false?"#ff4560":"#f5c518";
-
-    return `<div style="background:rgba(9,12,20,.92);border:1px solid ${accentColor}20;border-left:3px solid ${accentColor};border-radius:12px;padding:14px 16px;margin-bottom:9px;position:relative">
-      <!-- Rank -->
-      <div style="position:absolute;top:10px;right:13px;font-size:22px;font-weight:900;color:${accentColor};opacity:.08;font-family:'IBM Plex Mono',monospace">#${idx+1}</div>
-
-      <!-- Header -->
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
-        <div style="font-size:20px;font-weight:800;color:#e8f0f8;letter-spacing:1px">${r.ticker}</div>
-        <div style="font-size:18px;font-weight:700;color:#e8f0f8;font-family:'IBM Plex Mono',monospace">${fmt(r.price)}</div>
-        <div style="font-size:11px;font-weight:700;color:${r.ch24>=0?"#00ff87":"#ff4560"}">${r.ch24>=0?"+":""}${r.ch24.toFixed(2)}%</div>
-        <div style="background:${accentColor}15;border:1px solid ${accentColor}40;border-radius:6px;padding:3px 10px;font-size:9px;font-weight:700;color:${accentColor};letter-spacing:1px">
-          ${isLong?"▲ LONG":"▼ SHORT"} · Score ${score>0?"+":""}${score}
-        </div>
-        <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:3px 10px;font-size:9px;color:#c4ccd6">Konfluensi: ${conf}%</div>
-      </div>
-
-      <!-- Metrics -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(75px,1fr));gap:5px;margin-bottom:10px">
-        ${[
-          {l:"RSI",    v:r.rD,    c:r.rD>70?"#ff4560":r.rD<35?"#00ff87":"#f5c518"},
-          {l:"Stoch",  v:r.stK||"—", c:r.stK&&r.stK<25?"#00ff87":r.stK&&r.stK>75?"#ff4560":"#c4ccd6"},
-          {l:"MACD",   v:r.macdDir,  c:r.macdDir==="▲"?"#00ff87":"#ff4560"},
-          {l:"MA200",  v:r.aboveM200===true?"Atas":r.aboveM200===false?"Bawah":"—", c:maColor},
-          {l:"EMA X",  v:r.goldenX===true?"Golden":r.goldenX===false?"Death":"—", c:r.goldenX===true?"#00ff87":r.goldenX===false?"#ff4560":"#5a6a7a"},
-          {l:"BB",     v:r.bbState, c:r.bbState==="OS"?"#00ff87":r.bbState==="OB"?"#ff4560":"#5a6a7a"},
-          {l:"Vol24h", v:r.vol24>=1e9?"$"+(r.vol24/1e9).toFixed(1)+"B":"$"+(r.vol24/1e6).toFixed(0)+"M", c:"#5a6a7a"},
-          {l:"ATR%",   v:r.atrPct+"%", c:"#5a6a7a"},
-        ].map(x=>`<div style="background:rgba(255,255,255,.025);border-radius:6px;padding:5px 7px;text-align:center">
-          <div style="font-size:7px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">${x.l}</div>
-          <div style="font-size:10px;font-weight:700;color:${x.c};font-family:'IBM Plex Mono',monospace">${x.v}</div>
-        </div>`).join("")}
-      </div>
-
-      <!-- TP/SL levels -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:9px">
-        <div style="background:rgba(255,69,96,.06);border:1px solid rgba(255,69,96,.15);border-radius:6px;padding:5px 7px;text-align:center">
-          <div style="font-size:7px;color:#7a2030;letter-spacing:1px;margin-bottom:2px;text-transform:uppercase">Stop Loss</div>
-          <div style="font-size:10px;font-weight:700;color:#ff4560;font-family:'IBM Plex Mono',monospace">${fmt(sl)}</div>
-        </div>
-        ${[{l:"TP1",v:tp1},{l:"TP2",v:tp2},{l:"TP3",v:tp3}].map((tp,ti)=>`
-        <div style="background:rgba(0,255,135,${0.06-ti*0.015});border:1px solid rgba(0,255,135,${0.2-ti*0.05});border-radius:6px;padding:5px 7px;text-align:center">
-          <div style="font-size:7px;color:#1e4a2a;letter-spacing:1px;margin-bottom:2px;text-transform:uppercase">${tp.l}</div>
-          <div style="font-size:10px;font-weight:700;color:${ti===0?"#00ff87":ti===1?"#00c96a":"#009955"};font-family:'IBM Plex Mono',monospace">${fmt(tp.v)}</div>
-        </div>`).join("")}
-      </div>
-
-      <!-- R:R bar -->
-      <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px">
-        <div style="flex:1;background:rgba(255,255,255,.05);border-radius:3px;height:4px;overflow:hidden">
-          <div style="height:100%;width:${Math.min(100,rr/4*100)}%;background:${rrColor};border-radius:3px;transition:width .6s"></div>
-        </div>
-        <div style="font-size:11px;font-weight:800;color:${rrColor};font-family:'IBM Plex Mono',monospace;white-space:nowrap">R:R 1:${rr.toFixed(2)}</div>
-        <div style="font-size:9px;color:${rrColor}">${rr>=2.5?"✓ Excellent":rr>=2?"✓ Very Good":rr>=1.5?"✓ Good":"⚠ Minimal"}</div>
-      </div>
-
-      <!-- Confidence bar -->
-      <div style="margin-bottom:10px">
-        <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--dmr);margin-bottom:3px"><span>Konfluensi ${direction.toUpperCase()}</span><span style="color:${accentColor}">${conf}%</span></div>
-        <div style="background:rgba(255,255,255,.05);border-radius:3px;height:3px;overflow:hidden">
-          <div style="height:100%;width:${conf}%;background:${accentColor};border-radius:3px;opacity:.7"></div>
-        </div>
-      </div>
-
-      <!-- Actions -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
-        <button onclick="goAnalyze('${r.ticker}')"
-          style="padding:8px;background:rgba(0,255,135,.07);border:1px solid rgba(0,255,135,.25);border-radius:7px;color:#00ff87;font-size:9px;font-weight:700;letter-spacing:.8px;cursor:pointer;font-family:'IBM Plex Mono',monospace">
-          📊 DETAIL
-        </button>
-        <button onclick="quickSave('${r.ticker}','${isLong?"BELI":"JUAL"}',${r.price},${sl},${tp1},${tp2},${tp3},${conf})"
-          style="padding:8px;background:rgba(0,204,255,.07);border:1px solid rgba(0,204,255,.25);border-radius:7px;color:#00ccff;font-size:9px;font-weight:700;letter-spacing:.8px;cursor:pointer;font-family:'IBM Plex Mono',monospace">
-          ＋ TRACKER
-        </button>
-        <button onclick="quickTradeOpen('${r.ticker}','${isLong?"BELI":"JUAL"}',${r.price},${sl},${tp1},${tp2},${tp3})"
-          style="padding:8px;background:rgba(245,197,24,.07);border:1px solid rgba(245,197,24,.25);border-radius:7px;color:#f5c518;font-size:9px;font-weight:700;letter-spacing:.8px;cursor:pointer;font-family:'IBM Plex Mono',monospace">
-          ⚡ BYBIT
-        </button>
-      </div>
-    </div>`;
-  }).join("");
-}
-
-function renderTier(containerId, items, wrapId, color, label) {
-  if(!items.length) return;
-  sh(wrapId);
-  document.getElementById(containerId).innerHTML = items.map((r,idx) => {
-    const sc2 = SC[r.sig]||SC.TAHAN;
-    const rrColor = r.rr>=2?"#00ff87":r.rr>=1.5?"#00c96a":"#f5c518";
-    const maColor = r.aboveM200===true?"#00ff87":r.aboveM200===false?"#ff4560":"#f5c518";
-    const gcColor = r.goldenX===true?"#00ff87":r.goldenX===false?"#ff4560":"#5a6a7a";
-    return `<div style="background:rgba(9,12,20,.9);border:1px solid ${color}22;border-left:3px solid ${color};border-radius:12px;padding:14px 16px;margin-bottom:9px;position:relative;overflow:hidden">
-      <!-- Rank badge -->
-      <div style="position:absolute;top:12px;right:14px;font-size:10px;font-weight:800;color:${color};opacity:.4;font-family:'IBM Plex Mono',monospace">#${idx+1}</div>
-
-      <!-- Header row -->
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
-        <div style="font-size:18px;font-weight:800;color:#e8f0f8;letter-spacing:1px">${r.ticker}</div>
-        <div style="font-size:20px;font-weight:700;color:#e8f0f8;font-family:'IBM Plex Mono',monospace">${fmt(r.price)}</div>
-        <div style="font-size:11px;font-weight:700;color:${r.ch24>=0?"#00ff87":"#ff4560"}">${r.ch24>=0?"+":""}${r.ch24.toFixed(2)}%</div>
-        <span style="background:${sc2.bg};border:1px solid ${sc2.bd};border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700;color:${sc2.c};letter-spacing:1.5px">${sc2.ic} ${r.sig}</span>
-        <span style="background:${color}18;border:1px solid ${color}40;border-radius:6px;padding:3px 10px;font-size:9px;font-weight:700;color:${color}">Score: ${r.score>0?"+":""}${r.score}</span>
-      </div>
-
-      <!-- Metrics grid -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:6px;margin-bottom:10px">
-        ${[
-          {l:"RSI",      v:r.rD,                    c:r.rD>70?"#ff4560":r.rD<35?"#00ff87":"#f5c518"},
-          {l:"StochRSI", v:r.stK||"—",              c:r.stK&&r.stK<25?"#00ff87":r.stK&&r.stK>75?"#ff4560":"#c4ccd6"},
-          {l:"MACD",     v:r.macdDir,               c:r.macdDir==="▲"?"#00ff87":"#ff4560"},
-          {l:"MA200",    v:r.aboveM200===true?"Atas":r.aboveM200===false?"Bawah":"—", c:maColor},
-          {l:"EMA X",    v:r.goldenX===true?"Golden":r.goldenX===false?"Death":"—",   c:gcColor},
-          {l:"BB",       v:r.bbState,               c:r.bbState==="OS"?"#00ff87":r.bbState==="OB"?"#ff4560":"#5a6a7a"},
-          {l:"ATR%",     v:r.atrPct+"%",            c:"#5a6a7a"},
-          {l:"Konflu.",  v:r.conf_pct+"%",          c:color},
-        ].map(x=>`<div style="background:rgba(255,255,255,.025);border-radius:6px;padding:6px 8px;text-align:center">
-          <div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">${x.l}</div>
-          <div style="font-size:11px;font-weight:700;color:${x.c};font-family:'IBM Plex Mono',monospace">${x.v}</div>
-        </div>`).join("")}
-      </div>
-
-      <!-- TP/SL levels -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px">
-        <div style="background:rgba(255,69,96,.06);border:1px solid rgba(255,69,96,.15);border-radius:6px;padding:6px 8px;text-align:center">
-          <div style="font-size:8px;color:#7a2030;letter-spacing:1px;margin-bottom:2px;text-transform:uppercase">Stop Loss</div>
-          <div style="font-size:11px;font-weight:700;color:#ff4560;font-family:'IBM Plex Mono',monospace">${fmt(r.sl)}</div>
-        </div>
-        <div style="background:rgba(0,255,135,.06);border:1px solid rgba(0,255,135,.15);border-radius:6px;padding:6px 8px;text-align:center">
-          <div style="font-size:8px;color:#1e4a2a;letter-spacing:1px;margin-bottom:2px;text-transform:uppercase">TP1</div>
-          <div style="font-size:11px;font-weight:700;color:#00ff87;font-family:'IBM Plex Mono',monospace">${fmt(r.tp1)}</div>
-        </div>
-        <div style="background:rgba(0,255,135,.04);border:1px solid rgba(0,255,135,.1);border-radius:6px;padding:6px 8px;text-align:center">
-          <div style="font-size:8px;color:#1a3d24;letter-spacing:1px;margin-bottom:2px;text-transform:uppercase">TP2</div>
-          <div style="font-size:11px;font-weight:700;color:#00c96a;font-family:'IBM Plex Mono',monospace">${fmt(r.tp2)}</div>
-        </div>
-        <div style="background:rgba(0,255,135,.02);border:1px solid rgba(0,255,135,.07);border-radius:6px;padding:6px 8px;text-align:center">
-          <div style="font-size:8px;color:#14301c;letter-spacing:1px;margin-bottom:2px;text-transform:uppercase">TP3</div>
-          <div style="font-size:11px;font-weight:700;color:#009955;font-family:'IBM Plex Mono',monospace">${fmt(r.tp3)}</div>
-        </div>
-      </div>
-
-      <!-- R:R bar -->
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-        <div style="flex:1;background:rgba(255,255,255,.05);border-radius:4px;height:5px;overflow:hidden">
-          <div style="height:100%;width:${Math.min(100,r.rr/4*100)}%;background:linear-gradient(90deg,${rrColor},${rrColor}88);border-radius:4px;transition:width .5s"></div>
-        </div>
-        <div style="font-size:11px;font-weight:800;color:${rrColor};font-family:'IBM Plex Mono',monospace;white-space:nowrap">R:R 1:${r.rr.toFixed(2)}</div>
-        <div style="font-size:9px;color:${rrColor};">${r.rr>=2?"✓ Excellent":r.rr>=1.5?"✓ Good":"⚠ Minimal"}</div>
-      </div>
-
-      <!-- Action buttons -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px">
-        <button onclick="goAnalyze('${r.ticker}')"
-          style="padding:9px 8px;background:rgba(0,255,135,.08);border:1px solid rgba(0,255,135,.3);border-radius:8px;color:#00ff87;font-size:9px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s"
-          onmouseover="this.style.background='rgba(0,255,135,.18)'" onmouseout="this.style.background='rgba(0,255,135,.08)'">
-          📊 ANALISIS DETAIL
-        </button>
-        <button onclick="quickSave('${r.ticker}','${r.sig}',${r.price},${r.sl},${r.tp1},${r.tp2},${r.tp3},${r.conf_pct})"
-          style="padding:9px 8px;background:rgba(0,204,255,.08);border:1px solid rgba(0,204,255,.3);border-radius:8px;color:#00ccff;font-size:9px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s"
-          onmouseover="this.style.background='rgba(0,204,255,.18)'" onmouseout="this.style.background='rgba(0,204,255,.08)'">
-          ＋ SAVE TRACKER
-        </button>
-        <button onclick="quickTradeOpen('${r.ticker}','${r.sig}',${r.price},${r.sl},${r.tp1},${r.tp2},${r.tp3})"
-          style="padding:9px 8px;background:rgba(245,197,24,.08);border:1px solid rgba(245,197,24,.3);border-radius:8px;color:#f5c518;font-size:9px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s"
-          onmouseover="this.style.background='rgba(245,197,24,.18)'" onmouseout="this.style.background='rgba(245,197,24,.08)'">
-          ⚡ BYBIT
-        </button>
-      </div>
-    </div>`;
-  }).join("");
-}
-
-function goAnalyze(ticker) {
-  document.getElementById('ti').value = ticker;
-  T('analyze');
-  window.scrollTo({top:0,behavior:'smooth'});
-  setTimeout(()=>AN(ticker), 100);
-}
-
-function quickSave(ticker,sig,price,sl,tp1,tp2,tp3,cp) {
-  const sigs = GS();
-  const dup = sigs.find(s=>s.ticker===ticker&&s.status==="active"&&Date.now()-s.timestamp<7200000);
-  if(dup){ alert(`Signal ${ticker} sudah ada di tracker.`); return; }
-  sigs.unshift({id:Date.now(),ticker,coinName:ticker,sig,conf:7,cp,price,entry:price,sl,tp1,tp2,tp3,timestamp:Date.now(),status:"active",currentPrice:price,hitLevel:null,hitPrice:null,hitTime:null});
-  SS(sigs);
-  event.target.textContent="✓ Saved!";
-  event.target.style.color="#00ff87";
-  setTimeout(()=>{event.target.textContent="＋ SAVE TRACKER";event.target.style.color="#00ccff";},2000);
-}
-
-function quickTradeOpen(ticker,sig,price,sl,tp1,tp2,tp3) {
-  CSD={ticker,sig,conf:7,cp:70,price,entry:price,sl,tp1,tp2,tp3,trend:"—"};
-  const sym=ticker+"USDT";
-  const size=100,lev=LEV;
-  const qty=(size*lev/price);
-  const qtyStr=qty>=1?qty.toFixed(3):qty.toFixed(6);
-  const orderText=`AC369 SCANNER SIGNAL
-Pair: ${sym} | ${sig}
-Entry: ${fmt(price)} | SL: ${fmt(sl)}
-TP1: ${fmt(tp1)} | TP2: ${fmt(tp2)} | TP3: ${fmt(tp3)}
-Lev: ${lev}x | @Alphacrypto_id`;
-  navigator.clipboard.writeText(orderText).catch(()=>{});
-  window.open(`https://www.bybit.com/trade/usdt/${sym}`,'_blank');
-}
-
-// ═══════════════════════════════════════════════
-// CONTENT GENERATOR ENGINE
-// ═══════════════════════════════════════════════
-let scanResultsCache = [];
-let selectedCoinsForContent = new Set();
-let selectedTone = "institutional";
-let selectedContentTypes = new Set(["telegram_public","telegram_vip"]);
-
-const CONTENT_TYPES = [
-  {id:"telegram_public",  icon:"📢", label:"Telegram Publik",   desc:"Teaser + CTA ke premium"},
-  {id:"telegram_vip",     icon:"👑", label:"Telegram VIP",      desc:"Signal lengkap member"},
-  {id:"story_caption",    icon:"📱", label:"Story / Feed",       desc:"Caption singkat visual"},
-  {id:"thread",           icon:"🧵", label:"Thread Breakdown",   desc:"Edukasi 5-7 poin"},
-  {id:"daily_watchlist",  icon:"👁", label:"Daily Watchlist",    desc:"Ringkasan koin pantauan"},
-  {id:"winrate_post",     icon:"🏆", label:"Winrate Update",     desc:"Post track record bulanan"},
-];
-
-function openContentGenerator() {
-  T('content');
-}
-
-function initContentTab() {
-  // Build content type grid
-  const grid = document.getElementById('content-type-grid');
-  if(grid) {
-    grid.innerHTML = CONTENT_TYPES.map(ct => `
-      <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:${selectedContentTypes.has(ct.id)?"rgba(245,197,24,.08)":"rgba(255,255,255,.02)"};border:1px solid ${selectedContentTypes.has(ct.id)?"rgba(245,197,24,.3)":"rgba(255,255,255,.06)"};border-radius:9px;cursor:pointer;transition:all .2s" id="ctlbl-${ct.id}">
-        <input type="checkbox" ${selectedContentTypes.has(ct.id)?"checked":""} onchange="toggleCT('${ct.id}',this)" style="accent-color:#f5c518;width:14px;height:14px"/>
-        <div>
-          <div style="font-size:10px;font-weight:700;color:#e8f0f8">${ct.icon} ${ct.label}</div>
-          <div style="font-size:9px;color:var(--dmr);margin-top:1px">${ct.desc}</div>
-        </div>
-      </label>`).join("");
-  }
-
-  // Build coin selector from scan cache
-  const coinList = document.getElementById('content-coin-list');
-  if(coinList && scanResultsCache.length > 0) {
-    coinList.innerHTML = scanResultsCache
-      .filter(r => r.sig === "BELI" || r.score >= 3)
-      .slice(0, 12)
-      .map(r => {
-        const sc2 = SC[r.sig]||SC.TAHAN;
-        const sel = selectedCoinsForContent.has(r.ticker);
-        return `<button onclick="toggleCoin('${r.ticker}')" id="ccoin-${r.ticker}"
-          style="padding:6px 12px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s;
-          background:${sel?sc2.bg:"rgba(255,255,255,.03)"};border:1px solid ${sel?sc2.bd:"rgba(255,255,255,.07)"};color:${sel?sc2.c:"var(--dim)"}">
-          ${r.ticker} <span style="opacity:.6;font-size:8px">${r.sig}</span>
-        </button>`;
-      }).join("");
-  } else if(coinList && scanResultsCache.length === 0) {
-    coinList.innerHTML = `<div style="font-size:11px;color:var(--dmr)">Jalankan scanner dulu untuk memilih koin.</div>`;
-  }
-}
-
-function toggleCT(id, cb) {
-  if(cb.checked) selectedContentTypes.add(id); else selectedContentTypes.delete(id);
-  const lbl = document.getElementById('ctlbl-'+id);
-  if(lbl) {
-    lbl.style.background = cb.checked ? "rgba(245,197,24,.08)" : "rgba(255,255,255,.02)";
-    lbl.style.borderColor = cb.checked ? "rgba(245,197,24,.3)" : "rgba(255,255,255,.06)";
-  }
-}
-
-function toggleCoin(ticker) {
-  if(selectedCoinsForContent.has(ticker)) selectedCoinsForContent.delete(ticker);
-  else selectedCoinsForContent.add(ticker);
-  initContentTab();
-}
-
-function setTone(tone) {
-  selectedTone = tone;
-  document.querySelectorAll('.tone-btn').forEach(b => {
-    const active = b.dataset.tone === tone;
-    b.style.background = active ? "rgba(0,255,135,.12)" : "rgba(255,255,255,.03)";
-    b.style.borderColor = active ? "rgba(0,255,135,.4)" : "rgba(255,255,255,.08)";
-    b.style.color = active ? "#00ff87" : "var(--dim)";
-  });
-}
-
-function generateContent() {
-  const coins = scanResultsCache.filter(r => selectedCoinsForContent.has(r.ticker));
-  if(coins.length === 0) {
-    // use top results if none selected
-    const top = scanResultsCache.filter(r=>r.sig==="BELI").slice(0,3);
-    top.forEach(r => selectedCoinsForContent.add(r.ticker));
-    if(top.length === 0) { alert("Jalankan scanner dan pilih koin dulu."); return; }
-    top.forEach(r => coins.push(r));
-  }
-
-  const now = new Date();
-  const dateStr = now.toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"});
-  const timeStr = now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
-  const outputs = [];
-
-  // Get winrate from tracker for credibility
-  const sigs = GS();
-  const closedSigs = sigs.filter(s=>s.status!=="active");
-  const wins = closedSigs.filter(s=>s.status==="win").length;
-  const losses = closedSigs.filter(s=>s.status==="loss").length;
-  const wr = wins+losses > 0 ? Math.round(wins/(wins+losses)*100) : null;
-
-  const tierSCoins  = coins.filter(r => r.score >= 7 && r.rr >= 2);
-  const tierACoins  = coins.filter(r => r.score >= 4 && r.rr >= 1.5 && !tierSCoins.includes(r));
-  const allTiered   = [...tierSCoins, ...tierACoins, ...coins.filter(r=>!tierSCoins.includes(r)&&!tierACoins.includes(r))];
-
-  // ── TEMPLATE ENGINE ──
-  const toneEmoji = {institutional:"📊", casual:"🚀", hype:"🔥", educational:"🧠"};
-  const toneE = toneEmoji[selectedTone];
-
-  if(selectedContentTypes.has("telegram_public")) {
-    let body = "";
-    if(selectedTone === "institutional") {
-      body = `${toneE} *AC369 MARKET SCAN — ${dateStr}*\n\n` +
-        `Setelah scan ${UNIVERSES[SELECTED_UNIVERSE]?.length||22} aset dengan framework SMC + multi-indikator, berikut koin yang masuk radar hari ini:\n\n`;
-      allTiered.slice(0,4).forEach((r,i) => {
-        const tier = tierSCoins.includes(r)?"🥇 TIER S":tierACoins.includes(r)?"🟢 TIER A":"🔵 TIER B";
-        body += `${tier} *${r.ticker}/USDT*\n`;
-        body += `├ Harga: ${fmt(r.price)} (${r.ch24>=0?"+":""}${r.ch24.toFixed(2)}% 24h)\n`;
-        body += `├ Signal: *${r.sig}* | Konfluensi: ${r.conf_pct}%\n`;
-        body += `├ RSI: ${r.rD} | MACD: ${r.macdDir} | MA200: ${r.aboveM200?"✅ Atas":"❌ Bawah"}\n`;
-        body += `└ R:R ${r.rr.toFixed(2)} | SL: ${fmt(r.sl)} → TP1: ${fmt(r.tp1)}\n\n`;
-      });
-      body += `⚠️ _Ini adalah output dari sistem scan otomatis — bukan saran investasi._\n\n`;
-      body += `🔐 *Analisis lengkap + entry timing + update real-time ada di VIP Premium.*\n`;
-      body += `👉 DM @soloadmin369 atau cek bio untuk daftar.\n\n`;
-      if(wr) body += `📈 _Track record sistem: ${wr}% winrate dari ${wins+losses} signal closed_\n\n`;
-      body += `#AlphaCrypto369 #Crypto #Bitcoin #Trading`;
-    } else if(selectedTone === "casual") {
-      body = `${toneE} Guys, hasil scan malem ini keluar nih!\n\n`;
-      allTiered.slice(0,3).forEach(r => {
-        body += `🪙 *${r.ticker}* — ${r.sig === "BELI" ? "setup bagus nih" : r.sig === "TAHAN" ? "tunggu dulu" : "hati-hati"}\n`;
-        body += `Harga: ${fmt(r.price)} | RSI: ${r.rD} | R:R: 1:${r.rr.toFixed(1)}\n\n`;
-      });
-      body += `Detail lengkap + level entry/SL/TP ada di premium ya 👆\n`;
-      body += `DM @soloadmin369 untuk daftar 🔥\n\n`;
-      body += `#AC369 #Crypto #Trading`;
-    } else if(selectedTone === "hype") {
-      body = `🔥🔥 *ALARM SCANNER AC369* 🔥🔥\n\n`;
-      body += `Sistem kita baru aja deteksi setup GILA di:\n\n`;
-      allTiered.slice(0,3).forEach(r => {
-        body += `⚡ *${r.ticker}* — Score ${r.score>0?"+":""}${r.score}/15 | RSI ${r.rD}\n`;
-        body += `→ ${r.sig} setup dengan konfluensi ${r.conf_pct}%\n\n`;
-      });
-      body += `🔐 Level entry, SL, TP1/2/3 HANYA di VIP Premium.\n`;
-      body += `Slots terbatas — DM @soloadmin369 SEKARANG.\n\n`;
-      body += `#AC369 #CryptoSignal 🚀`;
-    } else {
-      body = `🧠 *BELAJAR BACA MARKET — ${dateStr}*\n\n`;
-      body += `Hari ini kita scan market dan temukan beberapa setup menarik. Mari kita bedah satu:\n\n`;
-      const r = allTiered[0];
-      if(r) {
-        body += `📌 *${r.ticker}/USDT — Case Study*\n\n`;
-        body += `*Kenapa masuk radar?*\n`;
-        body += `• RSI ${r.rD} — ${r.rD<50?"belum overbought, ada ruang naik":"mendekati area kritis"}\n`;
-        body += `• MA200: ${r.aboveM200?"Harga di atas MA200 = struktur bullish":"Harga di bawah MA200 = waspada"}\n`;
-        body += `• MACD: ${r.macdDir==="▲"?"Momentum naik, histogram positif":"Momentum sedang koreksi"}\n`;
-        body += `• R:R 1:${r.rr.toFixed(2)} — ${r.rr>=2?"setup favorable":"masih perlu konfirmasi"}\n\n`;
-        body += `*Setup yang baik harus punya:*\n`;
-        body += `✅ Minimal 3 konfirmasi\n✅ R:R minimal 1:1.5\n✅ SL di bawah support kuat\n\n`;
-      }
-      body += `📚 Mau belajar analisa mandiri? Join komunitas AC369 — link di bio.\n\n`;
-      body += `#AlphaCrypto369 #TradingEducation #Crypto`;
-    }
-    outputs.push({type:"telegram_public", title:"📢 Telegram Publik (Free Channel)", body, char: body.length});
-  }
-
-  if(selectedContentTypes.has("telegram_vip")) {
-    let body = `👑 *AC369 VIP SIGNAL REPORT*\n`;
-    body += `📅 ${dateStr} · ${timeStr} WIB\n`;
-    body += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-    allTiered.forEach((r,i) => {
-      const tier = tierSCoins.includes(r)?"🥇 TIER S — ENTRY NOW":tierACoins.includes(r)?"🟢 TIER A — HIGH PRIORITY":"🔵 TIER B — WATCHLIST";
-      const sc2 = SC[r.sig]||SC.TAHAN;
-      body += `${tier}\n`;
-      body += `*${r.ticker}/USDT PERPETUAL*\n`;
-      body += `💰 Harga: ${fmt(r.price)} | ${r.ch24>=0?"+":""}${r.ch24.toFixed(2)}% 24h\n\n`;
-      body += `📊 *Analisis Teknikal*\n`;
-      body += `• RSI D: ${r.rD} (${r.rD>70?"OB":r.rD<30?"OS":"Netral"})\n`;
-      body += `• StochRSI: ${r.stK||"—"} | MACD: ${r.macdDir==="▲"?"Bullish":"Bearish"}\n`;
-      body += `• MA200: ${r.aboveM200===true?"✅ Atas":r.aboveM200===false?"❌ Bawah":"—"} | GoldenX: ${r.goldenX===true?"✅":"❌"}\n`;
-      body += `• Konfluensi: ${r.conf_pct}% | Score: ${r.score>0?"+":""}${r.score}/15\n\n`;
-      body += `🎯 *Level Trading*\n`;
-      body += `• 🟡 Entry: ${fmt(r.price)}\n`;
-      body += `• 🔴 Stop Loss: ${fmt(r.sl)}\n`;
-      body += `• 🟢 TP1: ${fmt(r.tp1)} (R:R 1:${r.rr.toFixed(2)})\n`;
-      body += `• 🟢 TP2: ${fmt(r.tp2)}\n`;
-      body += `• 🟢 TP3: ${fmt(r.tp3)}\n\n`;
-      body += `⚡ *Action*: ${r.sig==="BELI"?"Akumulasi bertahap di zona entry. Pastikan volume konfirmasi.":r.sig==="JUAL"?"Hindari long. Tunggu reversal signal sebelum entry.":"Tunggu konfirmasi BOS atau breakout sebelum entry."}\n`;
-      body += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-    });
-    body += `⚠️ _Gunakan manajemen risiko. Max 1-2% per trade. Bukan saran investasi._\n`;
-    body += `_AC369 Signal System · @Alphacrypto_id_`;
-    outputs.push({type:"telegram_vip", title:"👑 Telegram VIP (Premium Member)", body, char: body.length});
-  }
-
-  if(selectedContentTypes.has("story_caption")) {
-    const topCoins = allTiered.slice(0,3);
-    let body = "";
-    if(selectedTone === "institutional") {
-      body = `📊 AC369 SCAN ALERT\n${dateStr}\n\n`;
-      topCoins.forEach(r => { body += `${r.sig==="BELI"?"🟢":"🔴"} ${r.ticker} ${fmt(r.price)} | RSI ${r.rD} | R:R ${r.rr.toFixed(1)}\n`; });
-      body += `\nDetail lengkap di VIP Premium 🔐\nDM @soloadmin369`;
-    } else if(selectedTone === "hype") {
-      body = `🚨 ALERT 🚨\n${topCoins.map(r=>`${r.ticker} ${r.sig==="BELI"?"🟢":"🔴"}`).join(" · ")}\n\nSetup gila terpantau!\nEntry, SL, TP di VIP 👑\nDM @soloadmin369`;
-    } else {
-      body = `${topCoins.slice(0,2).map(r=>`${r.ticker} ${r.sig}`).join(" · ")}\n${dateStr}\n\nJoin AC369 Premium untuk signal lengkap\n@Alphacrypto_id`;
-    }
-    outputs.push({type:"story_caption", title:"📱 Story / Feed Caption", body, char: body.length});
-  }
-
-  if(selectedContentTypes.has("thread")) {
-    const r = allTiered[0];
-    if(r) {
-      const body =
-`🧵 BREAKDOWN: Kenapa ${r.ticker} masuk radar hari ini?
-
-1/ Harga ${r.ticker} saat ini di ${fmt(r.price)} (${r.ch24>=0?"+":""}${r.ch24.toFixed(2)}% 24h). Setelah scan multi-timeframe, ada beberapa konfluensi menarik.
-
-2/ RSI Daily berada di ${r.rD}. ${r.rD<40?"Ini zona yang secara historis sering jadi area akumulasi sebelum momentum naik.":r.rD>65?"Mendekati area overbought — perlu konfirmasi volume sebelum entry.":"Netral — belum ekstrem di kedua arah."}
-
-3/ Moving Average: Harga ${r.aboveM200===true?"di atas MA200 — struktur bullish terjaga secara jangka panjang.":r.aboveM200===false?"di bawah MA200 — tekanan bearish masih dominan.":"dalam fase transisi terhadap MA200."}
-
-4/ MACD Daily menunjukkan histogram ${r.macdDir==="▲"?"positif — momentum naik aktif. Ini sering menjadi early signal sebelum pergerakan signifikan.":"negatif — momentum sedang turun. Perlu reversal konfirmasi sebelum entry."}
-
-5/ Setup R:R saat ini 1:${r.rr.toFixed(2)} dengan SL di ${fmt(r.sl)} dan TP1 di ${fmt(r.tp1)}. ${r.rr>=2?"Ini termasuk setup yang favorable untuk dipertimbangkan.":"Masih perlu konfirmasi tambahan untuk R:R yang lebih baik."}
-
-6/ Konfluensi keseluruhan: ${r.conf_pct}% dari ${r.score>0?r.score+" faktor bullish aktif":"faktor mixed"}. ${r.conf_pct>=70?"Setup ini layak masuk watchlist prioritas.":"Masih perlu 1-2 konfirmasi tambahan."}
-
-7/ CATATAN: Ini analisis teknikal dari AC369 Signal System — bukan saran finansial. Selalu gunakan SL dan manajemen risiko. Untuk signal lengkap + live update, bergabung di premium AC369.
-
-@Alphacrypto_id 🔐`;
-      outputs.push({type:"thread", title:"🧵 Thread Breakdown (7 poin)", body, char: body.length});
-    }
-  }
-
-  if(selectedContentTypes.has("daily_watchlist")) {
-    let body = `👁 *AC369 DAILY WATCHLIST*\n${dateStr} · ${timeStr} WIB\n\n`;
-    body += `Koin yang perlu dipantau ketat hari ini:\n\n`;
-    allTiered.slice(0,6).forEach((r,i) => {
-      const e = r.sig==="BELI"?"🟢":r.sig==="JUAL"?"🔴":"🟡";
-      body += `${i+1}. ${e} *${r.ticker}* — ${fmt(r.price)} | ${r.sig} | RSI ${r.rD}\n`;
-    });
-    body += `\n📌 Update signal real-time di VIP Premium.\n`;
-    body += `DM @soloadmin369 untuk daftar.\n\n`;
-    body += `#AC369 #Watchlist #Crypto`;
-    outputs.push({type:"daily_watchlist", title:"👁 Daily Watchlist", body, char: body.length});
-  }
-
-  if(selectedContentTypes.has("winrate_post")) {
-    if(wr !== null) {
-      const month = now.toLocaleDateString("id-ID",{month:"long",year:"numeric"});
-      let body = `🏆 *AC369 TRACK RECORD — ${month.toUpperCase()}*\n\n`;
-      body += `Transparansi adalah fondasi kepercayaan.\n\n`;
-      body += `📊 *Statistik Bulan Ini:*\n`;
-      body += `• Winrate: *${wr}%*\n`;
-      body += `• Total Signal: ${wins+losses}\n`;
-      body += `• ✅ Win: ${wins}\n`;
-      body += `• ❌ Loss: ${losses}\n\n`;
-      body += wr>=65 ?
-        `Konsistensi adalah kunci. Bukan hanya sekali profit, tapi sistem yang terbukti over time.\n\n` :
-        `Tidak semua signal win — yang penting manajemen risiko terjaga dan sistem berjalan konsisten.\n\n`;
-      body += `🔐 *Join AC369 Premium* untuk:\n`;
-      body += `✅ Signal real-time dengan entry/SL/TP\n`;
-      body += `✅ Analisis market harian\n`;
-      body += `✅ Track record transparan\n\n`;
-      body += `DM @soloadmin369 atau cek bio.\n\n`;
-      body += `#AC369 #TrackRecord #CryptoSignal`;
-      outputs.push({type:"winrate_post", title:`🏆 Post Winrate (${wr}% WR)`, body, char: body.length});
-    } else {
-      outputs.push({type:"winrate_post", title:"🏆 Post Winrate", body:"Belum ada data winrate. Simpan signal ke tracker dan tunggu hit TP/SL.", char:0});
-    }
-  }
-
-  // Render outputs
-  renderContentOutputs(outputs);
-  sh('content-output');
-  document.getElementById('content-output').scrollIntoView({behavior:'smooth',block:'start'});
-}
-
-function renderContentOutputs(outputs) {
-  const out = document.getElementById('content-output');
-  out.innerHTML = outputs.map((o,i) => `
-    <div style="background:rgba(9,12,20,.95);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:18px 20px;margin-bottom:12px;animation:fadeUp .35s ${i*0.08}s ease both">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-        <div style="font-size:10px;font-weight:700;color:#e8f0f8">${o.title}</div>
-        <div style="display:flex;gap:7px;align-items:center">
-          <span style="font-size:9px;color:var(--dmr)">${o.char} karakter</span>
-          <button onclick="copyContent(${i})" id="copybtn-${i}"
-            style="padding:6px 14px;background:rgba(0,255,135,.09);border:1px solid rgba(0,255,135,.3);border-radius:7px;color:#00ff87;font-size:9px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .2s">
-            📋 COPY
-          </button>
-        </div>
-      </div>
-      <div id="content-text-${i}" style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);border-radius:9px;padding:14px 16px;font-size:11px;color:#8a9aaa;line-height:1.8;white-space:pre-wrap;font-family:'IBM Plex Mono',monospace;max-height:320px;overflow-y:auto;word-break:break-word">${escHtml(o.body)}</div>
-      <div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap">
-        <button onclick="openTelegram(${i})"
-          style="padding:7px 14px;background:rgba(0,136,204,.1);border:1px solid rgba(0,136,204,.3);border-radius:7px;color:#00aaff;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace">
-          ✈️ Buka Telegram
-        </button>
-        <button onclick="previewContent(${i})"
-          style="padding:7px 14px;background:rgba(245,197,24,.07);border:1px solid rgba(245,197,24,.25);border-radius:7px;color:#f5c518;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace">
-          👁 Preview
-        </button>
-      </div>
-    </div>`).join("");
-
-  // Store outputs globally for copy access
-  window._contentOutputs = outputs;
-}
-
-function escHtml(t) { return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-
-function copyContent(i) {
-  const text = window._contentOutputs[i]?.body || "";
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.getElementById('copybtn-'+i);
-    btn.textContent = "✓ TERSALIN!";
-    btn.style.color = "#00ff87";
-    btn.style.background = "rgba(0,255,135,.18)";
-    setTimeout(() => { btn.textContent = "📋 COPY"; btn.style.color="#00ff87"; btn.style.background="rgba(0,255,135,.09)"; }, 2500);
-  }).catch(() => alert(window._contentOutputs[i]?.body));
-}
-
-function openTelegram(i) {
-  const text = window._contentOutputs[i]?.body || "";
-  navigator.clipboard.writeText(text).catch(()=>{});
-  window.open('https://t.me/','_blank');
-}
-
-function previewContent(i) {
-  const text = window._contentOutputs[i]?.body || "";
-  const win = window.open('','_blank','width=420,height=600');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Preview</title></head>
-    <body style="background:#17212b;color:#fff;font-family:sans-serif;padding:20px;font-size:13px;line-height:1.8;white-space:pre-wrap;word-break:break-word">${escHtml(text)}</body></html>`);
-}
-
-// Hook into scanner to cache results + show generate button
-const _origRenderTier = window.renderTier;
-function afterScanComplete(results) {
-  scanResultsCache = results;
-  sh('gen-content-wrap');
-}
-
-// UNIVERSES PRO — for scanner-pro.js
-window.UNIVERSES_PRO = {
-  top10:  ["BTC","ETH","BNB","SOL","XRP","AVAX","DOGE","ADA","LINK","DOT"],
-  top20:  ["BTC","ETH","BNB","SOL","XRP","AVAX","DOGE","ADA","LINK","DOT","NEAR","ATOM","HYPE","SUI","ARB","OP","TIA","INJ","WLD","RENDER"],
-  defi:   ["HYPE","AAVE","UNI","ARB","OP","GMX","INJ","LINK","ATOM","CRV","MKR","COMP","SNX","LDO","DYDX","1INCH","SUSHI","RDNT","SSV","LQTY"],
-  l1l2:   ["ETH","SOL","BNB","AVAX","DOT","NEAR","SUI","TIA","ARB","OP","INJ","ATOM","APT","SEI","STX","METIS","MANTA","STRK","IMX","CFX"],
-  top100: ["BTC","ETH","BNB","SOL","XRP","DOGE","ADA","AVAX","TRX","LINK","DOT","MATIC","LTC","UNI","ATOM","NEAR","ICP","FIL","APT","ARB","OP","INJ","SUI","TIA","RENDER","WLD","PEPE","WIF","FET","BONK","IMX","GRT","AAVE","SNX","ENS","LDO","SAND","MANA","AXS","GALA","CHZ","FLOW","ROSE","VET","ALGO","THETA","FTM","KAVA","CELO","CRV","MKR","COMP","SUSHI","1INCH","DYDX","GMX","JTO","PYTH","SEI","STRK","BLUR","METIS","STX","BEAM","ACE","MAGIC","RDNT","SSV","OCEAN","RUNE","AGIX","NFP","PERP","STORJ","CELR","TWT","CFX","FLOKI","BAND","ANKR","MTL","ACH","CHR","BNX","GMT","APE","HFT","SKL","OGN","REEF","CTSI","BAKE","DODO","WIN","HOT","SUPER","API3","COTI","HNT","GLM","BNT"],
-  top200: ["BTC","ETH","BNB","SOL","XRP","DOGE","ADA","AVAX","TRX","LINK","DOT","MATIC","LTC","UNI","ATOM","NEAR","ICP","FIL","APT","ARB","OP","INJ","SUI","TIA","RENDER","WLD","PEPE","WIF","FET","BONK","IMX","GRT","AAVE","SNX","ENS","LDO","SAND","MANA","AXS","GALA","CHZ","FLOW","ROSE","VET","ALGO","THETA","FTM","KAVA","CELO","CRV","MKR","COMP","SUSHI","1INCH","DYDX","GMX","JTO","PYTH","SEI","STRK","BLUR","METIS","STX","BEAM","ACE","MAGIC","RDNT","SSV","OCEAN","RUNE","AGIX","NFP","PERP","STORJ","CELR","TWT","CFX","FLOKI","BAND","ANKR","MTL","ACH","CHR","BNX","GMT","APE","HFT","SKL","OGN","REEF","CTSI","BAKE","DODO","WIN","HOT","SUPER","API3","COTI","HNT","GLM","BNT","MASK","AUDIO","NMR","MOVR","LQTY","BADGER","ALPHA","OAX","PROS","AKRO","HARD","NULS","STMX","SLP","POLY","BURGER","BOND","TRIBE","INDEX","MAPS","LIKE","STEP","AMPL","PAXG","NEXO","MDT","FOR","COCOS","TROY","POND","ARPA","STPT","DUSK","KNC","BAL","CVX","YGG","MC","SFUND","MBOX","WAXP","LOOM","ALT","DYM","PIXEL","ORDI","MANTA","PORTAL","SXP","RLC","POKT","HYPE","LINA","DATA","VOXEL","PORTAL","AI","NFP","ACE","PIXEL","DYM","ALT","MANTA","STRK","BLUR","RDNT","SSV","LQTY","OCEAN","NFP","PERP","STORJ","CELR","FLOKI","BAND","ANKR","MTL","ACH","SKL","OGN","REEF","CTSI","BAKE","DODO","WIN","HOT","SUPER","API3","COTI","HNT","GLM","BNT"],
-  top250: ["BTC","ETH","BNB","SOL","XRP","DOGE","ADA","AVAX","TRX","LINK","DOT","MATIC","LTC","UNI","ATOM","NEAR","ICP","FIL","APT","ARB","OP","INJ","SUI","TIA","RENDER","WLD","PEPE","WIF","FET","BONK","IMX","GRT","AAVE","SNX","ENS","LDO","SAND","MANA","AXS","GALA","CHZ","FLOW","ROSE","VET","ALGO","THETA","FTM","KAVA","CELO","CRV","MKR","COMP","SUSHI","1INCH","DYDX","GMX","JTO","PYTH","SEI","STRK","BLUR","METIS","STX","BEAM","ACE","MAGIC","RDNT","SSV","OCEAN","RUNE","AGIX","NFP","PERP","STORJ","CELR","TWT","CFX","FLOKI","BAND","ANKR","MTL","ACH","CHR","BNX","GMT","APE","HFT","SKL","OGN","REEF","CTSI","BAKE","DODO","WIN","HOT","SUPER","API3","COTI","HNT","GLM","BNT","MASK","AUDIO","NMR","MOVR","LQTY","BADGER","ALPHA","OAX","PROS","AKRO","HARD","NULS","STMX","SLP","POLY","BURGER","BOND","TRIBE","INDEX","MAPS","LIKE","STEP","AMPL","PAXG","NEXO","MDT","FOR","COCOS","TROY","POND","ARPA","STPT","DUSK","KNC","BAL","CVX","YGG","MC","SFUND","MBOX","WAXP","LOOM","ALT","DYM","PIXEL","ORDI","MANTA","PORTAL","SXP","RLC","POKT","HYPE","LINA","DATA","VOXEL","AI","NKN","STPT","FIDA","RAY","SRM","ORCA","ATLAS","POLIS","GTC","TORN","BOND","BAKE","DODO","WIN","HOT","SUPER","REEF","CTSI","SKL","OGN","ANKR","BAND","MTL","ACH","NULS","SXP","FOR","MDT","TROY","COCOS","POND","ARPA","HARD","STMX","SLP","POLY","BURGER","TRIBE","INDEX","MAPS","LIKE","STEP","PROS","OAX","AKRO","BADGER","ALPHA","MASK","AUDIO","NMR","MOVR","LQTY","NEXO","PAXG","AMPL","AUDIO","MASK","NMR","STORJ","PERP","CELR","AGIX","RUNE","OCEAN","SSV","RDNT","MAGIC","ACE","BEAM","STX","METIS","BLUR","STRK","SEI","PYTH","JTO","GMX","DYDX","COMP","MKR","CRV","CELO","KAVA","FTM","THETA","ALGO","VET","ROSE","FLOW","CHZ","GALA","AXS","MANA","SAND","LDO","ENS","SNX","AAVE","GRT","IMX"],
-};
-
-// Expose needed functions globally for scanner-pro.js
-window.SELECTED_UNIVERSE = 'top100';
-window.scanRunning = false;
-window.scanResultsCache = scanResultsCache;
-window.selectedCoinsForContent = selectedCoinsForContent;
-window.goAnalyze = goAnalyze;
-window.quickSave = quickSave;
-window.quickTradeOpen = quickTradeOpen;
-
-// TA helper functions exposed globally for scanner-pro.js
-window.sma = sma; window.ema = ema; window.rsi = rsi;
-window.macd = macd; window.lst = lst; window.stRSI = stRSI;
-window.atrF = atrF; window.bb = bb; window.findSR = findSR;
-window.fmt = fmt; window.SC = SC;
-
-// Load scanner-pro engine
-const scannerScript = document.createElement('script');
-scannerScript.src = 'scanner-pro.js';
-document.head.appendChild(scannerScript);
-
-// Auto refresh harga setiap 5 menit saat di tab tracker
+// Auto-refresh tracker every 5min when on tracker tab
 setInterval(()=>{if(document.getElementById('tab-tracker').classList.contains('active'))RF();},300000);
 RT();
 </script>
