@@ -12,56 +12,44 @@ const STABLES_SET = new Set([
 
 // ── PHASE 1: DYNAMIC FETCH ALL USDT TRADEABLE ───────────────────
 async function fetchAllCoins() {
-  const [tickerRes, infoRes] = await Promise.allSettled([
-    fetch('https://api.binance.com/api/v3/ticker/24hr'),
-    fetch('https://api.binance.com/api/v3/exchangeInfo'),
-  ]);
-
-  // Valid trading symbols
-  const tradingSet = new Set();
-  if (infoRes.status === 'fulfilled' && infoRes.value.ok) {
-    const info = await infoRes.value.json();
-    info.symbols
-      .filter(s => s.status === 'TRADING' && s.quoteAsset === 'USDT')
-      .forEach(s => tradingSet.add(s.baseAsset));
+  try {
+    const res = await fetch('https://api.binance.com/api/v3/ticker/24hr');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const all = await res.json();
+    if (!Array.isArray(all) || all.length === 0) throw new Error('empty response');
+    const map = {};
+    const coins = all
+      .filter(t => {
+        if (!t.symbol.endsWith('USDT')) return false;
+        const base = t.symbol.replace('USDT', '');
+        if (STABLES_SET.has(base)) return false;
+        if (/UP$|DOWN$|BULL$|BEAR$|LONG$|SHORT$/i.test(base)) return false;
+        if (base.length > 12 || base.includes('USDT')) return false;
+        return +t.quoteVolume > 200000 && +t.lastPrice > 0;
+      })
+      .map(t => {
+        const base = t.symbol.replace('USDT', '');
+        const coin = {
+          ticker: base, price: +t.lastPrice,
+          ch24: +t.priceChangePercent, vol24: +t.quoteVolume,
+          high24: +t.highPrice, low24: +t.lowPrice, open24: +t.openPrice,
+        };
+        map[base] = coin;
+        return coin;
+      })
+      .sort((a, b) => b.vol24 - a.vol24);
+    return { coins, map };
+  } catch (e) {
+    console.warn('fetchAllCoins fallback:', e.message);
+    const fb = (window.UNIVERSES_PRO?.top100 || [
+      'BTC','ETH','BNB','SOL','XRP','DOGE','ADA','AVAX','LINK','DOT',
+      'MATIC','LTC','UNI','ATOM','NEAR','ARB','OP','INJ','SUI','TIA',
+      'PEPE','WIF','FET','BONK','HYPE','RENDER','WLD','RUNE','APT','STX'
+    ]).map(t => ({ticker:t,price:0,ch24:0,vol24:1e7,high24:0,low24:0,open24:0}));
+    const map = {};
+    fb.forEach(c => { map[c.ticker] = c; });
+    return { coins: fb, map };
   }
-
-  if (tickerRes.status !== 'fulfilled' || !tickerRes.value.ok)
-    throw new Error('Gagal fetch ticker Binance');
-
-  const all = await tickerRes.value.json();
-  const map = {};
-
-  const coins = all
-    .filter(t => {
-      if (!t.symbol.endsWith('USDT')) return false;
-      const base = t.symbol.replace('USDT', '');
-      if (STABLES_SET.has(base)) return false;
-      // Skip leverage & inverse tokens
-      if (/UP$|DOWN$|BULL$|BEAR$|LONG$|SHORT$|\dL$|\dS$/.test(base)) return false;
-      if (base.includes('USDT')) return false;
-      if (tradingSet.size > 0 && !tradingSet.has(base)) return false;
-      const vol = +t.quoteVolume;
-      return vol > 200000 && +t.lastPrice > 0;
-    })
-    .map(t => {
-      const base = t.symbol.replace('USDT', '');
-      const coin = {
-        ticker:  base,
-        price:   +t.lastPrice,
-        ch24:    +t.priceChangePercent,
-        vol24:   +t.quoteVolume,
-        high24:  +t.highPrice,
-        low24:   +t.lowPrice,
-        count:   +t.count,
-        open24:  +t.openPrice,
-      };
-      map[base] = coin;
-      return coin;
-    })
-    .sort((a, b) => b.vol24 - a.vol24);
-
-  return { coins, map };
 }
 
 // ── PHASE 2: FETCH 48h DATA FOR OUTPERFORM DETECTION ────────────
@@ -360,7 +348,7 @@ async function deepAnalyze(ticker, prefetch, anomaly) {
     const validR=rs.find(r=>r.price>=tp1Base);
     const tp1=validR?.price||tp1Base;
     const tp2=price+risk*3.0, tp3=price+risk*5.0;
-    const rrSw=(tp1-price)/risk;
+    const rrSw = risk > 0 ? (tp1-price)/risk : 0;
 
     // TA score
     let sc=0;
@@ -443,7 +431,17 @@ window.startScanPro = async function() {
   // ── STEP 1: Fetch all coins ──────────────────────────────────
   if(stat)stat.textContent='Phase 1: Fetching semua koin...';
   if(phase)phase.textContent='Dynamic fetch dari Binance';
-  const {coins:allCoins,map:coinMap} = await fetchAllCoins();
+  let allCoins, coinMap;
+  try {
+    const result = await fetchAllCoins();
+    allCoins = result.coins;
+    coinMap  = result.map;
+  } catch(fetchErr) {
+    if(feed)feed.innerHTML+=`<span style="color:#ff4560">✗ Gagal fetch: ${fetchErr.message}</span><br/>`;
+    if(btn){btn.disabled=false;btn.textContent='⚡ MULAI SCAN PRO — R:R 1:2 ENFORCED';}
+    window.scanRunning=false;
+    return;
+  }
   if(feed)feed.innerHTML+=`<span style="color:#00ff87">✓ ${allCoins.length} koin aktif ditemukan dari Binance</span><br/>`;
 
   // Apply universe filter
@@ -546,6 +544,13 @@ window.startScanPro = async function() {
   const anomRes   = results.filter(r=>r.isAnomaly).sort((a,b)=>b.anomaly.anomalyScore-a.anomaly.anomalyScore).slice(0,15);
   const watchlist = results.filter(r=>r.swigSig==='TAHAN'&&r.prob.prob>=55).sort((a,b)=>b.prob.prob-a.prob.prob).slice(0,10);
 
+  if(results.length === 0) {
+    if(feed)feed.innerHTML+=`<span style="color:#ff4560">✗ Tidak ada hasil. Coba universe lebih kecil (TOP 10) atau cek koneksi.</span><br/>`;
+    if(btn){btn.disabled=false;btn.textContent='⚡ MULAI SCAN PRO — R:R 1:2 ENFORCED';}
+    document.getElementById('scan-progress')?.classList.add('hidden');
+    window.scanRunning=false;
+    return;
+  }
   renderResults(swingBuy,scalpBuy,shortList,anomRes,watchlist,results.length,universe.length,btc24,btc48);
 
   document.getElementById('scan-progress')?.classList.add('hidden');
