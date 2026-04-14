@@ -1,821 +1,751 @@
 // ═══════════════════════════════════════════════════════════════
-// AC369 SCANNER PRO ENGINE v3
-// 250 Koin · R:R 1:2 Enforced · Market Microstructure
-// Scalping (15m) + Swing (Daily) · Multi-Layer Probability
+// AC369 SCANNER PRO v5
+// Dynamic fetch semua koin Binance · Outperform BTC 2x (24-48h)
+// Inverse BTC · Volume Anomali · R:R 1:2 Enforced
+// Scalping 15m + Swing Daily · Multi-Layer Probability
 // ═══════════════════════════════════════════════════════════════
 
-// ── 250 CURATED USDT PERP SYMBOLS ──────────────────────────────
-const COINS_250 = [
-  // Tier 1 — Mega Cap
-  "BTC","ETH","BNB","SOL","XRP","DOGE","ADA","AVAX","TRX","LINK",
-  // Tier 2 — Large Cap
-  "DOT","MATIC","LTC","UNI","ATOM","NEAR","ICP","FIL","APT","ARB",
-  "OP","INJ","SUI","TIA","HYPE","RENDER","WLD","PEPE","WIF","FET",
-  // Tier 3 — Mid Cap
-  "IMX","GRT","AAVE","SNX","ENS","LDO","RPL","SAND","MANA","AXS",
-  "GALA","CHZ","FLOW","ROSE","VET","ALGO","THETA","FTM","KAVA","CELO",
-  "CRV","MKR","COMP","SUSHI","1INCH","DYDX","GMX","JTO","PYTH","SEI",
-  "STRK","BLUR","METIS","STX","BEAM","ACE","XAI","MAGIC","HOP","RDNT",
-  "SSV","LQTY","OCEAN","NMR","RLC","MASK","AUDIO","RUNE","AGIX","NFP",
-  "MOVR","PERP","STORJ","DENT","CELR","TWT","POLY","CFX","BONK","FLOKI",
-  // Tier 4 — Small/Mid
-  "BAND","ANKR","BADGER","ALPHA","MTL","OAX","AKRO","IDEX","PROS","ACH",
-  "CHR","FOR","COS","BNX","VOXEL","GMT","APE","HFT","LINA","MDT",
-  "DATA","HARD","SKL","OGN","REEF","CTSI","BAKE","DODO","WIN","HOT",
-  "LOOM","NFT","SUPER","VANRY","AI","PORTAL","MANTA","ALT","DYM","PIXEL",
-  // Ecosystem  
-  "ORDI","SATS","RATS","NULS","SXP","PERL","COCOS","TROY","TORN","BOND",
-  "FARM","MIR","RAMP","BURGER","MOB","POND","ARPA","STPT","DUSK","KNC",
-  "BAL","CVX","CREAM","PICKLE","TRIBE","FEI","ALCX","TOKE","DF","INDEX",
-  "BASED","FLOAT","RULER","DOUGH","ARMOR","CORE","PUNK","YGG","GUILD","MC",
-  "GAFI","SFUND","MBOX","MOOV","WAXP","ATLAS","POLIS","ORCA","PORT","SLIM",
-  "FIDA","COPE","MNGO","SABER","RAY","SRM","SERUM","MANGO","STAR","TULIP",
-  "OXY","MEDIA","KIN","MAPS","LIKE","STEP","NINJA","CHEEMS","COPE2","GENE",
-  // More DeFi & infra
-  "API3","POKT","COTI","HNT","GLM","BNT","PAXG","NEXO","CEL","AMPL",
-  "RAI","FLOAT2","OHM","KLIMA","TOKE2","SPA","EUPHORIA","JADE","SPELL","ICE",
-  "BTRFLY","RADIO","MIST","GYRO","FLOAT3","DEUS","DEI","MUON","BANK","GEAR"
-];
+const STABLES_SET = new Set([
+  "USDT","USDC","BUSD","DAI","TUSD","USDP","FDUSD","FRAX",
+  "LUSD","USDD","GUSD","SUSD","CUSD","XUSD","OUSD","EURS"
+]);
 
-// Filter to only well-known tradeable ones (remove fantasy coins)
-const COINS_REAL_250 = [
-  "BTC","ETH","BNB","SOL","XRP","DOGE","ADA","AVAX","TRX","LINK",
-  "DOT","MATIC","LTC","UNI","ATOM","NEAR","ICP","FIL","APT","ARB",
-  "OP","INJ","SUI","TIA","RENDER","WLD","PEPE","WIF","FET","BONK",
-  "IMX","GRT","AAVE","SNX","ENS","LDO","SAND","MANA","AXS","GALA",
-  "CHZ","FLOW","ROSE","VET","ALGO","THETA","FTM","KAVA","CELO","CRV",
-  "MKR","COMP","SUSHI","1INCH","DYDX","GMX","JTO","PYTH","SEI","STRK",
-  "BLUR","METIS","STX","BEAM","ACE","MAGIC","RDNT","SSV","OCEAN","RUNE",
-  "AGIX","NFP","PERP","STORJ","CELR","TWT","CFX","FLOKI","BAND","ANKR",
-  "MTL","ACH","CHR","BNX","VOXEL","GMT","APE","HFT","LINA","MDT",
-  "SKL","OGN","REEF","CTSI","BAKE","DODO","WIN","HOT","SUPER","AI",
-  "PORTAL","MANTA","ALT","DYM","PIXEL","ORDI","SXP","PERL","TROY","POND",
-  "ARPA","STPT","DUSK","KNC","BAL","CVX","YGG","GUILD","MC","GAFI",
-  "SFUND","MBOX","WAXP","ATLAS","POLIS","ORCA","FIDA","RAY","SRM","API3",
-  "POKT","COTI","HNT","GLM","BNT","NEXO","HYPE","MASK","AUDIO","NMR",
-  "MOVR","LOOM","NFT","VANRY","LQTY","BADGER","ALPHA","FOR","OAX","PROS",
-  "AKRO","IDEX","DATA","HARD","COCOS","NULS","MOB","STMX","SLP","POLY",
-  "TORN","BURGER","FARM","MIR","RAMP","BOND","FODL","TRIBE","ALCX","TOKE",
-  "DF","INDEX","PUNK","OXY","MEDIA","MAPS","LIKE","STEP","GENE","COPE",
-  "PORT","SLIM","KIN","NINJA","MNGO","SABER","STAR","TULIP","RAI","AMPL",
-  "PAXG","CEL","FLOAT","RULER","ARMOR","CORE","BASED","SMOL","FROG","POPO",
-  "SPELL","ICE","JADE","KLIMA","EUPHORIA","RADIO","MIST","GYRO","DEUS","DEI",
-  "MUON","BANK","GEAR","SPA","OHM","BTRFLY","CREAM","PICKLE","FEI","FARM2",
-  "ALCX2","TOKE3","FLOAT2","RULER2","PUNK2","YGG2","ATLAS2","SLIM2","PORT2","COPE2"
-];
+// ── PHASE 1: DYNAMIC FETCH ALL USDT TRADEABLE ───────────────────
+async function fetchAllCoins() {
+  const [tickerRes, infoRes] = await Promise.allSettled([
+    fetch('https://api.binance.com/api/v3/ticker/24hr'),
+    fetch('https://api.binance.com/api/v3/exchangeInfo'),
+  ]);
 
-// Use curated clean list
-const SCAN_250 = [
-  "BTC","ETH","BNB","SOL","XRP","DOGE","ADA","AVAX","TRX","LINK",
-  "DOT","MATIC","LTC","UNI","ATOM","NEAR","ICP","FIL","APT","ARB",
-  "OP","INJ","SUI","TIA","RENDER","WLD","PEPE","WIF","FET","BONK",
-  "IMX","GRT","AAVE","SNX","ENS","LDO","SAND","MANA","AXS","GALA",
-  "CHZ","FLOW","ROSE","VET","ALGO","THETA","FTM","KAVA","CELO","CRV",
-  "MKR","COMP","SUSHI","1INCH","DYDX","GMX","JTO","PYTH","SEI","STRK",
-  "BLUR","METIS","STX","BEAM","ACE","MAGIC","RDNT","SSV","OCEAN","RUNE",
-  "AGIX","NFP","PERP","STORJ","CELR","TWT","CFX","FLOKI","BAND","ANKR",
-  "MTL","ACH","CHR","BNX","VOXEL","GMT","APE","HFT","LINA","SKL",
-  "OGN","REEF","CTSI","BAKE","DODO","WIN","HOT","SUPER","PORTAL","MANTA",
-  "ALT","DYM","PIXEL","ORDI","SXP","ARPA","STPT","DUSK","KNC","BAL",
-  "CVX","YGG","MC","SFUND","MBOX","WAXP","API3","COTI","HNT","GLM",
-  "BNT","HYPE","MASK","AUDIO","NMR","MOVR","LOOM","LQTY","BADGER","ALPHA",
-  "OAX","PROS","AKRO","DATA","HARD","NULS","MOB","STMX","SLP","POLY",
-  "BURGER","BOND","TRIBE","INDEX","OXY","MAPS","LIKE","STEP","GENE","MNGO",
-  "STAR","RAI","AMPL","PAXG","NEXO","MDT","FOR","IDEX","COCOS","TROY",
-  "POND","BNX","RLC","POKT","BLUR2","MAGIC2","DUSK2","CELO2","KAVA2","FLOW2",
-  "ROSE2","VET2","ALGO2","THETA2","FTM2","CHZ2","GALA2","AXS2","MANA2","SAND2",
-  "SNX2","ENS2","LDO2","IMX2","GRT2","SUSHI2","1INCH2","DYDX2","GMX2","JTO2",
-  "PYTH2","SEI2","STRK2","METIS2","STX2","BEAM2","ACE2","SSV2","RDNT2","OCEAN2",
-  "RUNE2","AGIX2","PERP2","STORJ2","CELR2","TWT2","CFX2","FLOKI2","BAND2","ANKR2",
-  "MTL2","ACH2","CHR2","BNX2","VOXEL2","GMT2","APE2","HFT2","LINA2","SKL2",
-  "OGN2","REEF2","CTSI2","BAKE2","DODO2","WIN2","HOT2","SUPER2","PORT2","SLIM2",
-  "FIDA","RAY","SRM","ORCA","ATLAS","POLIS","KIN","NINJA","COPE","GENE2",
-  "TULIP","MEDIA","SABER","MNGO2","STAR2","SLIM3","PORT3","COPE3","NINJA2","KIN2"
-];
+  // Valid trading symbols
+  const tradingSet = new Set();
+  if (infoRes.status === 'fulfilled' && infoRes.value.ok) {
+    const info = await infoRes.value.json();
+    info.symbols
+      .filter(s => s.status === 'TRADING' && s.quoteAsset === 'USDT')
+      .forEach(s => tradingSet.add(s.baseAsset));
+  }
 
-// Clean verified 100 coins that actually exist on Binance
-const VERIFIED_COINS = [
-  "BTC","ETH","BNB","SOL","XRP","DOGE","ADA","AVAX","TRX","LINK",
-  "DOT","MATIC","LTC","UNI","ATOM","NEAR","ICP","FIL","APT","ARB",
-  "OP","INJ","SUI","TIA","RENDER","WLD","PEPE","WIF","FET","BONK",
-  "IMX","GRT","AAVE","SNX","ENS","LDO","SAND","MANA","AXS","GALA",
-  "CHZ","FLOW","ROSE","VET","ALGO","THETA","FTM","KAVA","CELO","CRV",
-  "MKR","COMP","SUSHI","1INCH","DYDX","GMX","JTO","PYTH","SEI","STRK",
-  "BLUR","METIS","STX","BEAM","ACE","MAGIC","RDNT","SSV","OCEAN","RUNE",
-  "AGIX","NFP","PERP","STORJ","CELR","TWT","CFX","FLOKI","BAND","ANKR",
-  "MTL","ACH","CHR","BNX","VOXEL","GMT","APE","HFT","SKL","OGN",
-  "REEF","CTSI","BAKE","DODO","WIN","HOT","SUPER","API3","COTI","HNT",
-  "GLM","BNT","MASK","AUDIO","NMR","MOVR","LQTY","BADGER","ALPHA","OAX",
-  "PROS","AKRO","HARD","NULS","STMX","SLP","POLY","BURGER","BOND","TRIBE",
-  "INDEX","MAPS","LIKE","STEP","AMPL","PAXG","NEXO","MDT","FOR","COCOS",
-  "TROY","POND","ARPA","STPT","DUSK","KNC","BAL","CVX","YGG","MC",
-  "SFUND","MBOX","WAXP","HYPE","LINA","BNX","DATA","LOOM","ALT","DYM",
-  "PIXEL","ORDI","MANTA","PORTAL","SXP","RLC","POKT","GLM","MOB","GRT",
-  "SNX","RDNT","LQTY","SSV","BAND","ANKR","NMR","OCEAN","API3","COTI",
-  "NFP","PERP","STORJ","CELR","TWT","CFX","FLOKI","MTL","ACH","CHR",
-  "VOXEL","GMT","APE","HFT","SKL","OGN","REEF","CTSI","BAKE","DODO",
-  "WIN","HOT","SUPER","SFUND","MBOX","WAXP","YGG","MC","INDEX","MAPS",
-  "LIKE","STEP","AMPL","PAXG","NEXO","MDT","FOR","COCOS","TROY","POND",
-  "ARPA","STPT","DUSK","KNC","BAL","CVX","BADGER","ALPHA","OAX","PROS",
-  "AKRO","HARD","NULS","STMX","SLP","POLY","BURGER","BOND","TRIBE","MASK",
-  "AUDIO","MOVR","LOOM","BLUR","METIS","STX","BEAM","ACE","MAGIC","RDNT"
-];
+  if (tickerRes.status !== 'fulfilled' || !tickerRes.value.ok)
+    throw new Error('Gagal fetch ticker Binance');
 
-// Deduplicate
-const ALL_250 = [...new Set(VERIFIED_COINS)];
+  const all = await tickerRes.value.json();
+  const map = {};
 
-// ── MARKET MICROSTRUCTURE DATA ─────────────────────────────────
-// Uses Binance Futures public endpoints (free, no auth needed)
+  const coins = all
+    .filter(t => {
+      if (!t.symbol.endsWith('USDT')) return false;
+      const base = t.symbol.replace('USDT', '');
+      if (STABLES_SET.has(base)) return false;
+      // Skip leverage & inverse tokens
+      if (/UP$|DOWN$|BULL$|BEAR$|LONG$|SHORT$|\dL$|\dS$/.test(base)) return false;
+      if (base.includes('USDT')) return false;
+      if (tradingSet.size > 0 && !tradingSet.has(base)) return false;
+      const vol = +t.quoteVolume;
+      return vol > 200000 && +t.lastPrice > 0;
+    })
+    .map(t => {
+      const base = t.symbol.replace('USDT', '');
+      const coin = {
+        ticker:  base,
+        price:   +t.lastPrice,
+        ch24:    +t.priceChangePercent,
+        vol24:   +t.quoteVolume,
+        high24:  +t.highPrice,
+        low24:   +t.lowPrice,
+        count:   +t.count,
+        open24:  +t.openPrice,
+      };
+      map[base] = coin;
+      return coin;
+    })
+    .sort((a, b) => b.vol24 - a.vol24);
 
-async function fetchFundingRate(ticker) {
-  try {
-    const r = await fetch(`https://fapi.binance.com/fapi/v1/fundingRate?symbol=${ticker}USDT&limit=3`);
-    if(!r.ok) return null;
-    const d = await r.json();
-    if(!Array.isArray(d)||!d.length) return null;
-    const rates = d.map(x=>parseFloat(x.fundingRate)*100); // convert to %
-    return {
-      current: rates[rates.length-1],
-      avg3: rates.reduce((a,b)=>a+b,0)/rates.length,
-    };
-  } catch(_){ return null; }
+  return { coins, map };
 }
 
-async function fetchOpenInterest(ticker) {
+// ── PHASE 2: FETCH 48h DATA FOR OUTPERFORM DETECTION ────────────
+// Uses 2d kline to get yesterday + today performance
+async function fetch48hChange(ticker) {
   try {
-    // Current OI
-    const r1 = await fetch(`https://fapi.binance.com/fapi/v1/openInterest?symbol=${ticker}USDT`);
-    if(!r1.ok) return null;
-    const d1 = await r1.json();
-    // OI history (last 5 periods)
-    const r2 = await fetch(`https://fapi.binance.com/futures/data/openInterestHist?symbol=${ticker}USDT&period=1h&limit=8`);
-    let oiTrend = null;
-    if(r2.ok) {
-      const d2 = await r2.json();
-      if(Array.isArray(d2)&&d2.length>=4) {
-        const old = parseFloat(d2[0].sumOpenInterest);
-        const now = parseFloat(d2[d2.length-1].sumOpenInterest);
-        oiTrend = old > 0 ? ((now-old)/old*100) : null; // % change
+    const r = await fetch(
+      `https://api.binance.com/api/v3/klines?symbol=${ticker}USDT&interval=1d&limit=3`
+    );
+    if (!r.ok) return null;
+    const kl = await r.json();
+    if (!Array.isArray(kl) || kl.length < 2) return null;
+    const open48 = +kl[0][1]; // open 2 days ago
+    const close  = +kl[kl.length - 1][4]; // latest close
+    const ch48   = open48 > 0 ? (close - open48) / open48 * 100 : null;
+    const ch24   = kl.length >= 2 ? (+kl[kl.length-1][4] - +kl[kl.length-2][4]) / +kl[kl.length-2][4] * 100 : null;
+    return { ch48, ch24 };
+  } catch (_) { return null; }
+}
+
+// ── PHASE 3: ANOMALY DETECTION ENGINE ───────────────────────────
+// Primary: outperform BTC ≥ 2x in 24h AND/OR 48h
+// Secondary: inverse BTC, volume spike, decorrelated
+function detectAnomalies(coins, coinMap, btc24, btc48) {
+  const anomalies = [];
+
+  coins.forEach(c => {
+    if (c.ticker === 'BTC' || c.ticker === 'ETH') return;
+    const flags = [];
+    let score = 0;
+
+    // ── OUTPERFORM BTC (PRIMARY SIGNAL) ──────────────────────
+    // 24h outperform
+    if (btc24 !== 0) {
+      const ratio24 = c.ch24 / (Math.abs(btc24) || 0.01);
+      if (c.ch24 > 0 && ratio24 >= 4) {
+        flags.push({ type:'OUTPERFORM_4X', label:`+${c.ch24.toFixed(1)}% vs BTC ${btc24.toFixed(1)}% (${ratio24.toFixed(1)}x)`, score:12 });
+        score += 12;
+      } else if (c.ch24 > 0 && ratio24 >= 2) {
+        flags.push({ type:'OUTPERFORM_2X', label:`+${c.ch24.toFixed(1)}% outperform BTC ${ratio24.toFixed(1)}x`, score:9 });
+        score += 9;
       }
     }
-    return {
-      value: parseFloat(d1.openInterest),
-      trend: oiTrend, // positive = OI growing (more conviction)
-    };
-  } catch(_){ return null; }
+
+    // 48h outperform (uses prefetched data if available)
+    if (c.ch48 != null && btc48 != null && btc48 !== 0) {
+      const ratio48 = c.ch48 / (Math.abs(btc48) || 0.01);
+      if (c.ch48 > 0 && ratio48 >= 3) {
+        flags.push({ type:'OUTPERFORM_48H', label:`48h: +${c.ch48.toFixed(1)}% vs BTC (${ratio48.toFixed(1)}x)`, score:10 });
+        score += 10;
+      } else if (c.ch48 > 0 && ratio48 >= 2) {
+        flags.push({ type:'OUTPERFORM_48H', label:`48h outperform ${ratio48.toFixed(1)}x`, score:7 });
+        score += 7;
+      }
+    }
+
+    // ── INVERSE BTC ───────────────────────────────────────────
+    if (btc24 < -1.5 && c.ch24 > 2) {
+      flags.push({ type:'INVERSE_BTC', label:`Naik ${c.ch24.toFixed(1)}% saat BTC -${Math.abs(btc24).toFixed(1)}%`, score:10 });
+      score += 10;
+    }
+    if (btc24 < -0.5 && c.ch24 > 4) {
+      flags.push({ type:'STRENGTH_BTC_DOWN', label:`Strong +${c.ch24.toFixed(1)}% saat BTC lemah`, score:7 });
+      score += 7;
+    }
+
+    // ── DECORRELATED ─────────────────────────────────────────
+    if (Math.abs(btc24) < 1 && c.ch24 > 6) {
+      flags.push({ type:'DECORRELATED_UP', label:`+${c.ch24.toFixed(1)}% mandiri (BTC flat)`, score:8 });
+      score += 8;
+    }
+    if (Math.abs(btc24) < 1 && c.ch24 < -6) {
+      flags.push({ type:'DECORRELATED_DOWN', label:`${c.ch24.toFixed(1)}% mandiri (BTC flat)`, score:5 });
+      score += 5;
+    }
+
+    // ── VOLUME ANOMALY ─────────────────────────────────────────
+    if (c.ch24 > 10 && c.vol24 > 5000000) {
+      flags.push({ type:'VOL_PRICE_SURGE', label:`Surge +${c.ch24.toFixed(1)}% vol $${(c.vol24/1e6).toFixed(0)}M`, score:6 });
+      score += 6;
+    }
+    if (c.ch24 > 20) {
+      flags.push({ type:'EXTREME_MOVE', label:`Extreme +${c.ch24.toFixed(1)}% dalam 24h`, score:8 });
+      score += 8;
+    }
+
+    if (score >= 7 && flags.length > 0) {
+      const sorted = flags.sort((a, b) => b.score - a.score);
+      anomalies.push({
+        ...c,
+        anomalyScore: score,
+        flags: sorted,
+        primaryFlag: sorted[0],
+        isOutperform: flags.some(f => f.type.startsWith('OUTPERFORM')),
+        isInverse:    flags.some(f => f.type === 'INVERSE_BTC' || f.type === 'STRENGTH_BTC_DOWN'),
+        isDecorl:     flags.some(f => f.type.startsWith('DECORRELATED')),
+        anomalyType:
+          flags.some(f => f.type.startsWith('OUTPERFORM')) ? '🚀 OUTPERFORM' :
+          flags.some(f => f.type === 'INVERSE_BTC')        ? '🔄 INVERSE BTC' :
+          flags.some(f => f.type.startsWith('DECORRELATED'))? '⚡ DECORRELATED' :
+          '📊 ANOMALI',
+      });
+    }
+  });
+
+  return anomalies.sort((a, b) => b.anomalyScore - a.anomalyScore);
 }
 
-async function fetchLongShortRatio(ticker) {
-  try {
-    const r = await fetch(`https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=${ticker}USDT&period=1h&limit=4`);
-    if(!r.ok) return null;
-    const d = await r.json();
-    if(!Array.isArray(d)||!d.length) return null;
-    const latest = d[d.length-1];
-    const oldest = d[0];
-    return {
-      longRatio: parseFloat(latest.longAccount)*100,
-      shortRatio: parseFloat(latest.shortAccount)*100,
-      trend: parseFloat(latest.longAccount) - parseFloat(oldest.longAccount), // positive = longs increasing
-    };
-  } catch(_){ return null; }
+// ── TA HELPERS ───────────────────────────────────────────────────
+const _S  = a  => window.sma(a[0], a[1]);
+const sma = (a,p) => window.sma(a,p);
+const ema = (a,p) => window.ema(a,p);
+const rsi = (a,p) => window.rsi(a,p);
+const mcd = a    => window.macd(a);
+const lst = a    => window.lst(a);
+const sRSI= a    => window.stRSI(a);
+const atr = (h,l,c,p) => window.atrF(h,l,c,p);
+const boll= a    => window.bb(a);
+const SR  = (h,l,p) => window.findSR(h,l,p);
+const fmt = n    => window.fmt(n);
+
+// ── MARKET MICROSTRUCTURE ────────────────────────────────────────
+async function getMicro(ticker) {
+  const [fr, ls, tk, oi] = await Promise.allSettled([
+    fetch(`https://fapi.binance.com/fapi/v1/fundingRate?symbol=${ticker}USDT&limit=3`).then(r=>r.ok?r.json():null),
+    fetch(`https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=${ticker}USDT&period=1h&limit=4`).then(r=>r.ok?r.json():null),
+    fetch(`https://fapi.binance.com/futures/data/takerlongshortRatio?symbol=${ticker}USDT&period=1h&limit=4`).then(r=>r.ok?r.json():null),
+    fetch(`https://fapi.binance.com/futures/data/openInterestHist?symbol=${ticker}USDT&period=1h&limit=8`).then(r=>r.ok?r.json():null),
+  ]);
+
+  let funding=null, lsR=null, taker=null, oiR=null;
+  try { const d=fr.value; if(Array.isArray(d)&&d.length){const rates=d.map(x=>+x.fundingRate*100);funding={cur:rates[rates.length-1],avg:rates.reduce((a,b)=>a+b,0)/rates.length};} } catch(_){}
+  try { const d=ls.value; if(Array.isArray(d)&&d.length){const n=d[d.length-1],o=d[0];lsR={long:+n.longAccount*100,short:+n.shortAccount*100,trend:+n.longAccount-+o.longAccount};} } catch(_){}
+  try { const d=tk.value; if(Array.isArray(d)&&d.length){const n=d[d.length-1];const b=+n.buyVol,s=+n.sellVol;taker={ratio:b/(s||1),delta:b-s};} } catch(_){}
+  try { const d=oi.value; if(Array.isArray(d)&&d.length>=2){const o=+d[0].sumOpenInterest,n=+d[d.length-1].sumOpenInterest;oiR={trend:o>0?(n-o)/o*100:0};} } catch(_){}
+
+  // Labels
+  const fLbl = funding?( funding.cur<-0.05?`🟢 Short overpay (${funding.cur.toFixed(3)}%)`: funding.cur>0.1?`🔴 Long overpay (${funding.cur.toFixed(3)}%)`: `⚪ Neutral (${funding.cur.toFixed(3)}%)` ):'—';
+  const oLbl = oiR?( oiR.trend>5?`🟢 OI +${oiR.trend.toFixed(1)}%`: oiR.trend<-5?`🔴 OI ${oiR.trend.toFixed(1)}%`: `⚪ OI ±${Math.abs(oiR.trend).toFixed(1)}%` ):'—';
+  const lLbl = lsR?( lsR.long<40?`🟢 Shorts ${lsR.short.toFixed(0)}%`: lsR.long>65?`🔴 Longs ${lsR.long.toFixed(0)}%`: `⚪ ${lsR.long.toFixed(0)}%L/${lsR.short.toFixed(0)}%S` ):'—';
+  const tLbl = taker?( taker.ratio>1.3?`🟢 Buy ${taker.ratio.toFixed(2)}x`: taker.ratio<0.7?`🔴 Sell ${taker.ratio.toFixed(2)}x`: `⚪ Neutral ${taker.ratio.toFixed(2)}x` ):'—';
+
+  const microBull = [funding?.cur<0, oiR?.trend>0, lsR?.long<50, taker?.ratio>1].filter(Boolean).length;
+  const whaleLbl  = (funding&&oiR&&lsR&&taker)
+    ? microBull>=3 ? '🟢 Akumulasi terdeteksi'
+    : microBull>=2 ? '🟡 Mixed signal'
+    : '🔴 Kemungkinan distribusi'
+    : '—';
+
+  return { funding, lsR, taker, oiR, fLbl, oLbl, lLbl, tLbl, whaleLbl };
 }
 
-async function fetchTakerVolume(ticker) {
-  try {
-    const r = await fetch(`https://fapi.binance.com/futures/data/takerlongshortRatio?symbol=${ticker}USDT&period=1h&limit=4`);
-    if(!r.ok) return null;
-    const d = await r.json();
-    if(!Array.isArray(d)||!d.length) return null;
-    const latest = d[d.length-1];
-    const buyVol = parseFloat(latest.buyVol);
-    const sellVol = parseFloat(latest.sellVol);
-    return {
-      ratio: buyVol/(sellVol||1),
-      delta: buyVol - sellVol, // positive = buy pressure
-    };
-  } catch(_){ return null; }
-}
-
-// ── SCALPING DATA: 15m candles ──────────────────────────────────
-async function fetchScalpingData(ticker) {
+// ── SCALP 15m ────────────────────────────────────────────────────
+async function getScalp(ticker) {
   try {
     const r = await fetch(`https://api.binance.com/api/v3/klines?symbol=${ticker}USDT&interval=15m&limit=60`);
-    if(!r.ok) return null;
+    if (!r.ok) return null;
     const kl = await r.json();
-    if(!Array.isArray(kl)||kl.length<20) return null;
-    const cl = kl.map(k=>+k[4]);
-    const hi = kl.map(k=>+k[2]);
-    const lo = kl.map(k=>+k[3]);
-    const vol = kl.map(k=>+k[5]);
-    const price = cl[cl.length-1];
-
-    // Fast indicators for scalp
-    const ema8  = lst(ema(cl,8));
-    const ema21 = lst(ema(cl,21));
-    const ema55 = lst(ema(cl,55));
-    const rsi15 = rsi(cl.slice(-20),14);
-    const atr15 = atrF(hi,lo,cl,14);
-    const bb15  = bb(cl);
-    const md15  = macd(cl);
-
-    // Volume surge: recent vs average
-    const avgVol15 = vol.slice(-20).reduce((a,b)=>a+b,0)/20;
-    const lastVol15 = vol[vol.length-1];
-    const volSurge = lastVol15/avgVol15;
-
-    // Momentum: % change last 4 candles (1 hour)
-    const mom1h = cl.length>=5 ? (cl[cl.length-1]-cl[cl.length-5])/cl[cl.length-5]*100 : 0;
-
-    // Scalp signal
-    let scalpScore = 0;
-    const emaAligned = ema8 > ema21 && ema21 > ema55;
-    const emaAlignedBear = ema8 < ema21 && ema21 < ema55;
-    if(emaAligned) scalpScore += 3;
-    if(emaAlignedBear) scalpScore -= 3;
-    if(rsi15 > 50 && rsi15 < 70) scalpScore += 1;
-    if(rsi15 < 30) scalpScore += 2; // oversold scalp buy
-    if(rsi15 > 75) scalpScore -= 2;
-    if(md15.h>0 && md15.ph<=0) scalpScore += 2; // fresh crossover
-    if(md15.h<0 && md15.ph>=0) scalpScore -= 2;
-    if(volSurge > 2) scalpScore += 1; // volume confirmation
-    if(mom1h > 1) scalpScore += 1; if(mom1h < -1) scalpScore -= 1;
-    if(bb15 && price < bb15.l) scalpScore += 2; // BB oversold
-    if(bb15 && price > bb15.u) scalpScore -= 1;
-
-    // SL/TP for scalp (tighter, based on ATR×1)
-    const slScalp = price - atr15*1.2;
-    const riskScalp = price - slScalp;
-    const tp1Scalp = price + riskScalp*2.0; // R:R 1:2 enforced
-    const tp2Scalp = price + riskScalp*3.0;
-    const rrScalp  = riskScalp > 0 ? (tp1Scalp-price)/riskScalp : 0;
-
+    if (!Array.isArray(kl)||kl.length<20) return null;
+    const cl=kl.map(k=>+k[4]),hi=kl.map(k=>+k[2]),lo=kl.map(k=>+k[3]),vl=kl.map(k=>+k[5]);
+    const p=cl[cl.length-1];
+    const e8=lst(ema(cl,8)),e21=lst(ema(cl,21)),e55=lst(ema(cl,55));
+    const r15=rsi(cl.slice(-20),14);
+    const a15=atr(hi,lo,cl,14);
+    const b15=boll(cl);
+    const m15=mcd(cl);
+    const avgV=vl.slice(-20).reduce((a,b)=>a+b,0)/20;
+    const vSurge=vl[vl.length-1]/(avgV||1);
+    const mom=cl.length>=5?(cl[cl.length-1]-cl[cl.length-5])/cl[cl.length-5]*100:0;
+    let sc=0;
+    if(e8>e21&&e21>e55)sc+=3; else if(e8<e21&&e21<e55)sc-=3;
+    if(r15<30)sc+=2; else if(r15>75)sc-=2; else if(r15>50&&r15<70)sc+=1;
+    if(m15.h>0&&m15.ph<=0)sc+=2; else if(m15.h>0)sc+=1;
+    if(m15.h<0&&m15.ph>=0)sc-=2; else if(m15.h<0)sc-=1;
+    if(vSurge>2)sc+=1; if(mom>1)sc+=1; else if(mom<-1)sc-=1;
+    if(b15&&p<b15.l)sc+=2; else if(b15&&p>b15.u)sc-=1;
+    const sl=p-a15*1.2, risk=p-sl;
+    const tp1=p+risk*2, tp2=p+risk*3, rrS=risk>0?(tp1-p)/risk:0;
     return {
-      scalpScore,
-      emaAligned: emaAligned?"▲ Bullish":"◆ Netral",
-      rsi15: Math.round(rsi15||0),
-      volSurge: volSurge.toFixed(1),
-      mom1h: mom1h.toFixed(2),
-      atr15Pct: (atr15/price*100).toFixed(2),
-      slScalp, tp1Scalp, tp2Scalp, rrScalp,
-      macd15: md15.h>0?"▲":"▼",
+      sc, rsi15:Math.round(r15||0),
+      ema:e8>e21&&e21>e55?'▲ Bull':e8<e21&&e21<e55?'▼ Bear':'◆ Mix',
+      macd:m15.h>0?'▲':'▼',
+      vSurge:vSurge.toFixed(1), mom:mom.toFixed(2),
+      atrP:(a15/p*100).toFixed(2),
+      sl, tp1, tp2, rr:rrS,
     };
-  } catch(_){ return null; }
+  } catch (_) { return null; }
 }
 
-// ── SWING DATA: already handled by quickTA (Daily) ─────────────
+// ── PROBABILITY ENGINE ────────────────────────────────────────────
+function calcProb(o) {
+  const S = [];
+  const {rsiD,macd,gx,abM200,bb,fr,ls,tk,oi,rr,anomalyFlags} = o;
 
-// ── PROBABILITY CALCULATOR ─────────────────────────────────────
-function calcProbability({
-  // TA
-  taScore, rsiD, bbState, macdDir, goldenX, aboveM200,
-  // Market Structure
-  fundingRate, oiTrend, lsRatio, takerDelta,
-  // Scalp
-  scalpScore,
-  // Price action
-  rrSwing, rrScalp,
-}) {
-  // Each signal contributes to weighted probability
-  const signals = [];
+  // RSI
+  if(rsiD<30)      S.push({n:'RSI OS',      p:77,w:9});
+  else if(rsiD<40) S.push({n:'RSI Low',     p:64,w:6});
+  else if(rsiD<50) S.push({n:'RSI Neutral-',p:53,w:3});
+  else if(rsiD>70) S.push({n:'RSI OB',      p:27,w:9});
+  else if(rsiD>62) S.push({n:'RSI High',    p:40,w:5});
+  else             S.push({n:'RSI Mid',     p:54,w:3});
 
-  // === SWING SIGNALS (60% weight) ===
-  // RSI (high weight)
-  if(rsiD < 30)      signals.push({name:"RSI Daily OS",    prob:75, w:8});
-  else if(rsiD < 40) signals.push({name:"RSI Daily Low",   prob:62, w:5});
-  else if(rsiD < 50) signals.push({name:"RSI Netral",      prob:52, w:3});
-  else if(rsiD > 70) signals.push({name:"RSI Daily OB",    prob:30, w:8});
-  else if(rsiD > 65) signals.push({name:"RSI High",        prob:42, w:5});
-  else               signals.push({name:"RSI Mid",         prob:53, w:3});
-
-  // MA structure (very high weight)
-  if(goldenX===true)         signals.push({name:"Golden Cross",  prob:68, w:10});
-  else if(goldenX===false)   signals.push({name:"Death Cross",   prob:28, w:10});
-  if(aboveM200===true)       signals.push({name:"Above MA200",   prob:65, w:8});
-  else if(aboveM200===false) signals.push({name:"Below MA200",   prob:35, w:8});
+  // MA structure
+  if(gx===true)          S.push({n:'Golden Cross',  p:71,w:12});
+  else if(gx===false)    S.push({n:'Death Cross',   p:25,w:12});
+  if(abM200===true)      S.push({n:'Above MA200',   p:67,w:10});
+  else if(abM200===false)S.push({n:'Below MA200',   p:33,w:10});
 
   // MACD
-  if(macdDir==="▲")          signals.push({name:"MACD Bull",     prob:61, w:5});
-  else                       signals.push({name:"MACD Bear",     prob:39, w:5});
+  if(macd==='▲')S.push({n:'MACD+',p:63,w:6}); else S.push({n:'MACD-',p:37,w:6});
 
-  // Bollinger
-  if(bbState==="OS")         signals.push({name:"BB Oversold",   prob:70, w:6});
-  else if(bbState==="OB")    signals.push({name:"BB Overbought", prob:30, w:6});
-  else                       signals.push({name:"BB Neutral",    prob:50, w:2});
+  // BB
+  if(bb==='OS')       S.push({n:'BB OS',     p:72,w:8});
+  else if(bb==='OB')  S.push({n:'BB OB',     p:28,w:8});
+  else                S.push({n:'BB Neutral',p:51,w:2});
 
-  // === MARKET MICROSTRUCTURE (30% weight) ===
-  if(fundingRate !== null) {
-    if(fundingRate < -0.05)      signals.push({name:"Funding Rate -",  prob:72, w:9}); // negative = shorts overpaying = bullish
-    else if(fundingRate < 0)     signals.push({name:"Funding Low",     prob:60, w:5});
-    else if(fundingRate > 0.1)   signals.push({name:"Funding Rate +",  prob:35, w:9}); // high positive = longs overpaying = bearish
-    else if(fundingRate > 0.05)  signals.push({name:"Funding Mid",     prob:44, w:5});
-    else                         signals.push({name:"Funding Neutral", prob:52, w:3});
+  // Microstructure
+  if(fr!=null){
+    if(fr<-0.05)    S.push({n:'Funding-',    p:75,w:11});
+    else if(fr<0)   S.push({n:'Funding Low', p:62,w:7});
+    else if(fr>0.1) S.push({n:'Funding+',   p:32,w:11});
+    else if(fr>0.05)S.push({n:'Funding Mid', p:43,w:7});
+    else            S.push({n:'Funding Neut',p:52,w:3});
+  }
+  if(oi!=null){
+    if(oi>5)      S.push({n:'OI Growing',  p:67,w:9});
+    else if(oi<-5)S.push({n:'OI Falling',  p:40,w:9});
+    else          S.push({n:'OI Stable',   p:52,w:3});
+  }
+  if(ls!=null){
+    if(ls<40)     S.push({n:'Shorts Dom',  p:71,w:10});
+    else if(ls>65)S.push({n:'Longs Crowd', p:29,w:10});
+    else          S.push({n:'L/S Balanced',p:52,w:3});
+  }
+  if(tk!=null){
+    if(tk>1.3)    S.push({n:'Buy Pressure', p:68,w:9});
+    else if(tk<0.7)S.push({n:'Sell Pressure',p:32,w:9});
+    else           S.push({n:'Taker Neut',  p:51,w:3});
   }
 
-  if(oiTrend !== null) {
-    if(oiTrend > 5)              signals.push({name:"OI Growing",      prob:65, w:7}); // rising OI = conviction
-    else if(oiTrend < -5)        signals.push({name:"OI Declining",    prob:42, w:7}); // declining OI = uncertainty
-    else                         signals.push({name:"OI Stable",       prob:52, w:3});
-  }
+  // R:R
+  if(rr>=3)S.push({n:'RR Excellent',p:70,w:5});
+  else if(rr>=2)S.push({n:'RR Good',p:63,w:5});
 
-  if(lsRatio !== null) {
-    if(lsRatio.longRatio < 40)   signals.push({name:"Shorts Dominant", prob:68, w:8}); // low longs = contrarian buy
-    else if(lsRatio.longRatio > 65) signals.push({name:"Longs Crowded",prob:32, w:8}); // high longs = crowded = risk
-    else                         signals.push({name:"L/S Balanced",   prob:52, w:3});
-    if(lsRatio.trend > 0.03)     signals.push({name:"Longs Rising",   prob:60, w:4});
-    else if(lsRatio.trend < -0.03) signals.push({name:"Longs Falling",prob:42, w:4});
-  }
+  // Anomaly bonus
+  if(anomalyFlags?.some(f=>f.type.startsWith('OUTPERFORM')))
+    S.push({n:'BTC Outperform',p:68,w:8});
+  if(anomalyFlags?.some(f=>f.type==='INVERSE_BTC'||f.type==='STRENGTH_BTC_DOWN'))
+    S.push({n:'Inverse BTC Strength',p:66,w:7});
 
-  if(takerDelta !== null) {
-    if(takerDelta.ratio > 1.3)   signals.push({name:"Buy Taker Dom",  prob:66, w:7}); // buy pressure
-    else if(takerDelta.ratio < 0.7) signals.push({name:"Sell Taker", prob:34, w:7}); // sell pressure
-    else                         signals.push({name:"Taker Neutral",  prob:50, w:3});
-  }
-
-  // === R:R QUALITY (10% weight) ===
-  if(rrSwing >= 3)               signals.push({name:"RR Excellent",   prob:70, w:5});
-  else if(rrSwing >= 2)          signals.push({name:"RR Good",        prob:62, w:5});
-  else if(rrSwing >= 1.5)        signals.push({name:"RR Minimal",     prob:53, w:5});
-
-  // Weighted average probability
-  const totalWeight = signals.reduce((a,s)=>a+s.w, 0);
-  const weightedProb = totalWeight > 0
-    ? signals.reduce((a,s)=>a+s.prob*s.w, 0) / totalWeight
-    : 50;
-
-  // Confidence based on signal count and alignment
-  const bullSignals = signals.filter(s=>s.prob>55).length;
-  const bearSignals = signals.filter(s=>s.prob<45).length;
-  const dominance = Math.abs(bullSignals-bearSignals)/(signals.length||1);
-  const confidence = Math.min(95, Math.round(weightedProb * (0.7 + dominance*0.3)));
+  const totW = S.reduce((a,s)=>a+s.w,0)||1;
+  const wP   = S.reduce((a,s)=>a+s.p*s.w,0)/totW;
+  const bull  = S.filter(s=>s.p>55).length;
+  const bear  = S.filter(s=>s.p<45).length;
+  const dom   = Math.abs(bull-bear)/(S.length||1);
+  const conf  = Math.min(95, Math.round(wP*(0.60+dom*0.40)));
 
   return {
-    probability: Math.round(weightedProb),
-    confidence,
-    signals,
-    bullSignals,
-    bearSignals,
-    interpretation: confidence>=75?"🟢 SETUP KUAT":confidence>=60?"🟡 SETUP MODERAT":confidence>=45?"⚪ NETRAL":"🔴 SETUP LEMAH",
-    grade: confidence>=75?"A":confidence>=65?"B":confidence>=55?"C":"D",
+    prob:Math.round(wP), conf, signals:S, bull, bear,
+    grade:conf>=78?'A':conf>=65?'B':conf>=52?'C':'D',
+    label:conf>=75?'🟢 SETUP KUAT':conf>=60?'🟡 MODERAT':conf>=45?'⚪ NETRAL':'🔴 LEMAH',
   };
 }
 
-// ── DEEP ANALYSIS PER COIN ─────────────────────────────────────
-async function deepAnalyze(ticker, pricePrefetch) {
+// ── DEEP ANALYZE PER COIN ─────────────────────────────────────────
+async function deepAnalyze(ticker, prefetch, anomaly) {
   try {
-    // Fetch daily candles (already filtered to 120 for speed)
     const kR = await fetch(`https://api.binance.com/api/v3/klines?symbol=${ticker}USDT&interval=1d&limit=120`);
-    if(!kR.ok) return null;
+    if (!kR.ok) return null;
     const kl = await kR.json();
-    if(!Array.isArray(kl)||kl.length<30) return null;
+    if (!Array.isArray(kl)||kl.length<25) return null;
 
-    const hi=kl.map(k=>+k[2]),lo=kl.map(k=>+k[3]),cl=kl.map(k=>+k[4]),vol=kl.map(k=>+k[5]);
-    const price = cl[cl.length-1];
+    const hi=kl.map(k=>+k[2]),lo=kl.map(k=>+k[3]),cl=kl.map(k=>+k[4]),vl=kl.map(k=>+k[5]);
+    const price=cl[cl.length-1];
+    const ch24=prefetch?.ch24||0, vol24=prefetch?.vol24||0;
 
-    // TA
-    const m50=lst(sma(cl,50)),m200=lst(sma(cl,Math.min(100,cl.length)));
-    const e50=lst(ema(cl,50)),e200=lst(ema(cl,Math.min(100,cl.length)));
+    // Core TA
+    const m50=lst(sma(cl,50)), m200=lst(sma(cl,Math.min(100,cl.length)));
+    const e50=lst(ema(cl,50)), e200=lst(ema(cl,Math.min(100,cl.length)));
     const rD=rsi(cl.slice(-30),14);
-    const st=stRSI(cl);
-    const aV=atrF(hi,lo,cl,14);
-    const bbd=bb(cl);
-    const md=macd(cl);
-    const {sp,rs}=findSR(hi,lo,price);
-    const t2=pricePrefetch||{};
-    const ch24=+(t2.priceChangePercent||0);
-    const vol24=+(t2.quoteVolume||0);
+    const st=sRSI(cl);
+    const aV=atr(hi,lo,cl,14);
+    const bbd=boll(cl);
+    const md=mcd(cl);
+    const {sp,rs}=SR(hi,lo,price);
 
-    // SWING SL/TP — S1-based, R:R minimum 2.0
+    // Volume ratio vs 20d avg
+    const avgV=vl.slice(-20).reduce((a,b)=>a+b,0)/20;
+    const vRatio=vl.slice(-3).reduce((a,b)=>a+b,0)/3/(avgV||1);
+
+    // SL/TP — enforced R:R 1:2
     const s1=sp[0]?.price;
-    const slSwing=s1?s1*0.993:price-(aV*1.8);
-    const riskSwing=Math.max(price-slSwing, aV*0.5);
-    // Enforce minimum R:R 2.0
-    const tp1Swing=price+riskSwing*2.0; // MINIMUM 1:2
-    const tp2Swing=price+riskSwing*3.0;
-    const tp3Swing=price+riskSwing*5.0;
-    // Check if resistance supports TP1
-    const validR=rs.find(r=>r.price>=tp1Swing);
-    const tp1Final=validR?.price||tp1Swing;
-    const rrSwing=(tp1Final-price)/riskSwing;
+    const slSw=s1?s1*0.993:price-aV*1.8;
+    const risk=Math.max(price-slSw, aV*0.4);
+    const tp1Base=price+risk*2.0; // MINIMUM 1:2
+    const validR=rs.find(r=>r.price>=tp1Base);
+    const tp1=validR?.price||tp1Base;
+    const tp2=price+risk*3.0, tp3=price+risk*5.0;
+    const rrSw=(tp1-price)/risk;
 
-    // Scores
-    let lScore=0;
-    if(rD<30)lScore+=4;else if(rD<40)lScore+=2;else if(rD<50)lScore+=1;
-    else if(rD>70)lScore-=3;else if(rD>65)lScore-=1;
-    if(st.k&&st.d){if(st.k<20&&st.d<20)lScore+=2;if(st.k>st.d&&st.k<40)lScore+=1;if(st.k>80)lScore-=2;}
-    if(m200&&price>m200)lScore+=2;else if(m200)lScore-=1;
-    if(price>m50)lScore+=1;else lScore-=1;
-    if(e200&&e50>e200)lScore+=2;else if(e200)lScore-=1;
-    if(md.h>0&&md.ph<=0)lScore+=2;else if(md.h>0)lScore+=1;else if(md.h<0&&md.ph>=0)lScore-=2;else if(md.h<0)lScore-=1;
-    if(bbd&&price<bbd.l)lScore+=2;if(bbd&&price>bbd.u)lScore-=1;
-    const avgVol=vol.slice(-20).reduce((a,b)=>a+b,0)/20;
-    if(vol.slice(-3).reduce((a,b)=>a+b,0)/3>avgVol*1.5)lScore+=1;
-    if(ch24>3)lScore+=1;else if(ch24<-8)lScore-=1;
+    // TA score
+    let sc=0;
+    if(rD<30)sc+=4; else if(rD<40)sc+=2; else if(rD<50)sc+=1;
+    else if(rD>70)sc-=3; else if(rD>65)sc-=1;
+    if(st.k&&st.d){if(st.k<20&&st.d<20)sc+=2;if(st.k>st.d&&st.k<40)sc+=1;if(st.k>80)sc-=2;}
+    if(m200&&price>m200)sc+=2; else if(m200)sc-=1;
+    if(price>m50)sc+=1; else sc-=1;
+    if(e200&&e50>e200)sc+=2; else if(e200)sc-=1;
+    if(md.h>0&&md.ph<=0)sc+=2; else if(md.h>0)sc+=1;
+    else if(md.h<0&&md.ph>=0)sc-=2; else if(md.h<0)sc-=1;
+    if(bbd&&price<bbd.l)sc+=2; else if(bbd&&price>bbd.u)sc-=1;
+    if(vRatio>1.5)sc+=1;
+    if(ch24>3)sc+=1; else if(ch24<-8)sc-=1;
+    if(anomaly?.isOutperform)sc+=2;
+    if(anomaly?.isInverse)sc+=2;
 
-    // Market microstructure (in parallel)
-    const [funding, oi, ls, taker, scalpData] = await Promise.allSettled([
-      fetchFundingRate(ticker),
-      fetchOpenInterest(ticker),
-      fetchLongShortRatio(ticker),
-      fetchTakerVolume(ticker),
-      fetchScalpingData(ticker),
+    // Parallel: micro + scalp
+    const [micro, scalp] = await Promise.allSettled([
+      getMicro(ticker),
+      getScalp(ticker),
     ]);
-    const fundingData = funding.status==="fulfilled"?funding.value:null;
-    const oiData      = oi.status==="fulfilled"?oi.value:null;
-    const lsData      = ls.status==="fulfilled"?ls.value:null;
-    const takerData   = taker.status==="fulfilled"?taker.value:null;
-    const scalp       = scalpData.status==="fulfilled"?scalpData.value:null;
+    const M = micro.status==='fulfilled'?micro.value:{fLbl:'—',oLbl:'—',lLbl:'—',tLbl:'—',whaleLbl:'—'};
+    const SC2= scalp.status==='fulfilled'?scalp.value:null;
 
-    // Probability
-    const prob = calcProbability({
-      taScore: lScore,
-      rsiD: Math.round(rD||0),
-      bbState: bbd?(price<bbd.l?"OS":price>bbd.u?"OB":"Netral"):"—",
-      macdDir: md.h>0?"▲":"▼",
-      goldenX: e200?e50>e200:null,
-      aboveM200: m200?price>m200:null,
-      fundingRate: fundingData?.current,
-      oiTrend: oiData?.trend,
-      lsRatio: lsData,
-      takerDelta: takerData,
-      rrSwing,
+    const abM200=m200?price>m200:null;
+    const gx=e200?e50>e200:null;
+    const bbS=bbd?(price<bbd.l?'OS':price>bbd.u?'OB':'Netral'):'—';
+
+    const prob=calcProb({
+      rsiD:Math.round(rD||0), macd:md.h>0?'▲':'▼',
+      gx, abM200, bb:bbS,
+      fr:M.funding?.cur, ls:M.lsR?.long,
+      tk:M.taker?.ratio, oi:M.oiR?.trend,
+      rr:rrSw, anomalyFlags:anomaly?.flags,
     });
 
-    // Market structure interpretation
-    const fundingLabel = fundingData?(
-      fundingData.current<-0.05?"🟢 Shorts overpay (bullish)":
-      fundingData.current>0.1?"🔴 Longs overpay (bearish)":
-      fundingData.current>0.03?"🟡 Slightly elevated":
-      "⚪ Neutral"
-    ):"—";
-
-    const oiLabel = oiData?.trend!=null?(
-      oiData.trend>5?"🟢 OI naik "+oiData.trend.toFixed(1)+"%":
-      oiData.trend<-5?"🔴 OI turun "+Math.abs(oiData.trend).toFixed(1)+"%":
-      "⚪ OI stabil"
-    ):"—";
-
-    const lsLabel = lsData?(
-      lsData.longRatio<40?"🟢 Shorts dominan "+lsData.shortRatio.toFixed(0)+"%":
-      lsData.longRatio>65?"🔴 Longs crowded "+lsData.longRatio.toFixed(0)+"%":
-      "⚪ Balanced "+lsData.longRatio.toFixed(0)+"%L/"+lsData.shortRatio.toFixed(0)+"%S"
-    ):"—";
-
-    const takerLabel = takerData?(
-      takerData.ratio>1.3?"🟢 Buy pressure "+takerData.ratio.toFixed(2)+"x":
-      takerData.ratio<0.7?"🔴 Sell pressure "+takerData.ratio.toFixed(2)+"x":
-      "⚪ Neutral "+takerData.ratio.toFixed(2)+"x"
-    ):"—";
-
-    // Whale interpretation
-    let whaleSignal = "—";
-    if(fundingData && oiData && lsData && takerData) {
-      const bullMicro = [
-        fundingData.current<0,
-        oiData.trend>0,
-        lsData.longRatio<50,
-        takerData.ratio>1,
-      ].filter(Boolean).length;
-      whaleSignal = bullMicro>=3?"🟢 Whale akumulasi terdeteksi":
-                   bullMicro>=2?"🟡 Mixed — pantau volume":"🔴 Smart money mungkin distribusi";
-    }
-
-    // Swing signal
-    const swingSig = lScore>=5?"BELI":lScore<=-3?"JUAL":"TAHAN";
-    const scalpSig = scalp?(scalp.scalpScore>=4?"BELI":scalp.scalpScore<=-3?"JUAL":"TAHAN"):"—";
+    const swigSig=sc>=5?'BELI':sc<=-3?'JUAL':'TAHAN';
+    const scalpSig=SC2?(SC2.sc>=4?'BELI':SC2.sc<=-3?'JUAL':'TAHAN'):'—';
 
     return {
-      ticker, price, ch24, vol24,
-      // Swing
-      swingSig, swingScore: lScore,
-      slSwing, tp1: tp1Final, tp2: tp2Swing, tp3: tp3Swing, rrSwing,
-      // Scalp
-      scalpSig, scalp,
-      // TA
-      rsiD: Math.round(rD||0),
-      stK: st.k?Math.round(st.k):null,
-      macdDir: md.h>0?"▲":"▼",
-      aboveM200: m200?price>m200:null,
-      goldenX: e200?e50>e200:null,
-      bbState: bbd?(price<bbd.l?"OS":price>bbd.u?"OB":"Netral"):"—",
-      atrPct: (aV/price*100).toFixed(1),
-      // Microstructure
-      fundingRate: fundingData?.current,
-      fundingLabel, oiLabel, lsLabel, takerLabel, whaleSignal,
-      oiTrend: oiData?.trend,
-      lsRatio: lsData?.longRatio,
-      takerRatio: takerData?.ratio,
-      // Probability
+      ticker,price,ch24,vol24,vRatio,
+      swigSig,sc,
+      slSw,tp1,tp2,tp3,rrSw,
+      scalpSig,scalp:SC2,
+      rsiD:Math.round(rD||0),stK:st.k?Math.round(st.k):null,
+      macd:md.h>0?'▲':'▼',abM200,gx,
+      bbS,atrP:(aV/price*100).toFixed(1),
+      micro:M,
       prob,
+      anomaly:anomaly||null,
+      isAnomaly:!!anomaly&&anomaly.anomalyScore>=7,
     };
-  } catch(e){ return null; }
+  } catch (_) { return null; }
 }
 
-// ── MAIN SCAN ORCHESTRATOR ────────────────────────────────────
+// ── MAIN SCAN ─────────────────────────────────────────────────────
 window.startScanPro = async function() {
-  if(window.scanRunning) return;
+  if (window.scanRunning) return;
   window.scanRunning = true;
 
-  const universe = window.SELECTED_UNIVERSE || "top100";
-  const allCoins = window.UNIVERSES_PRO[universe] || ALL_250.slice(0,100);
-  const filterRR = document.getElementById('f-minrr')?.checked !== false;
-  const minRR = 2.0; // ENFORCED 1:2
+  const univ    = window.SELECTED_UNIVERSE||'top100';
+  const volFilt = document.getElementById('f-vol')?.checked!==false;
+  const showSc  = document.getElementById('f-scalp')?.checked!==false;
+  const MIN_RR  = 2.0;
 
-  // UI Reset
-  const btn = document.getElementById('scan-btn');
-  if(btn){ btn.disabled=true; btn.textContent="⏳ SCANNING PRO..."; }
+  // UI
+  const btn=document.getElementById('scan-btn');
+  if(btn){btn.disabled=true;btn.textContent='⏳ FETCHING...';}
   ['pro-results','scan-results','gen-content-wrap'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));
-  const feed = document.getElementById('scan-feed');
-  const bar  = document.getElementById('scan-bar');
-  const cnt  = document.getElementById('scan-count');
-  const fnd  = document.getElementById('scan-found');
-  if(feed) feed.innerHTML=""; if(bar) bar.style.width="0%";
+  const feed=document.getElementById('scan-feed');
+  const bar=document.getElementById('scan-bar');
+  const cnt=document.getElementById('scan-count');
+  const fnd=document.getElementById('scan-found');
+  const stat=document.getElementById('scan-status');
+  const phase=document.getElementById('scan-phase');
+  if(feed)feed.innerHTML=''; if(bar)bar.style.width='0%';
   document.getElementById('scan-progress')?.classList.remove('hidden');
 
-  // PHASE 1: Batch pre-filter via 24h ticker (1 API call)
-  document.getElementById('scan-status').textContent="Phase 1: Pre-filtering...";
-  document.getElementById('scan-phase').textContent=`Fetching ${allCoins.length} ticker sekaligus...`;
-  let prefetchMap = {};
-  try {
-    const resp = await fetch('https://api.binance.com/api/v3/ticker/24hr');
-    if(resp.ok) {
-      const all = await resp.json();
-      all.forEach(t=>{ if(t.symbol.endsWith('USDT')) prefetchMap[t.symbol.replace('USDT','')] = t; });
+  // ── STEP 1: Fetch all coins ──────────────────────────────────
+  if(stat)stat.textContent='Phase 1: Fetching semua koin...';
+  if(phase)phase.textContent='Dynamic fetch dari Binance';
+  const {coins:allCoins,map:coinMap} = await fetchAllCoins();
+  if(feed)feed.innerHTML+=`<span style="color:#00ff87">✓ ${allCoins.length} koin aktif ditemukan dari Binance</span><br/>`;
+
+  // Apply universe filter
+  let universe = allCoins;
+  const uList = window.UNIVERSES_PRO?.[univ];
+  if(uList) {
+    const uSet=new Set(uList);
+    universe=allCoins.filter(c=>uSet.has(c.ticker));
+  } else if(univ==='top250'){ universe=allCoins.slice(0,250); }
+  else if(univ==='top200')  { universe=allCoins.slice(0,200); }
+  else if(univ==='top100')  { universe=allCoins.slice(0,100); }
+  else if(univ==='dynamic') { universe=allCoins.slice(0,400); }
+
+  if(volFilt) universe=universe.filter(c=>c.vol24>1000000);
+
+  // ── STEP 2: BTC reference ───────────────────────────────────
+  const btcCoin=coinMap['BTC'];
+  const btc24=btcCoin?.ch24||0;
+  let btc48=null;
+  try{const d=await fetch48hChange('BTC');btc48=d?.ch48||null;}catch(_){}
+  if(feed)feed.innerHTML+=`<span style="color:#f5c518">📊 BTC 24h: ${btc24>=0?'+':''}${btc24.toFixed(2)}% | 48h: ${btc48!=null?(btc48>=0?'+':'')+btc48.toFixed(2)+'%':'fetching...'}</span><br/>`;
+
+  // ── STEP 3: Fetch 48h for top candidates ────────────────────
+  if(stat)stat.textContent='Phase 2: Fetching 48h data...';
+  if(phase)phase.textContent='Ambil 48h candle untuk outperform detection';
+
+  // Only fetch 48h for high-volume coins (top 80)
+  const top80=universe.slice(0,80);
+  const batch48=await Promise.allSettled(top80.map(c=>fetch48hChange(c.ticker)));
+  batch48.forEach((res,i)=>{
+    if(res.status==='fulfilled'&&res.value){
+      top80[i].ch48=res.value.ch48;
+      top80[i].ch24_verify=res.value.ch24;
     }
-  } catch(_){}
-
-  // Pre-filter: only coins with volume + price data
-  const candidates = allCoins.filter(t => {
-    const d = prefetchMap[t];
-    if(!d) return false;
-    const vol = parseFloat(d.quoteVolume);
-    const price = parseFloat(d.lastPrice);
-    return vol > 500000 && price > 0; // min $500k volume
   });
+  // Merge back
+  const coin48Map={};
+  top80.forEach(c=>{if(c.ch48!=null)coin48Map[c.ticker]=c.ch48;});
+  universe.forEach(c=>{if(coin48Map[c.ticker]!=null)c.ch48=coin48Map[c.ticker];});
+  if(feed)feed.innerHTML+=`<span style="color:#00ccff">✓ 48h data fetched untuk ${Object.keys(coin48Map).length} koin</span><br/>`;
 
-  if(feed) feed.innerHTML+=`<span style="color:#00ff87">✓ Pre-filter: ${candidates.length}/${allCoins.length} lolos (vol>${500000/1e6}M)</span><br/>`;
-  if(fnd) fnd.textContent=`${candidates.length} kandidat`;
+  // ── STEP 4: Anomaly Detection ────────────────────────────────
+  if(stat)stat.textContent='Phase 3: Anomali detection...';
+  const anomalies=detectAnomalies(universe,coinMap,btc24,btc48);
+  const anomalyMap={};
+  anomalies.forEach(a=>{anomalyMap[a.ticker]=a;});
+  if(feed)feed.innerHTML+=`<span style="color:#ff8c00">🔍 ${anomalies.length} anomali · ${anomalies.filter(a=>a.isOutperform).length} outperform BTC · ${anomalies.filter(a=>a.isInverse).length} inverse BTC</span><br/>`;
+  if(fnd)fnd.textContent=`${anomalies.length} anomali`;
 
-  // PHASE 2: Deep analysis on candidates
-  document.getElementById('scan-status').textContent="Phase 2: Deep Analysis...";
-  document.getElementById('scan-phase').textContent="TA + Market Microstructure + Probability";
+  // ── STEP 5: Deep TA (priority: anomalies + top volume) ───────
+  if(stat)stat.textContent='Phase 4: Deep TA + Microstructure...';
+  if(phase)phase.textContent='Parallel: Funding · OI · L/S · 15m Scalp';
 
-  const results = [];
-  let done = 0;
+  const anomalyTickers=new Set(anomalies.slice(0,25).map(a=>a.ticker));
+  const prioritized=[
+    ...universe.filter(c=>anomalyTickers.has(c.ticker)),
+    ...universe.filter(c=>!anomalyTickers.has(c.ticker)).slice(0,75),
+  ].slice(0,100);
 
-  // Batch by 5 for speed (parallel within batch, sequential between batches)
-  const BATCH = 5;
-  for(let i=0; i<candidates.length; i+=BATCH) {
-    const batch = candidates.slice(i, i+BATCH);
-    const batchResults = await Promise.allSettled(
-      batch.map(t => deepAnalyze(t, prefetchMap[t]))
+  const results=[];
+  let done=0;
+  const BATCH=4;
+
+  for(let i=0;i<prioritized.length;i+=BATCH){
+    const batch=prioritized.slice(i,i+BATCH);
+    const bRes=await Promise.allSettled(
+      batch.map(c=>deepAnalyze(c.ticker,c,anomalyMap[c.ticker]||null))
     );
-    batchResults.forEach((res,bi) => {
+    bRes.forEach(res=>{
       done++;
-      if(bar) bar.style.width=Math.round(done/candidates.length*100)+"%";
-      if(cnt) cnt.textContent=`${done} / ${candidates.length} koin`;
-      if(res.status==="fulfilled"&&res.value) {
-        const r = res.value;
+      if(bar)bar.style.width=Math.round(done/prioritized.length*100)+'%';
+      if(cnt)cnt.textContent=`${done} / ${prioritized.length} koin`;
+      if(res.status==='fulfilled'&&res.value){
+        const r=res.value;
         results.push(r);
         if(feed){
-          const sc = r.swingSig==="BELI"?"#00ff87":r.swingSig==="JUAL"?"#ff4560":"#5a6a7a";
-          const pc = r.prob.grade==="A"?"#ffd700":r.prob.grade==="B"?"#00ff87":"#5a6a7a";
-          feed.innerHTML+=`<span style="color:#c4ccd6">${r.ticker}</span> · <span style="color:${sc}">${r.swingSig}</span> · P:<span style="color:${pc}">${r.prob.probability}%</span> · RR:${r.rrSwing.toFixed(1)} · FR:${r.fundingRate?.toFixed(3)||"—"}<br/>`;
+          const sc2=r.swigSig==='BELI'?'#00ff87':r.swigSig==='JUAL'?'#ff4560':'#5a6a7a';
+          const gc2=r.prob.grade==='A'?'#ffd700':r.prob.grade==='B'?'#00ff87':'#5a6a7a';
+          const aFlag=r.isAnomaly?`<span style="color:#f5c518">[${r.anomaly.anomalyType}]</span> `:'';
+          feed.innerHTML+=`${aFlag}<span style="color:#c4ccd6">${r.ticker}</span> · <span style="color:${sc2}">${r.swigSig}</span> · P:<span style="color:${gc2}">${r.prob.prob}%</span> · RR:${r.rrSw.toFixed(1)} · FR:${r.micro?.funding?.cur?.toFixed(3)||'—'}<br/>`;
           feed.scrollTop=feed.scrollHeight;
         }
-        if(fnd) fnd.textContent=`${results.filter(r=>r.prob.probability>=60).length} setup valid`;
+        const valid=results.filter(r=>r.rrSw>=MIN_RR&&r.prob.prob>=50).length;
+        if(fnd)fnd.textContent=`${anomalies.length} anomali · ${valid} setup valid`;
       }
     });
-    // Small delay between batches
-    await new Promise(res=>setTimeout(res,300));
+    await new Promise(res=>setTimeout(res,280));
   }
 
-  // Sort and classify
-  results.sort((a,b)=>b.prob.confidence-a.prob.confidence);
-
-  // Filter by R:R >= 2.0 and classify
-  const valid = results.filter(r => r.rrSwing >= minRR || r.scalp?.rrScalp >= minRR);
-
-  const swingBest  = valid.filter(r=>r.swingSig==="BELI"&&r.rrSwing>=minRR).slice(0,15);
-  const scalpBest  = valid.filter(r=>r.scalpSig==="BELI"&&r.scalp?.rrScalp>=minRR).slice(0,10);
-  const shortBest  = valid.filter(r=>r.swingSig==="JUAL").slice(0,8);
-  const watchlist  = results.filter(r=>r.swingSig==="TAHAN"&&r.prob.probability>=55).slice(0,10);
-
   // Cache
-  window.scanResultsCache = results;
-  window.selectedCoinsForContent = new Set(swingBest.slice(0,4).map(r=>r.ticker));
+  window.scanResultsCache=results;
+  window.selectedCoinsForContent=new Set(
+    results.filter(r=>r.swigSig==='BELI'&&r.rrSw>=2&&r.prob.prob>=60).slice(0,5).map(r=>r.ticker)
+  );
 
-  // Render
-  renderProResults(swingBest, scalpBest, shortBest, watchlist, results.length, candidates.length);
+  // Classify
+  const swingBuy  = results.filter(r=>r.swigSig==='BELI'&&r.rrSw>=MIN_RR).sort((a,b)=>b.prob.conf-a.prob.conf).slice(0,15);
+  const scalpBuy  = showSc?results.filter(r=>r.scalpSig==='BELI'&&(r.scalp?.rr||0)>=MIN_RR).sort((a,b)=>b.prob.conf-a.prob.conf).slice(0,10):[];
+  const shortList = results.filter(r=>r.swigSig==='JUAL').sort((a,b)=>b.prob.conf-a.prob.conf).slice(0,8);
+  const anomRes   = results.filter(r=>r.isAnomaly).sort((a,b)=>b.anomaly.anomalyScore-a.anomaly.anomalyScore).slice(0,15);
+  const watchlist = results.filter(r=>r.swigSig==='TAHAN'&&r.prob.prob>=55).sort((a,b)=>b.prob.prob-a.prob.prob).slice(0,10);
+
+  renderResults(swingBuy,scalpBuy,shortList,anomRes,watchlist,results.length,universe.length,btc24,btc48);
 
   document.getElementById('scan-progress')?.classList.add('hidden');
   document.getElementById('pro-results')?.classList.remove('hidden');
   document.getElementById('gen-content-wrap')?.classList.remove('hidden');
-  if(btn){ btn.disabled=false; btn.textContent="⚡ SCAN LAGI"; }
-  window.scanRunning = false;
+  if(btn){btn.disabled=false;btn.textContent='⚡ SCAN LAGI';}
+  window.scanRunning=false;
 };
 
-// ── RENDER PRO RESULTS ─────────────────────────────────────────
-function renderProResults(swingList, scalpList, shortList, watchlist, totalScanned, totalCandidates) {
-  const container = document.getElementById('pro-results');
-  if(!container) return;
+// ── RENDER ────────────────────────────────────────────────────────
+function renderResults(swingList,scalpList,shortList,anomList,watchlist,scanned,total,btc24,btc48){
+  const el=document.getElementById('pro-results');
+  if(!el)return;
+  const allV=[...swingList,...scalpList,...shortList].filter((v,i,a)=>a.findIndex(x=>x.ticker===v.ticker)===i);
+  const avgP=allV.length?Math.round(allV.reduce((a,r)=>a+r.prob.prob,0)/allV.length):0;
 
-  // Summary
-  const allValid = [...swingList,...scalpList,...shortList].filter((v,i,a)=>a.findIndex(x=>x.ticker===v.ticker)===i);
-  const avgProb = allValid.length ? Math.round(allValid.reduce((a,r)=>a+r.prob.probability,0)/allValid.length) : 0;
-
-  let html = `
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">
+  let html=`
+  <!-- Summary -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
     ${[
-      {l:"Di-scan",   v:totalScanned,      c:"#e8f0f8"},
-      {l:"Kandidat",  v:totalCandidates,   c:"#c4ccd6"},
-      {l:"R:R≥2 Valid",v:swingList.length+scalpList.length, c:"#00ff87"},
-      {l:"Avg Prob",  v:avgProb+"%",       c:avgProb>=65?"#00ff87":"#f5c518"},
+      {l:'Di-scan',  v:scanned,                       c:'#e8f0f8'},
+      {l:'Universe', v:total,                          c:'#c4ccd6'},
+      {l:'R:R≥2',    v:swingList.length+scalpList.length, c:'#00ff87'},
+      {l:'Anomali',  v:anomList.length,                c:'#f5c518'},
     ].map(x=>`<div style="background:rgba(9,12,20,.9);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:11px;text-align:center">
       <div style="font-size:18px;font-weight:800;color:${x.c};font-family:'IBM Plex Mono',monospace">${x.v}</div>
       <div style="font-size:8px;color:var(--dmr);letter-spacing:1px;text-transform:uppercase;margin-top:2px">${x.l}</div>
-    </div>`).join("")}
+    </div>`).join('')}
+  </div>
+
+  <!-- BTC Baseline -->
+  <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <span style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase">BTC Baseline</span>
+    <span style="font-size:14px;font-weight:800;color:${btc24>=0?'#00ff87':'#ff4560'};font-family:'IBM Plex Mono',monospace">24h: ${btc24>=0?'+':''}${btc24.toFixed(2)}%</span>
+    ${btc48!=null?`<span style="font-size:12px;font-weight:700;color:${btc48>=0?'#00c96a':'#d93848'};font-family:'IBM Plex Mono',monospace">48h: ${btc48>=0?'+':''}${btc48.toFixed(2)}%</span>`:''}
+    <span style="font-size:10px;color:#4b5d6e">${btc24<-2?'Bear market — inverse BTC lebih signifikan':btc24>3?'Bull market — cari outperform 2x':'Sideways — decorrelated moves menarik'}</span>
   </div>`;
 
-  // ── SWING TRADE SECTION ──
-  if(swingList.length) {
-    html += `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;margin-top:4px">
-      <div style="background:linear-gradient(135deg,#00ff87,#00cc6a);border-radius:8px;padding:5px 14px;font-size:10px;font-weight:800;color:#000;letter-spacing:2px">📈 SWING TRADE</div>
-      <div style="font-size:10px;color:#00ff87">Daily TF · R:R Min 1:2 · Hold 3-14 hari</div>
-    </div>
-    ${swingList.map((r,i)=>renderCoinCard(r,"swing",i)).join("")}`;
-  }
+  // Sections
+  const sections=[
+    {list:swingList,  mode:'swing',  color:'#00ff87', icon:'📈', label:'SWING TRADE',  sub:'Daily · R:R≥1:2 · Hold 3-14 hari'},
+    {list:anomList,   mode:'anomaly',color:'#f5c518', icon:'⚠️', label:'ANOMALI',       sub:'Outperform BTC 2x+ · Inverse · Decorrelated'},
+    {list:scalpList,  mode:'scalp',  color:'#00ccff', icon:'⚡', label:'SCALP 15m',    sub:'15m TF · R:R≥1:2 · Hold menit-jam'},
+    {list:shortList,  mode:'short',  color:'#ff4560', icon:'▼',  label:'SHORT',         sub:'Setup bearish terkonfirmasi'},
+  ];
 
-  // ── SCALP TRADE SECTION ──
-  if(scalpList.length) {
-    html += `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;margin-top:20px">
-      <div style="background:linear-gradient(135deg,#00ccff,#0088cc);border-radius:8px;padding:5px 14px;font-size:10px;font-weight:800;color:#000;letter-spacing:2px">⚡ SCALP TRADE</div>
-      <div style="font-size:10px;color:#00ccff">15m TF · R:R Min 1:2 · Hold menit-jam</div>
+  sections.forEach(s=>{
+    if(!s.list.length)return;
+    const grad=s.mode==='short'?`linear-gradient(135deg,${s.color},${s.color}88)`:
+               s.mode==='swing'?'linear-gradient(135deg,#00ff87,#00cc6a)':
+               s.mode==='anomaly'?'linear-gradient(135deg,#f5c518,#ff8c00)':
+               `linear-gradient(135deg,${s.color},${s.color}88)`;
+    html+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:11px;margin-top:${s.mode==='swing'?'4':'20'}px">
+      <div style="background:${grad};border-radius:8px;padding:5px 14px;font-size:10px;font-weight:800;color:${s.mode==='short'?'#fff':'#000'};letter-spacing:2px">${s.icon} ${s.label}</div>
+      <div style="font-size:10px;color:${s.color}">${s.sub}</div>
     </div>
-    ${scalpList.map((r,i)=>renderCoinCard(r,"scalp",i)).join("")}`;
-  }
+    ${s.list.map((r,i)=>card(r,s.mode,i,s.color)).join('')}`;
+  });
 
-  // ── SHORT SECTION ──
-  if(shortList.length) {
-    html += `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;margin-top:20px">
-      <div style="background:linear-gradient(135deg,#ff4560,#cc2040);border-radius:8px;padding:5px 14px;font-size:10px;font-weight:800;color:#fff;letter-spacing:2px">▼ SHORT / BEARISH</div>
-      <div style="font-size:10px;color:#ff4560">Setup bearish terkonfirmasi</div>
+  // Watchlist
+  if(watchlist.length){
+    html+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;margin-top:20px">
+      <div style="background:rgba(245,197,24,.18);border:1px solid rgba(245,197,24,.4);border-radius:8px;padding:5px 14px;font-size:10px;font-weight:800;color:#f5c518;letter-spacing:2px">👁 WATCHLIST</div>
+      <div style="font-size:10px;color:#f5c518">Tunggu konfirmasi entry</div>
     </div>
-    ${shortList.map((r,i)=>renderCoinCard(r,"short",i)).join("")}`;
-  }
-
-  // ── WATCHLIST ──
-  if(watchlist.length) {
-    html += `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;margin-top:20px">
-      <div style="background:rgba(245,197,24,.2);border:1px solid rgba(245,197,24,.4);border-radius:8px;padding:5px 14px;font-size:10px;font-weight:800;color:#f5c518;letter-spacing:2px">👁 WATCHLIST</div>
-      <div style="font-size:10px;color:#f5c518">TAHAN — Tunggu konfirmasi</div>
-    </div>
-    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px">
-      ${watchlist.map(r=>`<div onclick="window.goAnalyze('${r.ticker}')" style="padding:8px 14px;background:rgba(245,197,24,.06);border:1px solid rgba(245,197,24,.2);border-radius:10px;cursor:pointer;transition:all .2s"
-        onmouseover="this.style.borderColor='rgba(245,197,24,.5)'" onmouseout="this.style.borderColor='rgba(245,197,24,.2)'">
-        <div style="font-size:12px;font-weight:700;color:#e8f0f8">${r.ticker}</div>
-        <div style="font-size:9px;color:${r.prob.probability>=60?"#f5c518":"#5a6a7a"};margin-top:2px">${r.prob.probability}% prob</div>
-        <div style="font-size:9px;color:#3d4a5a">${r.rsiD} RSI</div>
-      </div>`).join("")}
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px">
+    ${watchlist.map(r=>`<div onclick="window.goAnalyze('${r.ticker}')" style="padding:8px 14px;background:rgba(245,197,24,.04);border:1px solid rgba(245,197,24,.15);border-radius:10px;cursor:pointer;transition:all .2s"
+      onmouseover="this.style.borderColor='rgba(245,197,24,.4)'" onmouseout="this.style.borderColor='rgba(245,197,24,.15)'">
+      <div style="font-size:12px;font-weight:700;color:#e8f0f8">${r.ticker}</div>
+      <div style="font-size:9px;color:#f5c518;margin-top:1px">${r.prob.prob}% prob · ${r.prob.label}</div>
+      <div style="font-size:9px;color:#3d4a5a">${r.rsiD} RSI · ${fmt(r.price)}</div>
+      ${r.isAnomaly?`<div style="font-size:8px;color:#f5c518;margin-top:2px">${r.anomaly.anomalyType}</div>`:''}
+    </div>`).join('')}
     </div>`;
   }
-
-  container.innerHTML = html;
+  el.innerHTML=html;
 }
 
-function renderCoinCard(r, mode, rank) {
-  const isScalp = mode==="scalp";
-  const isShort = mode==="short";
-  const color   = isShort?"#ff4560":isScalp?"#00ccff":"#00ff87";
-  const bgColor = isShort?"rgba(255,69,96,.05)":isScalp?"rgba(0,204,255,.05)":"rgba(0,255,135,.05)";
-  const sig     = isScalp?(r.scalpSig||"—"):r.swingSig;
-  const sl      = isScalp?r.scalp?.slScalp:r.slSwing;
-  const tp1     = isScalp?r.scalp?.tp1Scalp:r.tp1;
-  const tp2     = isScalp?r.scalp?.tp2Scalp:r.tp2;
-  const rr      = isScalp?r.scalp?.rrScalp:r.rrSwing;
-  const rrColor = (rr||0)>=3?"#00ff87":(rr||0)>=2?"#00c96a":"#f5c518";
-  const prob    = r.prob;
-  const gradeColor = prob.grade==="A"?"#ffd700":prob.grade==="B"?"#00ff87":prob.grade==="C"?"#f5c518":"#ff4560";
+function card(r,mode,rank,color){
+  const isScalp=mode==='scalp',isAnomaly=mode==='anomaly',isShort=mode==='short';
+  const sl=isScalp?r.scalp?.sl:r.slSw;
+  const tp1=isScalp?r.scalp?.tp1:r.tp1;
+  const tp2=isScalp?r.scalp?.tp2:r.tp2;
+  const rr=isScalp?r.scalp?.rr:r.rrSw;
+  const sig=isScalp?(r.scalpSig||'—'):r.swigSig;
+  const P=r.prob;
+  const gc=P.grade==='A'?'#ffd700':P.grade==='B'?'#00ff87':P.grade==='C'?'#f5c518':'#ff4560';
+  const rrC=(rr||0)>=3?'#00ff87':(rr||0)>=2?'#00c96a':'#f5c518';
 
-  return `<div style="background:${bgColor};border:1px solid ${color}22;border-left:3px solid ${color};border-radius:12px;padding:14px 16px;margin-bottom:10px">
+  return `<div style="background:rgba(9,12,20,.92);border:1px solid ${color}22;border-left:3px solid ${color};border-radius:12px;padding:13px 15px;margin-bottom:10px">
 
-  <!-- Header -->
-  <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px;flex-wrap:wrap">
-    <span style="font-size:18px;font-weight:800;color:#e8f0f8">#${rank+1}</span>
-    <span style="font-size:16px;font-weight:800;color:${color}">${r.ticker}</span>
-    <span style="font-size:15px;font-weight:700;color:#e8f0f8;font-family:'IBM Plex Mono',monospace">${fmt(r.price)}</span>
-    <span style="font-size:11px;color:${r.ch24>=0?"#00ff87":"#ff4560"};font-weight:700">${r.ch24>=0?"+":""}${r.ch24.toFixed(2)}%</span>
-    <span style="padding:3px 9px;background:${color}18;border:1px solid ${color}40;border-radius:5px;font-size:9px;font-weight:700;color:${color};letter-spacing:1px">${isScalp?"⚡":"📈"} ${sig}</span>
-    <!-- Grade badge -->
-    <span style="padding:3px 10px;background:${gradeColor}18;border:1px solid ${gradeColor}40;border-radius:5px;font-size:10px;font-weight:800;color:${gradeColor};margin-left:auto">GRADE ${prob.grade}</span>
+  <!-- Header row -->
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;flex-wrap:wrap">
+    <span style="font-size:13px;color:#5a6a7a">#${rank+1}</span>
+    <span style="font-size:17px;font-weight:800;color:${color}">${r.ticker}</span>
+    <span style="font-size:14px;font-weight:700;color:#e8f0f8;font-family:'IBM Plex Mono',monospace">${fmt(r.price)}</span>
+    <span style="font-size:11px;font-weight:700;color:${r.ch24>=0?'#00ff87':'#ff4560'}">${r.ch24>=0?'+':''}${r.ch24.toFixed(2)}%</span>
+    ${r.anomaly?.ch48!=null?`<span style="font-size:10px;color:${r.anomaly.ch48>=0?'#00c96a':'#d93848'}">${r.anomaly.ch48>=0?'+':''}${r.anomaly.ch48?.toFixed(1)||''}% 48h</span>`:''}
+    <span style="padding:2px 8px;background:${color}18;border:1px solid ${color}40;border-radius:5px;font-size:9px;font-weight:700;color:${color}">${sig}</span>
+    ${r.isAnomaly?`<span style="padding:2px 8px;background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.3);border-radius:5px;font-size:9px;color:#f5c518">${r.anomaly.anomalyType}</span>`:''}
+    <span style="margin-left:auto;padding:2px 9px;background:${gc}18;border:1px solid ${gc}40;border-radius:5px;font-size:10px;font-weight:800;color:${gc}">GRADE ${P.grade}</span>
   </div>
 
-  <!-- Probability gauge -->
-  <div style="background:rgba(255,255,255,.03);border-radius:9px;padding:11px 14px;margin-bottom:10px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-      <div style="font-size:9px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase">Probabilitas Win</div>
+  <!-- Probability -->
+  <div style="background:rgba(255,255,255,.03);border-radius:8px;padding:9px 12px;margin-bottom:9px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+      <span style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase">Probabilitas Win</span>
       <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:11px;color:#4b5d6e">${prob.bullSignals}B · ${prob.bearSignals}R</span>
-        <span style="font-size:16px;font-weight:800;color:${gradeColor};font-family:'IBM Plex Mono',monospace">${prob.probability}%</span>
+        <span style="font-size:9px;color:#4b5d6e">${P.bull}B·${P.bear}R·${P.signals.length}sig</span>
+        <span style="font-size:15px;font-weight:800;color:${gc};font-family:'IBM Plex Mono',monospace">${P.prob}%</span>
       </div>
     </div>
-    <div style="height:6px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden">
-      <div style="height:100%;width:${prob.probability}%;background:linear-gradient(90deg,${gradeColor}88,${gradeColor});border-radius:4px;transition:width .6s"></div>
+    <div style="height:5px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden">
+      <div style="height:100%;width:${P.prob}%;background:linear-gradient(90deg,${gc}88,${gc});border-radius:3px;transition:width .6s"></div>
     </div>
-    <div style="display:flex;justify-content:space-between;margin-top:5px">
-      <span style="font-size:9px;color:var(--dmr)">0% bearish</span>
-      <span style="font-size:9px;color:${gradeColor}">${prob.interpretation}</span>
-      <span style="font-size:9px;color:var(--dmr)">100% bullish</span>
-    </div>
-  </div>
-
-  <!-- TA + Market Microstructure grid -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-
-    <!-- TA Indicators -->
-    <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:9px;padding:10px 12px">
-      <div style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">📊 Teknikal</div>
-      ${[
-        {l:"RSI Daily",  v:r.rsiD,  c:r.rsiD>70?"#ff4560":r.rsiD<35?"#00ff87":"#f5c518"},
-        {l:"StochRSI",   v:r.stK||"—", c:r.stK&&r.stK<25?"#00ff87":r.stK&&r.stK>75?"#ff4560":"#c4ccd6"},
-        {l:"MACD",       v:r.macdDir, c:r.macdDir==="▲"?"#00ff87":"#ff4560"},
-        {l:"MA200",      v:r.aboveM200===true?"Atas":r.aboveM200===false?"Bawah":"—", c:r.aboveM200===true?"#00ff87":r.aboveM200===false?"#ff4560":"#f5c518"},
-        {l:"EMA Cross",  v:r.goldenX===true?"Golden ✓":r.goldenX===false?"Death ✗":"—", c:r.goldenX===true?"#00ff87":r.goldenX===false?"#ff4560":"#5a6a7a"},
-        {l:"Bollinger",  v:r.bbState, c:r.bbState==="OS"?"#00ff87":r.bbState==="OB"?"#ff4560":"#5a6a7a"},
-      ].map(x=>`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.03)"><span style="font-size:10px;color:#3d4a5a">${x.l}</span><span style="font-size:10px;font-weight:700;color:${x.c}">${x.v}</span></div>`).join("")}
-    </div>
-
-    <!-- Market Microstructure -->
-    <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:9px;padding:10px 12px">
-      <div style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">🐋 Market Structure</div>
-      ${[
-        {l:"Funding Rate", v:r.fundingLabel},
-        {l:"Open Interest",v:r.oiLabel},
-        {l:"Long/Short",   v:r.lsLabel},
-        {l:"Taker Volume", v:r.takerLabel},
-        {l:"Whale Signal", v:r.whaleSignal},
-        {l:"ATR Volatil.", v:r.atrPct+"%", c:"#5a6a7a"},
-      ].map(x=>`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.03);gap:6px"><span style="font-size:10px;color:#3d4a5a;flex-shrink:0">${x.l}</span><span style="font-size:9px;text-align:right;color:${x.c||"#8a9aaa"};line-height:1.3">${x.v}</span></div>`).join("")}
+    <div style="display:flex;justify-content:space-between;margin-top:4px">
+      <span style="font-size:8px;color:var(--dmr)">0% Bearish</span>
+      <span style="font-size:9px;color:${gc}">${P.label}</span>
+      <span style="font-size:8px;color:var(--dmr)">100% Bullish</span>
     </div>
   </div>
 
-  ${isScalp ? `
-  <!-- Scalp specific -->
-  <div style="background:rgba(0,204,255,.04);border:1px solid rgba(0,204,255,.15);border-radius:9px;padding:10px 12px;margin-bottom:10px">
-    <div style="font-size:8px;color:#00ccff;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">⚡ Scalp 15m Data</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center">
-      ${[
-        {l:"EMA 8/21/55",v:r.scalp?.emaAligned||"—",c:"#c4ccd6"},
-        {l:"RSI 15m",    v:r.scalp?.rsi15||"—",    c:r.scalp?.rsi15>70?"#ff4560":r.scalp?.rsi15<30?"#00ff87":"#f5c518"},
-        {l:"MACD 15m",  v:r.scalp?.macd15||"—",    c:r.scalp?.macd15==="▲"?"#00ff87":"#ff4560"},
-        {l:"Vol Surge", v:r.scalp?.volSurge+"x"||"—", c:r.scalp?.volSurge>2?"#00ff87":"#5a6a7a"},
-      ].map(x=>`<div><div style="font-size:8px;color:var(--dmr);margin-bottom:2px">${x.l}</div><div style="font-size:10px;font-weight:700;color:${x.c||"#c4ccd6"}">${x.v}</div></div>`).join("")}
-    </div>
-  </div>` : ""}
-
-  <!-- SL/TP Levels -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px">
-    <div style="background:rgba(255,69,96,.07);border:1px solid rgba(255,69,96,.2);border-radius:7px;padding:7px;text-align:center">
-      <div style="font-size:8px;color:#7a2030;margin-bottom:2px;text-transform:uppercase">Stop Loss</div>
-      <div style="font-size:11px;font-weight:700;color:#ff4560;font-family:'IBM Plex Mono',monospace">${fmt(sl)}</div>
-    </div>
-    <div style="background:rgba(0,255,135,.06);border:1px solid rgba(0,255,135,.2);border-radius:7px;padding:7px;text-align:center">
-      <div style="font-size:8px;color:#1e4a2a;margin-bottom:2px;text-transform:uppercase">TP1 (1:2)</div>
-      <div style="font-size:11px;font-weight:700;color:#00ff87;font-family:'IBM Plex Mono',monospace">${fmt(tp1)}</div>
-    </div>
-    <div style="background:rgba(0,255,135,.04);border:1px solid rgba(0,255,135,.12);border-radius:7px;padding:7px;text-align:center">
-      <div style="font-size:8px;color:#1a3d24;margin-bottom:2px;text-transform:uppercase">TP2 (1:3)</div>
-      <div style="font-size:11px;font-weight:700;color:#00c96a;font-family:'IBM Plex Mono',monospace">${fmt(tp2)}</div>
-    </div>
-    <div style="background:rgba(245,197,24,.05);border:1px solid rgba(245,197,24,.15);border-radius:7px;padding:7px;text-align:center">
-      <div style="font-size:8px;color:#4a3d10;margin-bottom:2px;text-transform:uppercase">R:R Ratio</div>
-      <div style="font-size:11px;font-weight:700;color:${rrColor};font-family:'IBM Plex Mono',monospace">1:${(rr||0).toFixed(2)}</div>
-    </div>
-  </div>
-
-  <!-- Signal breakdown top 5 -->
-  <div style="background:rgba(255,255,255,.02);border-radius:8px;padding:9px 11px;margin-bottom:10px">
-    <div style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase;margin-bottom:7px">Top Sinyal Konfluensi</div>
+  <!-- Anomaly flags if any -->
+  ${r.isAnomaly&&r.anomaly?.flags?.length?`
+  <div style="background:rgba(245,197,24,.04);border:1px solid rgba(245,197,24,.15);border-radius:8px;padding:8px 11px;margin-bottom:9px">
+    <div style="font-size:8px;color:#f5c518;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">⚠️ Anomali Signals</div>
     <div style="display:flex;gap:5px;flex-wrap:wrap">
-      ${prob.signals.sort((a,b)=>(b.prob>55?b.w:-b.w)-(a.prob>55?a.w:-a.w)).slice(0,8).map(s=>`
-        <span style="padding:3px 8px;background:${s.prob>55?"rgba(0,255,135,.08)":"rgba(255,69,96,.08)"};border:1px solid ${s.prob>55?"rgba(0,255,135,.2)":"rgba(255,69,96,.2)"};border-radius:10px;font-size:9px;color:${s.prob>55?"#00ff87":"#ff4560"}">
-          ${s.name} ${s.prob}%
-        </span>`).join("")}
+      ${r.anomaly.flags.map(f=>`<span style="padding:2px 7px;background:rgba(245,197,24,.08);border:1px solid rgba(245,197,24,.22);border-radius:7px;font-size:9px;color:#f5c518">${f.label}</span>`).join('')}
+    </div>
+    <div style="margin-top:6px;font-size:9px;color:#6a5010">Score anomali: ${r.anomaly.anomalyScore}/30</div>
+  </div>`:''}
+
+  <!-- TA + Micro grid -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px">
+    <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:8px;padding:9px 11px">
+      <div style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase;margin-bottom:7px">📊 Teknikal</div>
+      ${[
+        {l:'RSI',   v:r.rsiD,   c:r.rsiD>70?'#ff4560':r.rsiD<35?'#00ff87':'#f5c518'},
+        {l:'MACD',  v:r.macd,   c:r.macd==='▲'?'#00ff87':'#ff4560'},
+        {l:'MA200', v:r.abM200===true?'Atas':r.abM200===false?'Bawah':'—', c:r.abM200===true?'#00ff87':r.abM200===false?'#ff4560':'#f5c518'},
+        {l:'EMA X', v:r.gx===true?'Golden✓':r.gx===false?'Death✗':'—', c:r.gx===true?'#00ff87':r.gx===false?'#ff4560':'#5a6a7a'},
+        {l:'BB',    v:r.bbS,    c:r.bbS==='OS'?'#00ff87':r.bbS==='OB'?'#ff4560':'#5a6a7a'},
+        {l:'Vol',   v:r.vRatio?(r.vRatio>1.5?'Surge '+r.vRatio.toFixed(1)+'x':'Normal'):'—', c:r.vRatio>1.5?'#00ff87':'#5a6a7a'},
+      ].map(x=>`<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.03)">
+        <span style="font-size:10px;color:#3d4a5a">${x.l}</span>
+        <span style="font-size:10px;font-weight:700;color:${x.c||'#c4ccd6'}">${x.v}</span>
+      </div>`).join('')}
+    </div>
+    <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:8px;padding:9px 11px">
+      <div style="font-size:8px;color:var(--dmr);letter-spacing:2px;text-transform:uppercase;margin-bottom:7px">🐋 Market Structure</div>
+      ${[
+        {l:'Funding',v:r.micro?.fLbl||'—'},
+        {l:'OI',     v:r.micro?.oLbl||'—'},
+        {l:'L/S',    v:r.micro?.lLbl||'—'},
+        {l:'Taker',  v:r.micro?.tLbl||'—'},
+        {l:'Whale',  v:r.micro?.whaleLbl||'—'},
+        {l:'ATR',    v:r.atrP+'%',c:'#5a6a7a'},
+      ].map(x=>`<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.03);gap:4px">
+        <span style="font-size:10px;color:#3d4a5a;flex-shrink:0">${x.l}</span>
+        <span style="font-size:9px;color:${x.c||'#8a9aaa'};text-align:right;line-height:1.3">${x.v}</span>
+      </div>`).join('')}
     </div>
   </div>
 
-  <!-- Action buttons -->
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px">
-    <button onclick="window.goAnalyze('${r.ticker}')" style="padding:9px;background:rgba(0,255,135,.08);border:1px solid rgba(0,255,135,.25);border-radius:8px;color:#00ff87;font-size:9px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'IBM Plex Mono',monospace"
-      onmouseover="this.style.background='rgba(0,255,135,.18)'" onmouseout="this.style.background='rgba(0,255,135,.08)'">📊 DETAIL</button>
-    <button onclick="window.quickSave('${r.ticker}','${sig}',${r.price},${sl||0},${tp1||0},${tp2||0},${r.tp3||0},${prob.probability})" style="padding:9px;background:rgba(0,204,255,.08);border:1px solid rgba(0,204,255,.25);border-radius:8px;color:#00ccff;font-size:9px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'IBM Plex Mono',monospace"
-      onmouseover="this.style.background='rgba(0,204,255,.18)'" onmouseout="this.style.background='rgba(0,204,255,.08)'">＋ TRACKER</button>
-    <button onclick="window.quickTradeOpen('${r.ticker}','${sig}',${r.price},${sl||0},${tp1||0},${tp2||0},${r.tp3||0})" style="padding:9px;background:rgba(245,197,24,.08);border:1px solid rgba(245,197,24,.25);border-radius:8px;color:#f5c518;font-size:9px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'IBM Plex Mono',monospace"
-      onmouseover="this.style.background='rgba(245,197,24,.18)'" onmouseout="this.style.background='rgba(245,197,24,.08)'">⚡ BYBIT</button>
+  <!-- Scalp data -->
+  ${isScalp&&r.scalp?`<div style="background:rgba(0,204,255,.04);border:1px solid rgba(0,204,255,.15);border-radius:8px;padding:8px 11px;margin-bottom:9px">
+    <div style="font-size:8px;color:#00ccff;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">⚡ Scalp 15m</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;text-align:center">
+      ${[{l:'EMA',v:r.scalp.ema},{l:'RSI',v:r.scalp.rsi15,c:r.scalp.rsi15>70?'#ff4560':r.scalp.rsi15<30?'#00ff87':'#f5c518'},{l:'MACD',v:r.scalp.macd,c:r.scalp.macd==='▲'?'#00ff87':'#ff4560'},{l:'Vol',v:r.scalp.vSurge+'x',c:+r.scalp.vSurge>2?'#00ff87':'#5a6a7a'}]
+        .map(x=>`<div><div style="font-size:8px;color:var(--dmr);margin-bottom:2px">${x.l}</div><div style="font-size:10px;font-weight:700;color:${x.c||'#c4ccd6'}">${x.v}</div></div>`).join('')}
+    </div>
+  </div>`:''}
+
+  <!-- SL/TP -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:9px">
+    ${[
+      {l:'SL',     v:fmt(sl),   c:'#ff4560', bg:'rgba(255,69,96,.07)',   bd:'rgba(255,69,96,.2)'},
+      {l:'TP1 1:2',v:fmt(tp1),  c:'#00ff87', bg:'rgba(0,255,135,.06)',   bd:'rgba(0,255,135,.2)'},
+      {l:'TP2 1:3',v:fmt(tp2),  c:'#00c96a', bg:'rgba(0,255,135,.03)',   bd:'rgba(0,255,135,.1)'},
+      {l:'R:R',    v:`1:${(rr||0).toFixed(2)}`,c:rrC,bg:'rgba(245,197,24,.05)',bd:'rgba(245,197,24,.15)'},
+    ].map(x=>`<div style="background:${x.bg};border:1px solid ${x.bd};border-radius:7px;padding:6px;text-align:center">
+      <div style="font-size:8px;color:${x.c}55;margin-bottom:2px">${x.l}</div>
+      <div style="font-size:10px;font-weight:700;color:${x.c};font-family:'IBM Plex Mono',monospace">${x.v}</div>
+    </div>`).join('')}
+  </div>
+
+  <!-- Top signals -->
+  <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:9px">
+    ${P.signals.sort((a,b)=>(b.p>55?b.w:-b.w)-(a.p>55?a.w:-a.w)).slice(0,7).map(s=>`
+      <span style="padding:2px 6px;background:${s.p>55?'rgba(0,255,135,.06)':'rgba(255,69,96,.06)'};border:1px solid ${s.p>55?'rgba(0,255,135,.16)':'rgba(255,69,96,.16)'};border-radius:7px;font-size:8px;color:${s.p>55?'#00c96a':'#ff4560'}">${s.n} ${s.p}%</span>`).join('')}
+  </div>
+
+  <!-- Actions -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+    <button onclick="window.goAnalyze('${r.ticker}')" style="padding:8px;background:rgba(0,255,135,.07);border:1px solid rgba(0,255,135,.22);border-radius:8px;color:#00ff87;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace"
+      onmouseover="this.style.background='rgba(0,255,135,.16)'" onmouseout="this.style.background='rgba(0,255,135,.07)'">📊 DETAIL</button>
+    <button onclick="window.quickSave('${r.ticker}','${sig}',${r.price},${sl||0},${tp1||0},${tp2||0},${r.tp3||0},${P.prob})" style="padding:8px;background:rgba(0,204,255,.07);border:1px solid rgba(0,204,255,.22);border-radius:8px;color:#00ccff;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace"
+      onmouseover="this.style.background='rgba(0,204,255,.16)'" onmouseout="this.style.background='rgba(0,204,255,.07)'">＋ TRACKER</button>
+    <button onclick="window.quickTradeOpen('${r.ticker}','${sig}',${r.price},${sl||0},${tp1||0},${tp2||0},${r.tp3||0})" style="padding:8px;background:rgba(245,197,24,.07);border:1px solid rgba(245,197,24,.22);border-radius:8px;color:#f5c518;font-size:9px;font-weight:700;cursor:pointer;font-family:'IBM Plex Mono',monospace"
+      onmouseover="this.style.background='rgba(245,197,24,.16)'" onmouseout="this.style.background='rgba(245,197,24,.07)'">⚡ BYBIT</button>
   </div>
 </div>`;
 }
